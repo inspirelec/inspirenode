@@ -1,0 +1,36 @@
+{
+  "name": "inspirenode",
+  "version": "1.1.0",
+  "description": "inspirenode",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified! Configure in package.json\" && exit 1",
+    "postinstall": "npm install sqlite3 i2c"
+  },
+  "repository": "https://github.com/petitraoul/inspirenode_server.git",
+  "keywords": [
+    "node.js",
+    "eclipse",
+    "nodeclipse"
+  ],
+  "author": "",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "async": "1.5.2",
+    "events": "^1.1.0",
+    "fs": "0.0.2",
+    "http": "0.0.0",
+    "mime": "^1.3.4",
+    "moment": "^2.17.1",
+    "object-assign": "^4.1.1",
+    "path": "0.12.7",
+    "phonegap": "^7.1.1",
+    "querystring": "^0.2.0",
+    "request": "^2.67.0",
+    "sonos": "^0.11.1",
+    "sqlite3": "^3.1.8",
+    "url": "0.11.0",
+    "xml2js": "0.4.17"
+  }
+}
