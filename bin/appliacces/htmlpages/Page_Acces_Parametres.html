@@ -1,0 +1,84 @@
+	<div id="Acces_Parametres_Page" data-role="page" data-theme="c">
+	
+		<div id ="entete" data-role="header" data-theme="c" data-position="fixed">
+			<h1 id="titre"></h1>
+			<a href="#" style="margin-top:10px" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-icon-back ui-btn-icon-left ui-btn-icon-notext">Back</a>
+			<a href="#Acces_Info_Page" data-transition="slide" class="ui-btn-right ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-info ui-btn-icon-notext" >Button</a>
+		</div>
+		<div data-role="content" data-theme="c" style="padding:0px 0px;margin:0px 0px">
+
+			
+			<div id="params" style="margin:10px" >
+				<h3>General</h3>
+				<div id="params_general" class="sans_scroll">
+					<div style="display: inline-flex;">	
+					  	<p>Email expediteur pour envoi infos de commande</p>
+					    <div style="width: 400px;margin-right: 10px;margin-left: 10px;">
+					     	<input type="email" name="emailexped" id="params_emailexped" class="custom" style="background-color:white">
+					    </div> 
+					</div>
+					<div style="display: block;"></div>
+					<div style="display: inline-flex;">	
+					  	<p>Email destinataire pour retour infos de commande </p>
+					    <div style="width: 400px;margin-right: 10px;margin-left: 10px;">
+					     	<input type="email" name="emaildesticde" id="params_emaildesticde" class="custom" style="background-color:white">
+					    </div> 
+					</div>
+					<div style="display: block;"></div>
+				    <div style="display: inline-flex;">	
+					  	<p>Temps maxi pour validation paiement sur Tipi </p>
+					    <div style="width: 100px;margin-right: 10px;margin-left: 10px;">
+					     	<input type="number" step="1" min="0" name="tpsmaxtipivld" id="params_tpsmaxtipivld" class="custom" style="background-color:white">
+					    </div> 
+					    <p> minutes</p>
+					</div>
+					<div style="display: block;"></div>
+					<div style="display: inline-flex;">	
+					  	<p>Numero client Tipi </p>
+					    <div style="width: 200px;margin-right: 10px;margin-left: 10px;">
+					     	<input type="text" name="numclienttipi" id="params_numclienttipi" class="custom" style="background-color:white">
+					    </div> 
+					</div>
+					<div style="display: block;"></div>
+					<div style="display: inline-flex;">
+						<p>Horaires affiches de </p>
+						<div style="width: 100px;margin-right: 10px;margin-left: 10px;">
+						    <input type="time" name="params_calendar_heure_deb" id="params_calendar_heure_deb" class="custom" style="background-color:white">
+						</div>
+						<p>a</p> 
+						<div style="width: 100px;margin-left: 10px;margin-right: 10px;">
+						    <input type="time" name="params_calendar_heure_fin" id="params_calendar_heure_fin" class="custom" style="background-color:white">
+					    </div>
+					</div>
+				</div>
+				
+			</div>
+			<div style="margin:20px">
+				<button id="validparams" type="submit" onclick="sendparametres();return false;">Enregistrer</a>
+				<button id="annuleparams" type="submit" onclick="refreshinfosparams(true);return false;">Annuler</a>
+			
+			</div>
+	    </div>		
+		<div  id ="pied"  data-role="footer" data-theme="c" data-position="fixed" >
+			<div data-role="navbar">
+				<ul id="accueilmenulist1" class="accueilmenulist1" style="display: none;">
+					<li><a href="#" id="button1" data-transition="slide" class="button1 ui-btn-active ui-state-persist"></a></li>
+				</ul>
+				<ul id="accueilmenulist2" class="accueilmenulist2" style="display: none;">
+					<li><a href="#" id="button1" data-transition="slide" class="button1 ui-btn-active ui-state-persist"></a></li>
+					<li><a href="#" id="button2" data-transition="slide" class="button2" data-prefetch="true"></a></li>
+				</ul>
+				<ul id="accueilmenulist3" class="accueilmenulist3" style="display: none;" >
+					<li><a href="#" id="button1" data-transition="slide" class="button1 ui-btn-active ui-state-persist"></a></li>
+					<li><a href="#" id="button2" data-transition="slide" class="button2" data-prefetch="true"></a></li>
+					<li><a href="#" id="button3" data-transition="slide" class="button3" data-prefetch="true"></a></li>
+				</ul>
+				<ul id="accueilmenulist4" class="accueilmenulist4" style="display: none;">
+					<li><a href="#" id="button1" data-transition="slide" class="button1"></a></li>
+					<li><a href="#tagListPage" id="button2" class="button2" data-transition="slide" data-prefetch="true"></a></li>
+					<li><a href="#progmodepage" id="button3" class="button3  ui-btn-active ui-state-persist" data-transition="slide" data-prefetch="true"></a></li>
+					<li><a href="#" id="button4" class="button4" data-transition="slide" data-prefetch="true"></a></li>
+				</ul>
+			</div>
+		</div>
+	</div>

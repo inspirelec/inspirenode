@@ -1,0 +1,245 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/library/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="../majcore/my-globaldata.html">
+<dom-module id="my-combo_select2">
+
+  <template>
+		<style>
+			:host{
+				display:block;
+			}
+  		</style>
+
+	  		<my-globaldata id="globaldata"></my-globaldata>
+
+  			 <div style="display:flex">
+  			  <paper-dropdown-menu hidden$="{{affichevaadin}}" style="width:100%"  id="[[id]]" label="[[label]]" >
+				  <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{value_sel}}">
+					  <template is="dom-repeat" items="{{liste}}">
+					    <paper-item value="[[item.id]]">[[item.nom]][[item.facture_num]]
+					     </paper-item>
+					  </template>
+				  </paper-listbox>
+			  </paper-dropdown-menu>
+			  
+				<div hidden$="{{affichecombostd}}" style="width:100%">
+					<vaadin-combo-box 
+					        style="width:100%"  id="vaadin_sel"
+					        label="[[label]]"  item-label-path="fullname" item-value-path="id"
+							items="[[fullname_liste]]" 
+							filter="{{filter}}"
+							on-filterchanged="_vaadfilterChanged"
+							loading="[[loading]]"
+							value="{{value_sel2}}">
+					</vaadin-combo-box>
+				</div>
+			<paper-icon-button hidden$="[[hiderefresh]]" style="right:35px" suffix on-tap="_refreshtable" icon="cached" alt="Rafraichir la liste" title="Rafraichir la liste">
+			</div>
+			  	<iron-ajax
+					id="charge"
+				    method="GET"
+				    url="{{charge_url}}"
+				    headers="{{app.header_auth}}"
+				    params="{{params_get}}"
+				    handle-as="json"
+				    on-error="_disconnect"
+		    		on-response="_charge_validate"
+				    last-response="{{liste}}"
+				    debounce-duration="300">
+				</iron-ajax>
+	  		
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-combo_select2',
+	  
+	  properties: {  
+		     app: {
+		          type: Object
+		        },  
+		     table:{type:String
+		        	,notify:true
+		        },
+		  	 params_get:{type: Object,
+		   	 	  notify : true,
+		   	 	  value: {type:'get',action:'list__'}
+		        },
+		     limit:{type:Number,notify:true,value:-1},
+		   	 liste: {type:Array, 
+		   		    notify : true },	
+	   		 filter:{type: Object,
+		   	 	  notify : true
+		   	 },
+		   	 fullname_liste:{type:Array,notify:true,computed:'_getliste_fullname(liste,fullnamefields)'},
+		   	 charge_url: {type:String, 
+		   		    notify : true,
+		   		  	value:null },	
+		   	 hiderefresh:{type:Boolean,
+		   		  			notify:true,
+		   		  			value:false  },
+	   	     dropdown_selobj:{type:Object,
+		    	 	notify:true,
+		    	 	computed:'_dropdown_selobj(value_sel,liste)'
+		     },
+		     searchstyle:{type:Boolean,notify:true},
+		     queryfields:{type:String,
+		    	            notify:true,value:null
+		     },
+		     fullnamefields:{type:String,
+ 	            notify:true,
+ 	            value:'nom'
+  			 },
+		     affichevaadin:{type:Boolean,
+		    	 notify:true,
+		    	 computed:'_affichevaading(queryfields)'
+		     },
+		     affichecombostd:{type:Boolean,
+		    	 notify:true,
+		    	 computed:'_affichecombostd(queryfields)'
+		     },
+		     where:{type:Array,notify:true,value:[]},
+		     charge_table:{type:Boolean,
+		    	notify:true,
+		    	value:false},
+		   	 value_sel: {type:String, 
+		   		    notify : true},
+			 value_sel2: {type:String, 
+			   		    notify : true}
+	  },
+	  ready:function(){
+	        this.app = document.querySelector('#app');
+
+		    this.$.vaadin_sel._superfilterChanged=this.$.vaadin_sel._filterChanged;
+		    this.$.vaadin_sel._filterChanged=this._filterChanged;
+	  },
+	  
+	  observers:[
+		  '_charge(table,charge_table,where,limit)',
+		  '_valuevaadinchange(value_sel2)'  ,
+		  '_limitchange(limit,params_get)' 
+		  ],
+	  _valuevaadinchange(value_sel2){
+		 this.set('value_sel',value_sel2);
+	  },
+	  _limitchange:function(limit,params_get){
+		  if (limit>=0) {
+			  params_get.limit=" "+limit;
+		  } else {
+			  delete(params_get.limit);
+		  }
+		 
+	  },
+	  _affichevaading(queryfields){
+		  if (queryfields) {
+			  return true;
+		  } else {
+			  return false;
+		  }
+	  }  ,
+	  _affichecombostd(queryfields){
+		  if (!queryfields) {
+			  return true;
+		  } else {
+			  return false;
+		  }
+	  }  ,
+       _charge(table,charge_table,where,limit){
+		  if(charge_table) {
+		      var last_charge=this.$.globaldata.get('select_charge_'+this.table);
+		      if (!last_charge || last_charge.where+'' != where+'') {
+
+                  this.set('show_loading',1);
+                  this.app = document.querySelector('#app');
+                  if (this.app && !this.app.listcombo) {
+                      this.app.listcombo={};
+                  }
+                  /*if (limit==-1 &&  this.app.listcombo['list'+table]){
+                      this.set('liste',this.app.listcombo['list'+table]);
+                  } else {*/
+                      this.set('params_get',{type:'get',action:'list'+table});
+
+                    /*  for (var w in where){
+                          this.set('params_get.'+where[w].column,where[w].value);
+                      }*/
+                      if (limit>=0) {
+                          this.set('params_get.limit'," "+limit);
+                      }
+                  this.$.globaldata.set('select_charge_'+this.table,{table:table,where:where});
+
+                  this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
+                      this.$.charge.generateRequest();
+                 /* }*/
+              } else {
+                  this.set('liste',this.$.globaldata.get(this.table));
+              }
+		  }
+   
+	  },
+	  _refreshtable:function(){
+		  this.set('show_loading',1);
+    	  this.app = document.querySelector('#app');
+    	  this.set('params_get.action','list'+this.table);
+	      this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
+	      this.$.charge.generateRequest();
+	  },
+	  _charge_validate:function(){
+		  this.set('show_loading',0);
+		  this.set(this.charge_url,undefined);
+		 /* if (this.limit==-1) {
+			  this.app.listcombo['list'+this.table]=this.liste;  
+		  }*/
+          this.$.globaldata.set(this.table,this.liste);
+		  this.refresh_busy=false;
+	  },
+      _dropdown_selobj:function(value_sel,liste_objets){
+    	  for (var e in liste_objets){
+    		  if (liste_objets[e] && liste_objets[e].id==value_sel){
+    			  return liste_objets[e];
+    		  }
+    	  }
+    	  return null;
+      },
+      _getliste_fullname:function(liste,fullnamefields){
+    	  var res=[];
+    	  var fields=fullnamefields.split(";");
+    	  for (var e in liste){
+    		  var ele=liste[e];
+    		  if (ele){
+        		  ele.fullname="";
+        		  for (var f in fields){
+        			  ele.fullname=ele.fullname+' '+ele[fields[f]]
+        		  }
+        		  res.push(ele);
+    		  }
+
+    	  }
+    	  return res;
+    	  
+      },
+	  _vaadfilterChanged:function(e,filter){
+		  console.log(filter);
+		    this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
+		    
+    	  this.set('params_get.queryfields',this.queryfields);
+    	  this.set('params_get.query',filter);
+    	  this.$.charge.generateRequest(); 
+	  },
+      _filterChanged: function(filter) {
+    	  //this._superfilterChanged(filter);
+    	  this.fire('filterchanged',filter);
+        },
+  });
+  
+  </script>
+
+</dom-module>
+		

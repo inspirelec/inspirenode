@@ -1,0 +1,162 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../element/my-profilsexe.html">
+
+<dom-module id="my-liste_sexes">
+
+  <template>
+		<style >
+		 .add-button{
+		 	/*position:fixed;
+		 	bottom:50px;
+		 	left:50px;*/
+		 	float:right;
+		 	--paper-fab-background: var(--paper-blue-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-blue-900);
+		 }
+		 .item-title {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color: rgba(50, 170, 25, 0.5);
+          color: white;
+          font-weight: 400;
+          padding: 16px;
+        }
+        .card {
+        	display :block;
+            
+            padding:5px;
+            padding-bottom: 20px;
+          	max-width: 500px;
+          	margin-right: auto;
+          	margin-left: auto;
+          	position: relative;
+            background-color: white;
+        	color: var(--paper-blue-800);
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	        
+	     }
+	     .cardprinc{
+		 	padding-top:60px;
+		 	margin-top: 40px;
+		 	position: relative;
+		 }
+  		</style>
+
+			  <paper-dropdown-menu style="width:100%" hidden$="[[dropdowntype]]"  id="[[id]]" label="[[label]]" value="{{value_sel}}" >
+				  <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{value_sel}}">
+				  <template is="dom-repeat" items="{{sexes_Response}}">
+				    <paper-item value="[[item.nom]]">[[item.nom]]</paper-item>
+				  </template>
+				  </paper-listbox>
+			  </paper-dropdown-menu>
+		<div class="card cardprinc" hidden$="[[!dropdowntype]]">
+		  	<iron-ajax
+				id="charge_allsexes"
+			    method="GET"
+			    url="{{charge_allsexes_url}}"
+			    headers="{{app.header_auth}}"
+			    params="{{params_allsexes}}"
+			    handle-as="json"
+			    on-error="_disconnect"
+			    last-response="{{sexes_Response}}"
+			    debounce-duration="300">
+			</iron-ajax>
+				<div class="item-title" >Sexes</div>
+		    <template is="dom-repeat" items="{{sexes_Response}}">
+					<my-profilsexe objet="{{item}}" editbuttonhide="{{editbuttonhide}}"></my-profilsexe>
+			</template>
+			<paper-fab class="add-button" hidden$="[[editbuttonhide]]" mini icon="add" title="Cr�er" on-tap="add"></paper-fab>
+		</div>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_sexes',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    
+  		 params_allsexes:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {type:'get',action:'listsexe'}},
+	   	 charge_allsexes_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+	     editbuttonhide:{type:Boolean,
+	    	 	notify : true,
+	    	 	value:false },	     
+		 selsexe:{type:Number,
+	    	 	notify : true,
+	    	 	value :-1},
+	     sexes_Response:{type: Object,
+	    	 notify : true
+	     },
+	     dropdowntype:{type: Boolean,
+	    	 notify : true,
+	    	 value:false
+	     },
+	     value_sel:{type: String,
+	    	 notify : true
+	     }
+	  },
+	  listeners: {
+          'reply_sexe': 'handleReply',
+        },
+	  ready:function(){
+	        this.app = document.querySelector('#app');
+	        /*this.set('params_allsexes.titulaire_id',seltitulaire);*/
+	    	this.charge_allsexes_url=this.app.url_api+':'+this.app.port_api+'/index'
+	    	this.$.charge_allsexes.generateRequest();  
+	  },
+      refreshdata(){
+		  this.$.charge_allsexes.generateRequest();  
+	  } ,         
+	  add : function(){
+		  if (!this.sexes_Response) {
+			  this.set('sexes_Response',[]);
+		  }
+		 this.push('sexes_Response', {newobjet:true,id:-1});
+		 this.set('seltitulaire',-1);
+		 this.set('editmode',true);
+		 this.set('editbuttonhide',true);
+	  },
+	  handleReply:function(e,detail){
+		  if (detail.id==-1) {
+			  this.splice('sexes_Response', this.sexes_Response.indexOf(detail), 1);
+		  }
+		  
+	  },
+	  _titulairechange:function(seltitulaire,titulaire){
+		  /*if(seltitulaire==titulaire.id){*/
+		        this.app = document.querySelector('#app');
+		        /*this.set('params_allsexes.titulaire_id',seltitulaire);*/
+		    	this.charge_allsexes_url=this.app.url_api+':'+this.app.port_api+'/index'
+		    	this.$.charge_allsexes.generateRequest();
+		  /*}*/
+	  },
+
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+
+  })
+  </script>
+
+</dom-module>

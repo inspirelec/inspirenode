@@ -1,0 +1,34 @@
+@CHARSET "ISO-8859-1";
+
+label
+{
+	display: inline;
+	width: 150px;
+}
+
+.content-primary {
+
+		  position: fixed;
+		  height: 100%;
+		  width: 20%;
+		  min-width: 120px;
+		  left: 0;
+		  top: 23px;
+		  overflow: auto;
+		  z-index: 100;
+		  margin-bottom: -63px;
+		  float: left;
+			margin-right: 1%;
+			padding-right: 1%;
+		/*width: 20%;
+		
+		margin-top: 30px;*/
+	}
+	
+.content-secondary {
+	text-align: left;	
+	width: 75%;
+	float: left;
+	padding-left: 20%;
+	background: none;
+}

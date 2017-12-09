@@ -1,0 +1,188 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../majcore/my-majliste_behavior.html">
+<link rel="import" href="../element/my-searchbox.html">
+<link rel="import" href="/library/bower_components/app-layout/app-grid/app-grid-style.html">
+
+<dom-module id="my-liste_behavior">
+
+  <template >
+		<style include="app-grid-style">
+		
+		 :host{
+		 	
+		 	
+		 	
+		 /*display:flex;*/
+			display: block;
+          --app-grid-columns: 1;
+          --app-grid-gutter: 10px;
+          --app-grid-expandible-item-columns: 2;
+          --paper-icon-button-ink-color: white;
+          margin-top :2px;
+          margin-bottom:2px;
+		 }
+
+		ul {
+		 padding:0;
+		/* margin-bottom:-15px;*/
+		 line-height:1.2;
+		 list-style: none;
+		}
+		 .add-button{
+		 	/*position:fixed;
+		 	bottom:50px;
+		 	left:50px;*/
+		 	float:right;
+		 	--paper-fab-background: var(--paper-blue-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-blue-900);
+		 }
+		 .item-title {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color:var(--title_background_color) ;
+          color: white;
+          font-weight: 400;
+          padding: 16px;
+        }
+        .card {
+        	display :block;
+            
+            padding:5px;
+            padding-bottom: 20px;
+          	max-width: var(--max_widthliste);
+          	margin-right: auto;
+          	margin-left: auto;
+          	position: relative;
+            background-color: white;
+        	color: var(--paper-blue-800);
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	        
+	     }
+	     .cardprinc{
+		 	padding-top:60px;
+		 	margin-top: 5px;
+		 	position: relative;
+		 }
+		 .refresh-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:5px;
+    		color: var(--paper-blue-500);
+		 }
+		 .regionscroll {
+	        max-height: var(--liste_maxheight);
+	        overflow: var(--liste_overflow);
+	      }
+  		</style>
+			  <paper-dropdown-menu style="width:100%" hidden$="[[!dropdowntype]]"  id="[[id]]" label="[[label]]" >
+				  <paper-listbox class="dropdown-content" attr-for-selected="value" selected="{{value_sel}}">
+					  <template is="dom-repeat" items="{{liste_objets}}">
+					    <paper-item value="[[item.id]]">[[item.nom]]</paper-item>
+					  </template>
+				  </paper-listbox>
+			  </paper-dropdown-menu>
+		<div class="card cardprinc" hidden$="[[dropdowntype]]">
+		  	<iron-ajax
+				id="charge"
+			    method="GET"
+			    url="{{charge_url}}"
+			    headers="{{app.header_auth}}"
+			    params="{{params}}"
+			    handle-as="json"
+			    on-error="_disconnect"
+	    		on-response="charge_validate"
+			    last-response="{{liste_objets}}"
+			    debounce-duration="300">
+			</iron-ajax>
+				<div class="item-title" ><div style="float:left">{{title}}</div></div>
+				<paper-icon-button  hidden$="[[refreshbutton_hide]]" class="refresh-button" mini icon="cached" title="Rafraichir" on-tap="refreshthis"></paper-icon-button>
+			 	<div>
+			 		<content style="float:left" select=".selection"></content>
+			 		<my-searchbox placeholder="Filtre" query="{{searchquery}}"></my-searchbox>	
+			 	</div>
+
+			<div id="regionscroll" class="regionscroll">
+				<ul class="app-grid" >
+				    <template id="temp_liste" is="dom-repeat" items="{{liste_objets}}">
+					    <li class="item" style="margin-bottom:0;margin-top:-2px">
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profiltarif')}}">
+						          	<my-profiltarif name="my-profiltarif" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}"  parent="{{parent}}"></my-profiltarif>
+						          </template>
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profilsexe')}}">
+						          	<my-profilsexe name="my-profilsexe" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profilsexe>
+						          </template>								  
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profiltypecaf')}}">
+						          	<my-profiltypecaf name="my-profiltypecaf" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profiltypecaf>
+						          </template>								  
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profiltype_paiement')}}">
+						          	<my-profiltype_paiement name="my-profiltype_paiement" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profiltype_paiement>
+						          </template>
+						          <template is="dom-if" if="{{show_element(detail_code,'my-profiltype_operation')}}">
+						          	<my-profiltype_operation name="my-profiltype_operation" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profiltype_operation>
+						          </template>
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profilsociete')}}">
+						          	<my-profilsociete name="my-profilsociete" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profilsociete>
+						          </template>
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profilaire')}}">
+						          	<my-profilaire name="my-profilaire" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profilaire>
+						          </template>
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profilemplacement')}}">
+						          	<my-profilemplacement name="my-profilemplacement" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profilemplacement>
+						          </template>
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profilfamille')}}">
+						          	<my-profilfamille name="my-profilfamille" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profilfamille>
+						          </template>
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profilfamillesejour')}}">
+						          	<my-profilfamillesejour id="[[item.id]]" name="my-profilfamillesejour" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profilfamillesejour>
+						          </template>
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profilfamillemembre')}}">
+						          	<my-profilfamillemembre id="[[item.id]]" name="my-profilfamillemembre" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profilfamillemembre>
+						          </template>
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profilcompte_ecriture')}}">
+						          	<my-profilcompte_ecriture id="[[item.id]]" name="my-profilcompte_ecriture" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profilcompte_ecriture>
+						          </template>
+								  <template is="dom-if" if="{{show_element(detail_code,'my-profilfacture')}}">
+						          	<my-profilfacture id="[[item.id]]" name="my-profilfacture" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" parent="{{parent}}"></my-profilfacture>
+						          </template>						          						          		
+					        
+					    </li>
+					</template>
+				</ul>
+			</div>
+			<paper-fab class="add-button" hidden$="[[createbutton_hide]]" mini icon="add" title="Créer" on-tap="add"></paper-fab>
+		</div>
+		
+	<paper-dialog id="load_dialog" >
+		<paper-spinner active style="z-index:100"></paper-spinner>	
+	</paper-dialog>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_behavior',
+	  behaviors: [MajListe,Polymer.IronScrollTargetBehavior]/*,
+	  properties: {  
+	
+	  },
+	  observers:[
+	
+	  ],
+	  listeners: {
+	      
+	    },*/
+
+  })
+  </script>
+
+</dom-module>

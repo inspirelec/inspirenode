@@ -1,0 +1,73 @@
+﻿<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+
+
+<link rel="import" href="../majcore/my-liste_behavior.html">
+<link rel="import" href="../majcore/my-sous_liste_behavior.html">
+<link rel="import" href="../majcore/my-profil_behavior.html">
+
+<link rel="import" href="../element/my-liste_factures.html">
+
+<dom-module id="my-facturepage">
+
+  <template>
+
+    <style>
+
+		my-liste_factures{
+			--max_widthliste:95%;
+			--liste_maxheight:70vh;
+			--liste_overflow:auto;
+		}
+    </style>
+    
+    <app-location  route="{{route}}"></app-location>
+    <!-- ip.../appli/main -->
+    <app-route  route="{{route}}" pattern="/:typeappli" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <!-- reglages, appli, applicamp ... -->
+    <app-route  route="{{subroute}}"  pattern="/:page"   data="{{subrouteData}}" tail="{{uuidroute}}"></app-route>
+    <!-- uuid ... -->
+    <app-route  route="{{uuidroute}}"  pattern="/:page"   data="{{uuidrouteData}}"></app-route>
+  
+	<my-liste_factures searchmode="true" charge_table selitem="[[selitem]]" titulaire="{{titulaire}}" ></my-liste_factures>
+	
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'my-facturepage',
+	  properties: {  
+		     selitem:{type:Number,
+		    	 	notify : true,
+		    	 	computed:'_selitem(subrouteData.page,uuidrouteData.page)'  
+		    	 },   
+		     titulaire:{type:Object,
+		    	    notify:true,
+		    	    value:{id:'',spe:'listfactures'}
+		     }
+	  },
+	  _selitem:function(subroutepage,uuidroutepage){
+		  //console.log(subroutepage,uuidroutepage);
+		  if (subroutepage=='facturepage') {
+			  return uuidroutepage;
+		  } else {
+			  return null;
+		  }
+		  
+	  }
+    });
+  </script>
+
+</dom-module>

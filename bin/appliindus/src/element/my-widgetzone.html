@@ -1,0 +1,66 @@
+
+
+
+<dom-module id="my-widgetzone">
+
+  <template>
+		<style >
+			:host {
+				--grillesnapwidth: 50px;
+				--grillesnapheight: 50px;
+				background-color: #93a1a1;
+				width:100%;
+				heigth:100%;
+				font-size: small;
+			}
+			.grillecolonne{
+				width:var(--grillesnapwidth);
+				height:var(--grillesnapheight);
+				border-width: 1px;
+				border-style:solid;
+				border-color: #1e88e5;
+				background-color:#93a1a1;
+
+			}
+  		</style>
+
+
+			<template is="dom-repeat" items="{{grillelignes}}" as="lig">
+				<tr id="[[lig]]" class="grilleligne">
+					<template is="dom-repeat" items="{{grillecolonnes}}" as="col">
+						<td id="[[col]]" class="grillecolonne">
+							L[[lig]]C[[col]]
+						</td>
+					</template>
+				</tr>
+			</template>
+
+
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-widgetzone',
+	  
+	  properties: {
+	      grillecolonnes:{type:Array,notify:true,value:[0,1,2,3,4,5,6,7,8,9]},
+          grillelignes:{type:Array,notify:true,value:[0,1,2,3,4,5,6,7,8,9]}
+	  },
+	  listeners: {
+        },
+     observers: [
+                ],
+                
+
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+
+  })
+  </script>
+
+</dom-module>

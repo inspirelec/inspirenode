@@ -1,0 +1,255 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<dom-module id="my-profilfamillesejour">
+
+  <template>
+		<style>
+  		</style>
+  		
+  	 	<my-profil_behavior 
+  	 		id="profilfamillesejour"
+	  		table_code="sejour" 
+	  		params_get="{{params_get}}"
+	  		params_save="{{params_save}}"
+	  		params_delete="{{params_delete}}"
+	  		edited_item_id="{{edited_item_id}}"
+  	 	 	objet="{{objet}}" 
+  	 	 	obj_id="{{objet.id}}"
+  	 	 	parent="{{parent}}"
+  	 	 	parentfield_id="titulaire_id"
+  	 	 	grants_acces="{{grants_acces}}"
+  	 	 	hideother_onedit="{{hideother_onedit}}"
+  	 	 	hideothereditbutton_onedit="{{hideothereditbutton_onedit}}"
+  	 	 	return_onsave=true
+  		> 
+  		
+
+	  		
+	  		<div class="reduit">
+				du {{objet.date_debut}} au {{objet.date_fin}}</br>
+				<a href="#" on-tap="gettagclicked">{{emplobj_sel.nom}}</a>
+	  		</div>
+	  		
+	  		
+	  		<div class="edition">
+			    <paper-input id="id" label="id" hidden type="text" value="{{objet.id}}"> </paper-input>
+			    <paper-input id="uuid" label="uuid" hidden type="text" value="{{objet.uuid}}">     </paper-input>              
+		
+				
+				<div class="ligne">
+					<!-- <my-liste_emplacements objet_sel="{{emplobj_sel}}" class="input3cols" tags_Response="{{tags_Response}}" id="emplacement_id" label="Emplacement" value_sel="{{objet.emplacement_id}}"></my-liste_emplacements> -->
+					<my-combo_select liste="{{liste_soustable.tag_voyage}}" dropdown_selobj="{{emplobj_sel}}" class="input3cols" table="tag_voyage" id="emplacement_id" label="Emplacement" value_sel="{{objet.emplacement_id}}"></my-combo_select>
+					
+				</div>
+				<div class="ligne">
+					<!-- <my-liste_tarifs class="input05cols" id="type_tarif" label="Type Tarif" value_sel="{{objet.type_tarif}}"></my-liste_tarifs> -->
+					<my-combo_select liste="{{liste_soustable.tarif}}" dropdown_selobj="{{tarifobj_sel}}" class="input05cols" table="tarif" id="type_tarif" label="Type Tarif" value_sel="{{objet.type_tarif}}"></my-combo_select>
+					<!-- <my-liste_typecafs class="input05cols" id="type_caf" label="Type Caf" value_sel="{{objet.type_caf}}"></my-liste_typecafs> -->
+					<my-combo_select liste="{{liste_soustable.typecaf}}" dropdown_selobj="{{Cafobj_sel}}" class="input05cols" table="typecaf" id="type_caf" label="Type Caf" value_sel="{{objet.type_caf}}"></my-combo_select>
+				</div>
+				<div class="ligne">
+				   	<paper-input class="input05cols" id="date_debut" label="Date debut" type="date" value="{{objet.date_debut}}"> 
+		              <!-- <iron-icon prefix height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon> -->
+		            </paper-input>
+		 		    <paper-input class="input05cols" id="date_fin" label="Date Fin" type="date" value="{{objet.date_fin}}"></paper-input>
+					
+					<paper-checkbox class="input1col" style="margin:auto" id="clos" checked="{{objet.clos}}"><b>Séjour Clos</b></paper-checkbox>
+				 	 
+				</div>
+				<div class="ligne">
+				 	 <paper-input class="input05cols" id="valeur0" label="depart Kwh" type="number" value="{{objet.valeur0}}">
+				 	  <paper-icon-button  suffix on-tap="getcompteurelec0" icon="restore" alt="Releve auto" title="Releve auto">
+				 	 </paper-input>
+		             <paper-input class="input05cols" id="valeur2" label="fin Kwh" type="number" value="{{objet.valeur2}}">
+		              <paper-icon-button  suffix on-tap="getcompteurelec2" icon="restore" alt="Releve auto" title="Releve auto">
+		             </paper-input>
+		             
+				</div>
+				<div class="ligne">
+				 	 <paper-input class="input05cols" id="valeur1" label="depart M3" type="number" value="{{objet.valeur1}}">
+				 	  <paper-icon-button  suffix on-tap="getcompteureau1" icon="restore" alt="Releve auto" title="Releve auto">
+				 	 </paper-input>
+				 	 <paper-input class="input05cols" id="valeur3" label="fin M3" type="number" value="{{objet.valeur3}}">
+				 	  <paper-icon-button  suffix on-tap="getcompteureau3" icon="restore" alt="Releve auto" title="Releve auto">
+				 	 </paper-input>
+				</div>
+				<div class="ligne">
+				 	 <paper-checkbox class="input1col" id="service_eau" checked="{{objet.service_eau}}">Eau</paper-checkbox>
+				 	 <paper-checkbox class="input1col" id="service_elec" checked="{{objet.service_elec}}">Electricité</paper-checkbox>
+				 	 <paper-checkbox class="input1col" id="service_chauffeeau"  checked="{{objet.service_chauffeeau}}">Chauffe eau</paper-checkbox>
+				</div>
+	  		</div>
+  		 		
+  		
+  		</my-profil_behavior>
+	  		
+	  	<iron-ajax
+			id="charge_tagclicked"
+		    method="GET"
+		    url="{{charge_tagclicked_url}}"
+		    headers="{{app.header_auth}}"
+		    params="{{params_tagclicked}}"
+		    handle-as="json"
+		    on-error="_disconnect"
+		    last-response="{{tag_clicked}}"
+		    on-response= "tagclicked_retour"
+		    debounce-duration="300">
+		</iron-ajax>	
+	  		
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-profilfamillesejour',
+	  
+	  properties: {  
+	  	 params_get:{type: Object,
+		   	 	  notify : true,
+		   	 	  computed:'_getparams_get(objet.id,objet)'
+		     },
+	     params_save:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'sejour'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_delete:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'delete',type:'maj',element:'sejour'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_tagclicked:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {type:'get',action:'listtag',id:"=''"}},
+	     edited_item_id:{notify : true},
+	     
+	     doc_print_link:{type:String,
+	    	 notify:true,
+	    	 computed:'_getprintlink(objet)'}
+	     
+	  },
+	  observers: [
+	              '_calculdate(objet)',
+	              '_calculservice1(objet.service_eau)',
+	              '_calculservice12(objet.service_elec)',
+	              '_calculservice13(objet.service_chauffeeau)',
+	              '_calculclos(objet.clos)'
+	              ]
+	  ,
+      _calculservice1:function(service_eau){
+    	  if (service_eau=="1"){
+    		  this.set('objet.service_eau',true);
+    	  } else {
+    		  this.set('objet.service_eau',false);
+    	  }
+      },
+      _calculservice12:function(service_elec){
+    	  if (service_elec=="1"){
+    		  this.set('objet.service_elec',true);
+    	  } else {
+    		  this.set('objet.service_elec',false);
+    	  }
+      },
+      _calculservice13:function(service_chauffeeau){
+    	  if (service_chauffeeau=="1"){
+    		  this.set('objet.service_chauffeeau',true);
+    	  } else {
+    		  this.set('objet.service_chauffeeau',false);
+    	  }
+      },
+      _calculclos:function(clos){
+    	  if (clos=="1"){
+    		  this.set('objet.clos',true);
+    		  if (!this.objet.date_fin) {
+    			  var today_3m = new Date();
+    			  today_3m.setMonth(today_3m.getMonth()+3);
+    			  dd = today_3m.getDate()+"";
+    			  mm = today_3m.getMonth()+1+""; //January is 0!
+    			  if (dd.length<2) {dd="0"+dd;}
+    			  if (mm.length<2) {mm="0"+mm;}
+    			  yyyy = today_3m.getFullYear();
+    			  this.set('objet.date_fin',yyyy+'-'+mm+'-'+dd);
+    		  }
+    	  } else {
+    		  this.set('objet.clos',false);
+    	  }
+      },
+	  _calculdate:function(objet){
+		  if (!objet.date_debut && !objet.date_fin) {
+			  var today = new Date();
+			  var dd = today.getDate()+"";
+			  var mm = today.getMonth()+1+""; //January is 0!
+			  if (dd.length<2) {dd="0"+dd;}
+			  if (mm.length<2) {mm="0"+mm;}
+			  var yyyy = today.getFullYear();
+			  this.set('objet.date_debut',yyyy+'-'+mm+'-'+dd);
+			  
+			  var today_3m = new Date();
+			  today_3m.setMonth(today_3m.getMonth()+3);
+			  dd = today_3m.getDate()+"";
+			  mm = today_3m.getMonth()+1+""; //January is 0!
+			  if (dd.length<2) {dd="0"+dd;}
+			  if (mm.length<2) {mm="0"+mm;}
+			  yyyy = today_3m.getFullYear();
+			  this.set('objet.date_fin',yyyy+'-'+mm+'-'+dd);
+		  }
+	  },
+	  _getprintlink:function(objet){
+		  if (objet && objet.id) {
+			  return "doc_sejour&id="+objet.id;
+		  } else {
+			  return null;
+		  }
+		  
+	  },
+	  _getparams_get:function(obj_id,objet){
+		  return {type:'get',action:'detailsejour',id:obj_id}
+	  },
+	  
+	  
+      gettagclicked:function(){
+    	    this.$.profilfamillesejour.app.$.location.path="/appliairevoyage/periphListPage/"+this.emplobj_sel.uuid;
+			this.$.profilfamillesejour.app.$.location.path="/appliairevoyage/periphListPage/"+this.emplobj_sel.uuid;
+	  },
+
+	  getcompteurelec0:function(elem){
+		  this.app = document.querySelector('#app');
+		  var eleccounter=this.app.lastetat[this.emplobj_sel.periph_elec_uuid];
+		  if (eleccounter && eleccounter.expression){
+			  this.set('objet.valeur0',eleccounter.expression.etat);
+		  }
+		  
+	  },
+	  getcompteurelec2:function(elem){
+		  this.app = document.querySelector('#app');
+		  var eleccounter=this.app.lastetat[this.emplobj_sel.periph_elec_uuid];
+		  if (eleccounter && eleccounter.expression){
+		  	this.set('objet.valeur2',eleccounter.expression.etat);
+		  }
+	  },
+	  getcompteureau1:function(elem){
+		  this.app = document.querySelector('#app');
+		  var eaucounter=this.app.lastetat[this.emplobj_sel.periph_eau_uuid];
+		  if (eaucounter && eaucounter.expression){
+		  	this.set('objet.valeur1',eaucounter.expression.etat);
+		  }
+	  },
+	  getcompteureau3:function(elem){
+		  this.app = document.querySelector('#app');
+		  var eaucounter=this.app.lastetat[this.emplobj_sel.periph_eau_uuid];
+		  if (eaucounter && eaucounter.expression){
+		  	this.set('objet.valeur3',eaucounter.expression.etat);
+		  }
+	  },
+  });
+  
+  </script>
+
+</dom-module>
+		

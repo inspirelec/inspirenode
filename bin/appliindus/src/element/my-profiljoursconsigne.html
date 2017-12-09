@@ -1,0 +1,100 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<link rel="import" href="../majcore/my-combo_select.html">
+<dom-module id="my-profiljoursconsigne">
+
+  <template>
+		<style>
+  		</style>
+  		
+  	 	<my-profil_behavior 
+	  		table_code="joursconsigne" 
+	  		params_get="{{params_get}}"
+	  		params_save="{{params_save}}"
+	  		params_delete="{{params_delete}}"
+	  		edited_item_id="{{edited_item_id}}"
+  	 	 	objet="{{objet}}" 
+  	 	 	obj_id="{{objet.id}}"
+  	 	 	grants_acces="{{grants_acces}}"
+  	 	 	hideother_onedit="{{hideother_onedit}}"
+  	 	 	hideothereditbutton_onedit="{{hideothereditbutton_onedit}}"
+  	 	 	return_onsave=true
+  		> 
+  		
+
+	  		
+	  		<div class="reduit">
+				{{dropdown_selobj.nom}} {{objet.nom}} </br>du {{objet.date_debut}} au {{objet.date_fin}}
+	  		</div>
+	  		
+	  		
+	  		<div class="edition">
+			    <paper-input id="id" label="id" hidden type="text" value="{{objet.id}}"> </paper-input>
+			    <paper-input id="uuid" label="uuid" hidden type="text" value="{{objet.uuid}}">     </paper-input>              
+				<div class="ligne">
+		 		    <paper-input class="input05cols" id="nom" label="Libelle" type="text" value="{{objet.nom}}"></paper-input>
+					<my-combo_select liste="[[liste_typejour]]" dropdown_selobj="{{dropdown_selobj}}" class="input1col"  id="type" label="Type" value_sel="{{objet.typejour}}"></my-combo_select>
+		 		</div>
+		 		<div class="ligne">
+		 		    <paper-input class="input05cols" id="date_debut" label="Date début" type="date" value="{{objet.date_debut}}"></paper-input>
+		 		    <paper-input class="input05cols" id="date_fin" label="Date Fin" type="date" value="{{objet.date_fin}}"></paper-input>
+				</div>
+	  		</div>
+  		 		
+  		
+  		</my-profil_behavior>
+	  		
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-profiljoursconsigne',
+	  
+	  properties: {  
+	  	 params_get:{type: Object,
+		   	 	  notify : true,
+		   	 	  computed:'_getparams_get(objet.id,objet)'
+		     },
+	     params_save:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'joursconsigne'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_delete:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'delete',type:'maj',element:'joursconsigne'/*v:'voyage.1.1.1'*/}}
+	        },
+	     edited_item_id:{notify : true},
+	     liste_typejour:{type:Array,notify : true,
+	    	value:[{id:'VA',nom:'Vacances'},{id:'FE',nom:'Fériés'}]
+	     },
+	     doc_print_link:{type:String,
+	    	 notify:true,
+	    	 computed:'_getprintlink(objet)'}
+	     
+	  },
+	  _getprintlink:function(objet){
+		  if (objet && objet.id) {
+			  return "doc_joursconsigne&id="+objet.id;
+		  } else {
+			  return null;
+		  }
+		  
+	  },
+	  _getparams_get:function(obj_id,objet){
+		  return {type:'get',action:'detailjoursconsigne',id:obj_id}
+	  }
+  });
+  
+  </script>
+
+</dom-module>
+		

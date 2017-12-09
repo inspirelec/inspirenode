@@ -1,0 +1,255 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<dom-module id="my-profilfacture">
+
+  <template>
+		<style>
+  		</style>
+  		
+  	 	<my-profil_behavior 
+  	 		id="profilfacture"
+	  		table_code="facture" 
+	  		params_get="{{params_get}}"
+	  		params_save="{{params_save}}"
+	  		params_delete="{{params_delete}}"
+	  		edited_item_id="{{edited_item_id}}"
+  	 	 	objet="{{objet}}" 
+  	 	 	obj_id="{{objet.id}}"
+  	 	 	parent="{{parent}}"
+  	 	 	parentfield_id="titulaire_id"
+  	 	 	doc_print_link="{{doc_print_link}}"
+  	 	 	grants_acces="{{grants_acces}}"
+  	 	 	hideother_onedit="{{hideother_onedit}}"
+  	 	 	hideothereditbutton_onedit="{{hideothereditbutton_onedit}}"
+  	 	 	return_onsave=false
+  		> 
+  		
+
+	  		
+	  		<div class="reduit">
+				{{objet.facture_num}}, {{objet.date}}, {{objet.libelle}}
+	  		</div>
+	  		
+	  		
+	  		<div class="edition">
+			    <paper-input id="id" label="id" hidden type="text" value="{{objet.id}}"> </paper-input>
+			    <paper-input id="uuid" label="uuid" hidden type="text" value="{{objet.uuid}}">     </paper-input>    
+				<div class="ligne">
+					<paper-input class="input05cols" id="date" label="Date" required type="date" value="{{objet.date}}"></paper-input>
+		            <paper-input class="input05cols" disable id="facture_num" label="Numéro facture" disabled type="text" value="{{objet.facture_num}}"></paper-input>
+				</div>
+			    <div class="ligne">
+				 	 <paper-input class="input3cols" id="libelle" label="Libelle" required  type="text" value="{{objet.libelle}}"></paper-input>
+				</div>          
+				<template is="dom-repeat" items="{{liste_soustable2}}">
+					<template is="dom-if" if="{{show_ecriture_lgn_choice(objet.id,item.id,objet.facture_num,item.facture_num)}}">
+						<div><paper-checkbox class="lgn_ecr" obj="{{item}}" checked>{{item.checked}}[[item.recu_num]] du [[item.date]], [[item.type_operation]] de [[item.signe]][[item.montant]]€</paper-checkbox></div>
+					</template>
+					<template is="dom-if" if="{{show_ecriture_lgn(objet.id,item.id,objet.facture_num,item.facture_num)}}">
+						<div><paper-checkbox class="lgn_ecr" obj="{{item}}" checked disabled>{{item.checked}}[[item.recu_num]] du [[item.date]], [[item.type_operation]] de [[item.signe]][[item.montant]]€</paper-checkbox></div>
+					</template>
+				</template>
+	  		</div>
+	 <iron-ajax
+		id="charge_compte_ecr"
+	    method="GET"
+	    url="{{charge_url}}"
+	    headers="{{app.header_auth}}"
+	    params="{{params_get_compte_ecr}}"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    last-response="{{liste_soustable2}}"
+	    on-response="retour_cpt_ecr"
+	    debounce-duration="300">
+	</iron-ajax>
+	  	<iron-ajax
+			id="save_ecritures"
+		    method="POST"
+		    headers="{{app.header_auth}}"
+		    body="{{params_ecr_save.body}}"
+		    params="{{params_ecr_save.params}}"
+		    content-type="application/json"
+		    handle-as="json"
+		    on-error="_disconnect"
+		    on-response="save_ecr_validate"
+		    last-response="{{save_ecr_Response}}"
+		    debounce-duration="300">
+		</iron-ajax>
+  		
+  		</my-profil_behavior>
+	  <iron-ajax
+		id="get_new_facture_num"			    method="GET"
+	    url="{{new_facture_url}}"	    		headers="{{app.header_auth}}"
+	    params="{{params_new_facture.params}}"	handle-as="json"   	on-error="_disconnect"
+	    last-response="{{new_facture}}"   		debounce-duration="300"
+	    on-response="set_facture">
+	</iron-ajax>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-profilfacture',
+	  
+	  properties: { 
+	     app: {
+	          type: Object
+	        }, 
+	  	 params_get:{type: Object,
+		   	 	  notify : true,
+		   	 	  computed:'_getparams_get(objet.id,objet)'
+		     },
+		 params_get_compte_ecr:{type: Object,
+	   	 	  notify : true,
+	   	 	  value:{type:'get',action:'listcompte_ecriture',facture_num:''}
+	     },
+	     params_save:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'facture'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_ecr_save:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'compte_ecriture'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_delete:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'delete',type:'maj',element:'facture'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_new_facture:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'getfacture_num',v:'voyage.1.1.1'}}
+	        },
+	     edited_item_id:{notify : true},
+	     
+	     doc_print_link:{type:String,
+	    	 notify:true,
+	    	 computed:'_getprintlink(objet)'},
+		 // index de compteur	 
+		 index_fac_eau:{type:Number,notify:true,value:0},
+		 index_fac_elec:{type:Number,notify:true,value:0},
+		 date_fac:{type:Number,notify:true,value:0}
+	     
+	  },
+	  listeners: {
+          'save_validate': 'savethis_ecr',
+        },
+	  observers: [
+          '_calculfacture_num(objet.id,objet)',
+          '_calculdate(objet)',
+          '_edited_item_change(edited_item_id,objet)',
+        ],
+	  _getprintlink:function(objet){
+		  if (objet && objet.id) {
+			  return "doc_facture&facture_id="+objet.id+"&titulaire_id="+objet.titulaire_id+"&facture_num="+objet.facture_num;
+		  } else {
+			  return null;
+		  }
+		  
+	  },
+	  _getparams_get:function(obj_id,objet){
+		  return {type:'get',action:'detailfacture',id:obj_id}
+	  },
+	  _edited_item_change:function(edited_item_id,objet){
+		  if (objet && objet.id==edited_item_id && edited_item_id>0){
+			  if (objet && objet.facture_num ){
+				  this.set('params_get_compte_ecr.facture_num',"='"+objet.facture_num+"'");
+			  } else {
+				  this.set('params_get_compte_ecr.facture_num',"='aucune'");
+			  }
+		  	  this.set('show_loading',1);
+			  this.app = document.querySelector('#app');
+		      this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
+		      this.$.charge_compte_ecr.generateRequest();  
+		  }
+	  },
+	  retour_cpt_ecr:function(){
+		  this.set('show_loading',0);
+	  },
+	  _calculfacture_num:function(id,objet){
+
+			if(id<0 && objet &&	(objet.facture_num=="" || !objet.facture_num)){
+				this.app = document.querySelector('#app');
+				this.set('objet.facture_num','...');
+		        this.app = document.querySelector('#app');
+				this.$.get_new_facture_num.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+		        this.$.get_new_facture_num.generateRequest();
+			}
+	  },
+	  _calculdate:function(objet){
+		  if (!objet.date) {
+			  var today = new Date();
+			  var dd = today.getDate()+"";
+			  var mm = today.getMonth()+1+""; //January is 0!
+			  if (dd.length<2) {dd="0"+dd;}
+			  if (mm.length<2) {mm="0"+mm;}
+			  var yyyy = today.getFullYear();
+			  this.set('objet.date',yyyy+'-'+mm+'-'+dd);
+		  }
+	  },
+	  set_facture:function(){
+	        this.set('objet.facture_num',this.new_facture.num)  ;
+		  
+	  },
+	  show_ecriture_lgn_choice: function (facture_id,ecriture_id,facture_num,ecriture_factnum) {
+			if (facture_id<0 && ecriture_id>=0 && (!ecriture_factnum || facture_num==ecriture_factnum)){
+				return true;
+			} else {
+				return false;
+			}
+    	    
+    	 },
+   	  show_ecriture_lgn: function (facture_id,ecriture_id,facture_num,ecriture_factnum) {
+			if (facture_id>0 && ecriture_id>=0 && (facture_num==ecriture_factnum)){
+				return true;
+			} else {
+				return false;
+			}
+  	    
+  	 },
+   	  savethis_ecr:function (event) {
+		  this.set('show_loading',1);
+		  this.app = document.querySelector('#app');
+		  var list= document.querySelectorAll('.lgn_ecr');
+    	  var rep=[];
+    	  for (var c in list){
+    		  if (list[c].checked && !list[c].obj.facture_num){
+    			  //console.log('acquitement '+list[c].uuid);
+    			  list[c].obj.facture_num=this.objet.facture_num;
+    			  rep.push(list[c].obj);
+				   
+					if (list[c].obj.type_operation == '9' && list[c].obj.libelle == 'Emplacement') { this.date_fac = list[c].obj.index_fin;}
+					else if (list[c].obj.type_operation == '9' && list[c].obj.libelle == 'Electricité') {this.index_fac_elec = list[c].obj.index_fin;}
+					else if (list[c].obj.type_operation == '9' && list[c].obj.libelle == 'Eau') {this.index_fac_eau = list[c].obj.index_fin;}
+				  
+    		  } else {
+    			 // console.log('non acquit� '+list[c].uuid);
+    		  }
+    	  }
+		  this.set('params_ecr_save.body',{data:rep});
+		  this.$.save_ecritures.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save_ecritures.generateRequest();
+
+      },
+      
+      save_ecr_validate:function(e,r,t){
+    	  /*var liste_compteectritures = document.querySelector('#fam_liste_compte_ecritures'+this.objet.titulaire_id);
+    	  liste_compteectritures.refreshthis();*/
+		  if (this.return_onsave){
+			  this.reply();
+		  }
+		  
+	  },
+  });
+  
+  </script>
+
+</dom-module>
+		

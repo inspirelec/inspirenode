@@ -1,0 +1,182 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<dom-module id="my-periph_view_BINAIRE">
+
+  <template >
+  		<style>
+  		  	 :host {
+		        --background-color: #fff;
+		  		--color: #757575;
+		      }   
+			.item-title {
+	          position: absolute;
+	          top: 0;
+	          left: 0;
+	          right: 0;
+	          /*background-color: rgba(0, 0, 0, 0.2);
+	          color: white;*/
+	          		background-color: var(--background-color);
+			        color: var(--color);
+	          font-weight: 400;
+	          padding: 16px;
+	        }
+
+	        .item-content {
+	          position: absolute;
+	          bottom: 0;
+	          left: 0;
+	          right: 0;
+	          padding: 16px;
+	        }
+	        paper-button{
+	        	width:100%;
+	        	height:100%;
+	        	margin:0;
+	        }
+  		</style>
+  		
+  		<paper-button on-tap="change_etat"  >
+        	<div class="item-content">
+	        	 <img id="icon" src="{{app.url_http}}:{{app.port_http}}/[[periph_icon]]" height="50" width="50"/>
+				 <div style="display: inline-block;"> 
+				 	<!-- <h6 id="tags" style="font-size: 12px">{{periph.categorie.nom}}</h6> -->
+					<h6  style="font-size: 12px"></h6>
+					<h6  style="font-size: 12px"></h6>
+					<h6  style="font-size: 12px"></h6>
+				</div>
+			</div>
+			<div class="item-title">[[periph.nom]]</div>
+		</paper-button>
+		
+		<iron-ajax
+			id="send_etat"
+		    method="GET"
+		    url="{{send_etat_url}}"
+		    headers="{{app.header_auth}}"
+		    params="{{params_send_etat}}"
+		    handle-as="json"
+	    	on-error="_disconnect"
+		    last-response="{{send_etat_Response}}"
+		    debounce-duration="300">
+		</iron-ajax>
+  </template>
+  <script>
+
+  Polymer({
+
+	  is: 'my-periph_view_BINAIRE',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	     periph:{type:Object,
+	    	 notify:true
+	     },
+	     etat:{type:String,
+	    	 notify :true,
+	    	 computed: 'compute_etat(lastupdatetime,periph)'},
+	     periph_icon:{type:String,
+	    	 notify:true
+	     },
+	     params_send_etat:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'allconfiglite',v:'indus.1.1.1'}},
+	   	 send_etat_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null }
+	  }, 
+      observers: [
+                  '_periphchange(periph)',
+                  'onEtatchange(etat,periph)'
+                ],
+
+	  _periphchange:function (periph){
+		  this.app = document.querySelector('#app');
+		  //if (this.periph.ecriture_type=='BINAIRE') {
+		  		this.customStyle['--background-color']='#fff';
+		  		this.customStyle['--color']='#000';
+		        if (periph.categorie && periph.categorie.couleur_fond) {
+			        this.customStyle['--background-color']=periph.categorie.couleur_fond;
+			        this.updateStyles();	        	
+		        }
+		        if (periph.categorie && periph.categorie.couleur_text) {
+		        	switch (periph.categorie.couleur_text) {
+			        	case 'blanc' :
+			        		this.customStyle['--color']='#fff';
+			        	break;
+			        	default:
+			        		this.customStyle['--color']='#000';
+			        	break;
+		        	}
+			        
+			        this.updateStyles();	        	
+		        }
+			//  }
+	  },
+	  ready: function() {
+		 // console.log('Ready',this.periph.uuid,this.periph.ecriture_type,'BINAIRE');
+
+	        
+
+	  },
+	  _toArray(obj){
+	    	  return this.app._toArray(obj);
+	      },
+	  _disconnect(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+
+	  compute_etat(lastupdatetime,periph){
+	    	 this.app = document.querySelector('#app');
+    		 if (this.periph && this.app.lastetat &&this.app.lastetat[periph.uuid] && this.app.lastetat[periph.uuid].expression){
+    			 return this.app.lastetat[periph.uuid].expression;			 
+    		 }
+    		 return null;
+	      },
+	  onEtatchange(etat,periph){
+	    	 
+	    	 if (this.etat){
+	    		 if (etat.etat+""==periph.ecriture_min_value) {
+	    			 this.periph_icon=periph.categorie.iconMin;	 
+	    		 } else if (etat.etat+""==periph.ecriture_max_value) {
+	    			 this.periph_icon=periph.categorie.iconMax;	 
+	    		 } else  {
+	    			 this.periph_icon=periph.categorie.iconMidle;	 
+	    		 }
+	    	 }
+	    	 
+	      },
+	  change_etat(){
+	    	  this.params_send_etat.action='setetat';
+	    	  this.params_send_etat.uuid=this.periph.uuid;
+	    	  if (this.app.lastetat && this.app.lastetat[this.periph.uuid]){
+	    		  if (this.app.lastetat[this.periph.uuid].expression.etat+""!=this.periph.ecriture_min_value){
+	    			  this.params_send_etat.valeur=this.periph.ecriture_min_value;
+	    	    	  this.params_send_etat.cmd=this.periph.cmd='OFF';
+	    		  } else {
+	    			  this.params_send_etat.valeur=this.periph.ecriture_max_value;
+	    	    	  this.params_send_etat.cmd=this.periph.cmd='ON';
+	    		  }
+	    		  
+	    	  }
+	    	  
+	    	  this.send_etat_url=this.app.url_api+':'+this.app.port_api+'/index'
+	    	  this.$.send_etat.generateRequest();
+	    	  
+	    	  console.log("send changeetat",this.params_send_etat.valeur);
+	      }
+  })
+  </script>
+
+</dom-module>

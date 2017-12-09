@@ -1,0 +1,110 @@
+	<div id="Acces_Resa_Page" data-role="page" data-theme="c">
+	<style>
+		.ui-autocomplete-loading {
+		  background: white url("images/ui-anim_basic_16x16.gif") right center no-repeat;
+		}
+	</style>
+		<div id ="entete" data-role="header" data-theme="c" data-position="fixed">
+			
+			<div class='topuser' style="margin-left:10px;margin-right:15px;float:left;display:none;border:none;width:40%" >
+		  		<input class='user' name="usersel" id="usersel" style="background-color:white" placeholder="Selection client">
+		  	</div><div><h1 style="text-align:center" id="titre"></h1></div>
+			<a href="#Acces_Info_Page" data-transition="slide" class="ui-btn-right ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-info ui-btn-icon-notext" >Button</a>
+		</div>
+		<div id="content" data-role="content" data-theme="c" style="padding:0px 0px;margin:0px 0px">
+				<div id="didact" style="display:none;z-index:9999;position:fixed;background-color:white;opacity:0.8;width:100%;height:100%">
+				  <div style="display:flex;marin-left:15px;margin-top:45px ">			    
+			    		<input  type="checkbox" name="afficheaide" class="afficheaide" data-mini="true" style="float:left" required="required">
+			    <div id="didactAff" style="margin-left:40px ;font-size:x-large;color:black">Ne plus afficher</div>
+				</div>
+				<div class="ui_persoeventbutton" style="display:flex;top:0">
+					<a href="#" onclick="$('#didact').fadeOut();"style="background-color:transparent" class="ui_persoeventbut_href ui_btniconseul ui-btn-left ui-btn ui-btn-icon-left ui-icon-delete ui-btn-icon-notext" >Button</a>
+					<div id="didactFermer" style="margin-left:40px ;font-size:x-large;color:black">Fermer</div>
+				</div>
+				  <div id="aide1" style="font-size:x-large;color:red"><b> 1 : Sélectionner une salle</b></div>
+				  <div id="aide2" style="font-size:x-large;color:green"><b> 2 : Sélectionner la date</b></div>
+				  <div id="aide3" style="font-size:x-large;color:blue"><p><b> 3 : Sélectionner l’horaire  </br>et faite glisser </br>la durée souhaitée</b></p></div>
+				  <div id="aide4"><div id="Textaide4" style="font-size:x-large;color:brown	;transform: rotate(-90deg);transform-origin: left top 0;"><b>Zone de défilement du calendrier</b></div></div>
+				</div>
+			 <div id='top'>
+				<div id='topsalle' data-role="fieldcontain" style="display:none;border:none">
+					<label id="label_salles" for="Salle" style="width:50px">Salle : </label>
+			  		 <select name="Salle" id="Salle" >
+				    </select>
+			  	</div>
+			</div>
+			<div id='wrap'>
+				<div class="content-primary" >
+						<div id='type_resa' class="boxs_left">
+							<select name="resa_type" id="resa_type" >
+								 <option value="resa_horaire">Forfait Heure</option>
+							     <option value="resa_hebdo">Forfait Semaine</option>
+							     <option value="resa_mensuelle">Forfait Mois</option>
+				    		</select>
+
+						</div>
+					<div id='panier-events' class="boxs_left">
+						<p><b><u>Panier</u></b></p>
+						<div id='panier-info'></div>
+
+						<div id='payer_panier' >
+							<button id="payer" type="submit" onclick="getpaiement();return false;">Valider</a>
+						</div>
+
+					</div>
+					<div id='infos' class="boxs_left">
+						<p><b><u>Informations</u></b></p>
+						<div id='infosuser'></div>
+						<div id='payer_panier' >
+							<button id="creeruser" class="adminprofil" type="submit" style="display:none" onclick="creationcompteuseradmin();return false;">Créer un profil</a>
+						</div>
+					</div>
+				</div>
+				
+				<div class="content-secondary">
+					<div id='calendar'></div>
+					<div id='div_resa_semaine' style="display:none">
+						<label id="label_semaine" for="select_semaine" >Selectionné une semaine</label>
+				  		 <select name="select_semaine" id="select_semaine" >
+					    </select>
+					    <button id="ajout_semaine" type="submit" onclick="add_resasemaine();return false;">Ajouter au panier</a>
+					</div>
+					<div id='div_resa_mois' style="display:none">
+						<label id="label_mois" for="select_mois" >Selectionné un mois</label>
+				  		 <select name="select_mois" id="select_mois" >
+					    </select>
+						<button id="ajout_mois" type="submit" onclick="add_resamois();return false;">Ajouter au panier</a>
+						
+					</div>
+				</div>
+				<div style='clear:both'></div>
+		
+			</div>
+		
+		
+		
+
+	    </div>		
+		<div  id ="pied"  data-role="footer" data-theme="c" data-position="fixed" >
+			<div data-role="navbar">
+				<ul id="accueilmenulist1" class="accueilmenulist1" style="display: none;">
+					<li><a href="#" id="button1" data-transition="slide" class="button1 ui-btn-active ui-state-persist"></a></li>
+				</ul>
+				<ul id="accueilmenulist2" class="accueilmenulist2" style="display: none;">
+					<li><a href="#" id="button1" data-transition="slide" class="button1 ui-btn-active ui-state-persist"></a></li>
+					<li><a href="#" id="button2" data-transition="slide" class="button2" data-prefetch="true"></a></li>
+				</ul>
+				<ul id="accueilmenulist3" class="accueilmenulist3" style="display: none;" >
+					<li><a href="#" id="button1" data-transition="slide" class="button1 ui-btn-active ui-state-persist"></a></li>
+					<li><a href="#" id="button2" data-transition="slide" class="button2" data-prefetch="true"></a></li>
+					<li><a href="#" id="button3" data-transition="slide" class="button3" data-prefetch="true"></a></li>
+				</ul>
+				<ul id="accueilmenulist4" class="accueilmenulist4" style="display: none;">
+					<li><a href="#" id="button1" data-transition="slide" class="button1 ui-btn-active ui-state-persist"></a></li>
+					<li><a href="#tagListPage" id="button2" class="button2" data-transition="slide" data-prefetch="true"></a></li>
+					<li><a href="#progmodepage" id="button3" class="button3" data-transition="slide" data-prefetch="true"></a></li>
+					<li><a href="#" id="button4" class="button4" data-transition="slide" data-prefetch="true"></a></li>
+				</ul>
+			</div>
+		</div>
+	</div>

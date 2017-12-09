@@ -1,0 +1,49 @@
+	<div id="loginPage" data-role="page" data-theme="c" data-add-back-btn="true"  >
+	
+		<div  id ="entete"  data-role="header" data-theme="c" data-position="fixed"  >
+			<h1>InspirAcces</h1>
+			<a href="#Acces_Info_Page" data-transition="slide" class="ui-btn-right ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-info ui-btn-icon-notext" >Button</a>
+		<!--	<a href="#settingListPage" data-transition="slide" class="ui-btn-right ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-gear ui-btn-icon-notext" >Button</a>-->
+		</div>
+		<div data-role="content" data-theme="c">
+		<div  id="popupLogin" data-theme="a"  class="ui-corner-all">
+			<!-- data-role="popup" data-overlay-theme="b"-->	 
+			<form>
+				<div style="padding:10px 20px;">
+				  <h3  data-i18n="identification">Identification</h3>
+			
+		          <label for="un" class="ui-hidden-accessible">Login:</label>
+		          <input type="text" name="user" id="un" value="" placeholder="Email" autocapitalize="off" autocorrect="off" autocomplete="off" data-theme="a" />
+
+		          <label for="pw" class="ui-hidden-accessible">Mot de passe:</label>
+		          <input type="password" name="pass" id="pw" value="" placeholder="Mot de passe" data-theme="a" />
+		    	  <!-- 
+		    	  <label for="savepw" data-i18n="sauvegarder">Sauvegarder</label>
+		    	  <input type="checkbox" name="savepw" id="savepw" checked=true/>
+		    	   -->
+		    	  <button id="btnconnection" type="submit" data-theme="b" data-i18n="connexion" onclick="connexionappli();return false;";>Connexion</button>
+				  <button id="btnconnection" type="submit" data-theme="b" data-i18n="creercompte" onclick="creationcompteuser();return false;";>Créer un compte</button>
+		    	  <button id="btnconnection" type="submit" data-theme="b" data-i18n="passwordoublie" onclick="userpasswordoublie();return false;";>Mot de passe oublié</button>
+		    	  
+		    	  <!--<button id="btnconnectiontest" type="submit" data-theme="b" onclick="testdownload();return false;";>TestDownload</button>
+					<img id="testdownloadimg" style = "float:right;" src="">-->
+				</div>
+				
+				 <fieldset data-role="controlgroup" data-type="vertical" data-role="fieldcontain" id="langues">
+				
+					<!-- <input type="radio" name="radio-choice" id="radio-fr" value="fr">
+					<label for="radio-fr" >Francais</label>
+				
+					<input type="radio" name="radio-choice" id="radio-en" value="en">
+					<label for="radio-en" >English</label> -->
+         		</fieldset>	 			
+				
+			</form>
+			
+
+		</div>
+	    </div>		
+
+
+
+	</div>  

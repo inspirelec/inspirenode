@@ -1,0 +1,146 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../element/my-profilfamillemembre.html">
+
+<dom-module id="my-liste_famillemembres">
+
+  <template>
+		<style >
+		 .add-button{
+		 	/*position:fixed;
+		 	bottom:50px;
+		 	left:50px;*/
+		 	float:right;
+		 	--paper-fab-background: var(--paper-blue-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-blue-900);
+		 }
+		 .item-title {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color: rgba(30, 0, 170, 0.5);
+          color: white;
+          font-weight: 400;
+          padding: 16px;
+        }
+  		</style>
+
+  	<iron-ajax
+		id="charge_allfamillemembres"
+	    method="GET"
+	    url="{{charge_allfamillemembres_url}}"
+	    headers="{{app.header_auth}}"
+	    params="{{params_allfamillemembres}}"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    last-response="{{famillemembres_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+		<div class="item-title" >Membres de la famille</div>
+    <template is="dom-repeat" items="{{titulaire.membres}}">
+			<my-profilfamillemembre objet="{{item}}" selmembre="{{selmembre}}" editbuttonhide="{{editbuttonhide}}"></my-profilfamillemembre>
+	</template>
+	<paper-fab class="add-button" hidden$="[[!button_add_show]]" mini icon="add" title="Cr�er" on-tap="add"></paper-fab>
+
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_famillemembres',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    
+  		 params_allfamillemembres:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {type:'get',action:'listpersonne',titulaire_id:'=-1'}},
+	   	 charge_allfamillemembres_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+	     editbuttonhide:{type:Boolean,
+	    	 	notify : true,
+	    	 	value:false },	     
+	     seltitulaire:{type:Number,
+		    	 	notify : true,
+		    	 	value :-1},
+		 selmembre:{type:Number,
+	    	 	notify : true,
+	    	 	value :-1},
+		 titulaire:{type: Object,
+	    	 notify : true,
+	    	 value:{}
+	     },
+	     addable:{type:Boolean,
+	    	 notify:true},
+	     button_add_show:{type:Boolean,
+	    	 notify:true,
+	    	 computed:'_compute_isaddable(addable,editbuttonhide)'
+	     },
+	     famillemembres_Response:{type: Object,
+	    	 notify : true
+	     }
+	  },
+	  listeners: {
+          'reply_membre': 'handleReply',
+        },
+     observers: [
+                  '_titulairechange(seltitulaire,titulaire)',
+                  '_titulairemembrechange(famillemembres_Response)'
+                ],
+                
+	  add : function(){
+		  if (!this.titulaire.membres) {
+			  this.set('titulaire.membres',[]);
+		  }
+		 this.push('titulaire.membres', {newobjet:true,id:-1});
+		 this.set('seltitulaire',-1);
+		 this.set('editmode',true);
+		 this.set('editbuttonhide',true);
+	  },
+	  handleReply:function(e,detail){
+		  if (detail.id==-1 && this.titulaire.membres.indexOf(detail)>-1) {
+			  this.splice('titulaire.membres', this.titulaire.membres.indexOf(detail), 1);
+		  }
+		  
+	  },
+	  _compute_isaddable:function(addable,editbuttonhide){
+		  if (addable && !editbuttonhide){
+			  return true;
+		  }  else {
+			  return false;
+		  }
+	  },
+	  _titulairechange:function(seltitulaire,titulaire){
+		  if(seltitulaire==titulaire.id){
+		        this.app = document.querySelector('#app');
+		        this.set('params_allfamillemembres.titulaire_id','='+seltitulaire);
+		    	this.charge_allfamillemembres_url=this.app.url_api+':'+this.app.port_api+'/index'
+		    	this.$.charge_allfamillemembres.generateRequest();
+		  }
+	  },
+	  _titulairemembrechange:function(famillemembres_Response){
+		  this.set('titulaire.membres',famillemembres_Response);
+		  this.notifyPath('titulaire.membres');
+	  },
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+
+  })
+  </script>
+
+</dom-module>

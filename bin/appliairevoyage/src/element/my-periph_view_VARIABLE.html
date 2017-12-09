@@ -1,0 +1,226 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/library/bower_components/paper-slider/paper-slider.html">
+
+<dom-module id="my-periph_view_VARIABLE">
+
+  <template>
+  		<style>
+  		  	 :host {
+		        --background-color: #fff;
+		  		--color: #757575;
+		      }   
+			.item-title {
+	          position: absolute;
+	          top: 0;
+	          left: 0;
+	          right: 0;
+	          /*background-color: rgba(0, 0, 0, 0.2);
+	          color: white;*/
+	          		background-color: var(--background-color);
+			        color: var(--color);
+	          font-weight: 400;
+	          padding: 16px;
+	        }
+
+	        .item-content {
+	          position: absolute;
+	          background: transparent;
+	          bottom: 0;
+	          left: 0;
+	          right: 0;
+	          padding: 16px;
+	        }
+	         #icon {
+	          position: absolute;
+	          bottom: 10px;
+	          left: 0;
+	          padding: 16px;
+	        }
+	        paper-button{
+	        	background: transparent;
+	        	width:100%;
+	        	height:80%;
+	        	margin:0;
+	        }
+	        paper-slider{
+	        	position: absolute;
+	        	z-index :10;
+	        	width:100%;
+	        	margin:0;
+	        	bottom: 0;
+	          	left: 0;
+	          	right: 0;
+	        }
+  		</style>
+  		
+		<img id="icon" src="{{app.url_http}}:{{app.port_http}}/{{periph_icon}}" height="50" width="50"/>
+  		<paper-button id="peripherique" on-tap="change_etat"  >
+        	<div class="item-content">	        	 
+				 <div style="display: inline-block;"> 
+				 	<!-- <h6 id="tags" style="font-size: 12px">{{periph.categorie.nom}}</h6> -->
+					<h6 id="expr1" style="font-size: 12px"></h6>
+					<h6 id="expr2" style="font-size: 12px"></h6>
+					<h6 id="expr3" style="font-size: 12px"></h6>
+				</div>
+			</div>
+			<div class="item-title">[[periph.nom]]</div>
+		</paper-button>
+		<paper-slider id="slider" pin step="0.5" value="{{etat_slider}}" min="0" max="1"></paper-slider>
+		<iron-ajax
+			id="send_etat"
+		    method="GET"
+		    url="{{send_etat_url}}"
+		    headers="{{app.header_auth}}"
+		    params="{{params_send_etat}}"
+		    handle-as="json"
+	    	on-error="_disconnect"
+		    last-response="{{send_etat_Response}}"
+		    debounce-duration="300">
+		</iron-ajax>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-periph_view_VARIABLE',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	     periph:{type:Object,
+	    	 notify:true
+	     },
+	     periph_icon:{type:String,
+	    	 notify:true
+	     },
+	     etat_slider:{type:Number,
+	    	 notify:true,
+	    	 value:0},
+	     params_send_etat:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'allconfiglite',v:'voyage.1.1.1'}},
+	   	 send_etat_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null }
+	  }, 
+	  _listen_changeslide:function(e){
+		  this.change_slide(this,this.$.slider,e);
+      },
+	  attached:function(){
+		  //console.log('attached',this.periph.nom);
+	        this.listen(this.app, 'Etatchange', 'onEtatchange');
+	        var self=this;
+	        this.listen(this.$.slider,'value-change','_listen_changeslide');
+	  },
+	  detached:function(){
+		  //console.log('detached',this.periph.nom);
+	        this.unlisten(this.app, 'Etatchange', 'onEtatchange');
+	        var self=this;
+	        this.unlisten(this.$.slider,'value-change', '_listen_changeslide');
+	  },
+	  ready: function() {
+		  //console.log('Ready',this.periph.uuid,this.periph.ecriture_type,'VARIABLE');
+		  if (this.periph.ecriture_type=='VARIABLE') {
+		        this.app = document.querySelector('#app');
+		        
+		        if (this.periph.categorie && this.periph.categorie.couleur_fond) {
+			        this.customStyle['--background-color']=this.periph.categorie.couleur_fond;
+			        this.updateStyles();	        	
+		        }
+		        if (this.periph.categorie && this.periph.categorie.couleur_text) {
+		        	switch (this.periph.categorie.couleur_text) {
+			        	case 'blanc' :
+			        		this.customStyle['--color']='#fff';
+			        	break;
+			        	default:
+			        		this.customStyle['--color']='#000';
+			        	break;
+		        	}
+			        
+			        this.updateStyles();	        	
+		        }
+
+		        if  (this.periph.categorie && this.periph.categorie.iconMin) {
+		        	this.periph_icon=this.periph.categorie.iconMin;
+		        }
+		        this.$.slider.max=Number(this.periph.ecriture_max_value);
+		        this.$.slider.min=Number(this.periph.ecriture_min_value);
+		        /*this.listen(this.app, 'Etatchange', 'onEtatchange');
+		        var self=this;
+		        this.$.slider.addEventListener('value-change', 
+		        		function(e){
+		        			self.change_slide(self,this,e);
+		        });*/
+		        this.onEtatchange({detail:{uuid:this.periph.uuid,data:this.app.lastetat[this.periph.uuid]}});
+		  }
+
+	   },
+	  _toArray(obj){
+	    	  return this.app._toArray(obj);
+	      },
+	  _disconnect(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  onEtatchange(e){
+	    	 
+	    	 if (this.periph.uuid==e.detail.uuid){
+	    		 //console.log('on etat change',this.periph.uuid, e.detail.uuid,e.detail.data); 
+	    		 if (e.detail.data.expression.etat+""==this.periph.ecriture_min_value) {
+	    			 this.periph_icon=this.periph.categorie.iconMin;	 
+	    		 } else if (e.detail.data.expression.etat+""==this.periph.ecriture_max_value) {
+	    			 this.periph_icon=this.periph.categorie.iconMax;	 
+	    		 } else  {
+	    			 this.periph_icon=this.periph.categorie.iconMidle;	 
+	    		 }
+	    		 if (parseFloat(e.detail.data.expression.etat) >= parseFloat(this.periph.ecriture_min_value) &&
+	    				 parseFloat(e.detail.data.expression.etat) <= parseFloat(this.periph.ecriture_max_value) ) {
+	    			 this.etat_slider=parseFloat(e.detail.data.expression.etat);	 
+	    		 }
+	    		 
+	    	 }
+	    	 //console.log('update etat');
+	      },
+	  change_etat(){
+	    	  this.params_send_etat.action='setetat';
+	    	  this.params_send_etat.uuid=this.periph.uuid;
+	    	  if (this.app.lastetat && this.app.lastetat[this.periph.uuid]){
+	    		  if (this.app.lastetat[this.periph.uuid].expression.etat+""!=this.periph.ecriture_min_value){
+	    			  this.params_send_etat.valeur=this.periph.ecriture_min_value;
+	    	    	  this.params_send_etat.cmd=this.periph.cmd='DIM';
+	    		  } else {
+	    			  this.params_send_etat.valeur=this.periph.ecriture_max_value;
+	    	    	  this.params_send_etat.cmd=this.periph.cmd='DIM';
+	    		  }
+	    		  
+	    	  }
+	    	  
+	    	  this.send_etat_url=this.app.url_api+':'+this.app.port_api+'/index'
+	    	  this.$.send_etat.generateRequest();
+	    	  
+	    	  //console.log("send changeetat");
+	      },
+	 change_slide(element_periph,slider,e){
+	    	  this.params_send_etat.action='setetat';
+	    	  this.params_send_etat.uuid=this.periph.uuid;
+	    	  this.params_send_etat.valeur=slider.value;
+	    	  this.params_send_etat.cmd='DIM';
+
+	    	  
+	    	  this.send_etat_url=this.app.url_api+':'+this.app.port_api+'/index'
+	    	  this.$.send_etat.generateRequest();
+	    	  
+	    	  //console.log("send change slider");
+	      }
+  })
+  </script>
+
+</dom-module>

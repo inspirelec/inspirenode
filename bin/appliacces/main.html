@@ -1,0 +1,208 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset='utf-8' />
+<title>InspiratAcces</title>
+<!-- <meta name="viewport" content="width=device-width,user-scalable=no"/> -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<!--<meta name="viewport" content="width=device-width,initial-scale=1"/>
+ <link rel="stylesheet" href="http://code.jquery.com.mobile/latest/jquery.mobile.css" />
+<link rel="stylesheet" href="css/jquery.mobile-1.0rc1.min.css" />
+<script src="js/jquery.js"></script>
+<script src="js/jquery.mobile-1.0rc1.min.js"></script>
+ -->
+<link rel="shortcut icon" type="image/png" href="icon.png"/>
+
+<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+<link rel="stylesheet" href="//inspirelec.com/lib/jqueryui/jquery-ui.css" />
+<!--<link rel="stylesheet" href="../lib_jquery/leaflet-0.7.3/leaflet.css" />
+<link rel="stylesheet" href="../lib_jquery/rating/jrating.css" />-->  
+
+<link rel='stylesheet' href='css/cupertino/jquery-ui.min.css' />
+
+<link rel="stylesheet" href="../themes/jquery.mobile.icons.min.css" />
+<link rel="stylesheet" href="../themes/style_perso.css" />
+<link href='css/fullcalendar.css' rel='stylesheet' />
+<link href='css/fullcalendar.print.css' rel='stylesheet' media='print' />
+<link rel="stylesheet" href="css/fullcalendar_perso.css" />
+<link rel="stylesheet" href="css/styles.css" />
+<!-- <script src="../lib_jquery/jquery/jquery-1.11.3.js"></script> -->
+<script src="//inspirelec.com/lib/jquery/jquery-2.1.1.js"></script>
+<!-- <script src="../lib_jquery/jqueryui/external/jquery/jquery.js"></script> -->
+<script src='//inspirelec.com/lib/jquery/jquery.min.js'></script>
+<script src='//inspirelec.com/lib/jquery/jquery-ui.custom.min.js'></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+<script src="../lib_jquery/jquery.ui.touch.punch-0.2.3.js"></script>
+<!--<script src="../lib_jquery/jqueryplayer/jquery.jplayer.js"></script>
+
+
+<script src="../lib_jquery/highchart/highcharts.js"></script>-->
+<!--<script src="../lib_jquery/leaflet-0.7.3/leaflet-src.js"></script> -->
+<!--<script src="../lib_jquery/rating/jrating.js"></script> -->
+<script src="../lib_jquery/jquery.i18n/jquery.i18n.js"></script>
+<script src="../lib_jquery/jquery.i18n/jquery.i18n.messagestore.js"></script>
+<script src="../lib_jquery/jquery.i18n/jquery.i18n.fallbacks.js"></script>
+<script src="../lib_jquery/jquery.i18n/jquery.i18n.parser.js"></script>
+<script src="../lib_jquery/jquery.i18n/jquery.i18n.emitter.js"></script>
+<script src="../lib_jquery/jquery.i18n/jquery.i18n.language.js"></script>
+
+<script src='../lib_jquery/moment.min.js'></script>
+
+<!--<script src='../lib_jquery/fullcalendar/fullcalendar.min.js'></script>-->
+<script src='../lib_jquery/fullcalendar/fullcalendar.min.js'></script>
+<script src='i18n/lang-all.js'></script>
+
+
+
+<!--</script>
+
+
+<link rel="stylesheet" href="../lib_jquery/jquery-ui-timepicker-addon.css" />
+<script src="../lib_jquery/jquery-ui-timepicker-addon-0.6.2.js"></script>-->
+ 
+<script> $(function(){  
+	
+		$.ajax({
+		    url: "htmlpages/"+"Page_login"+".html",
+		    success: function (data) { 
+		    	$('body').append(data); 
+		    	//document.location.hash = "loginPage";
+		    	$.mobile.changePage( $('#loginPage'),{transition:"slide"});
+
+		    	},
+		    dataType: 'html'
+		});
+		
+		var pages=[/*"Page_login",*/
+		           "Page_Acces_Resa",
+		           "Page_Acces_Profil",
+		           "Page_Acces_Batiment",
+		           "Page_Acces_Tag",
+		           "Page_Acces_Periph",
+		           "Page_Acces_Parametres",
+		           "Page_Acces_Info",
+		           "Page_Acces_Validcreationuser",
+		           "Page_Acces_Recupmotpasse"
+		           ];
+		for ( var page_html in pages) {
+			$("body").load
+			$.ajax({
+			    url: "htmlpages/"+pages[page_html]+".html",
+			    success: function (data) { 
+			    	$('body').append(data); 
+			    	},
+			    dataType: 'html'
+			});
+		}
+	}); 
+	
+</script> 
+
+
+</head>
+    
+<body>
+
+	<div id="startPage" data-role="page" data-theme="c" data-add-back-btn="true" >
+		<div data-role="content" data-theme="c">
+		</div>
+	</div>  
+	<div id="settingListPage" data-role="page" style="background: #333333" data-add-back-btn="true" >
+	
+		<div  id ="entete"  data-role="header" data-theme="c" data-position="fixed" >
+			<h1 id="titre"></h1>
+			<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-icon-back ui-btn-icon-left ui-btn-icon-notext">Back</a>
+			
+		</div>
+		<div data-role="content" data-theme="c">
+			<ul id="settingList" data-role="listview" data-filter="false" data-theme="b"></ul>	
+	    </div>		
+	</div>  
+<script src="cordova.js"></script>
+<script src="js/index.js"></script>
+<script src="js/main.js"></script>
+<script src="js/variables.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/md5.js"></script>
+<script src="js/refreshetat.js"></script>
+
+<script src="js/_request_manager.js"></script> 
+<script src="js/_core.js"></script>
+<script src="js/_connexion_request.js"></script>
+<script src="js/filemanager.js"></script>
+<script src="i18n/traductions.js"></script>    
+
+
+<script src="js/Page_start.js"></script>
+<script src="js/Page_login.js"></script> 
+<script src="js/Page_Acces_Parametres.js"></script>
+<script src="js/Page_Acces_Resa.js"></script>
+<script src="js/Page_Acces_Profil.js"></script>
+<script src="js/Page_Acces_Batiment.js"></script>
+<script src="js/Page_Acces_Tag.js"></script>
+<script src="js/Page_Acces_Periph.js"></script>
+<script src="js/Page_periph.js"></script>
+<script src="js/Page_tagList.js"></script>
+<script src="js/Page_Acces_Recupmotpasse.js"></script>
+
+<script src="js/onclickperipheriques.js"></script> 
+<!--
+<script src="js/Page_Indus_Graphique.js"></script>
+ <script src="js/Page_Indus_GraphiqueDetail.js"></script> 
+<script src="js/Page_Indus_ProgListMode.js"></script>
+<script src="js/Page_Indus_ProgListTag.js"></script>
+<script src="js/Page_Indus_ProgChauffage.js"></script>
+<script src="js/Page_Indus_ProgReservation.js"></script>
+
+
+-->
+<!--
+
+
+<script src="js/Page_user.js"></script>
+<script src="js/Page_acceuil.js"></script> 
+<script src="js/Page_periph.js"></script>
+<script src="js/Page_debug.js"></script>
+<script src="js/Page_prog.js"></script>
+<script src="js/Page_progListmode.js"></script>
+<script src="js/Page_progListCateg.js"></script>
+<script src="js/Page_progList.js"></script>
+<script src="js/Page_progalarme.js"></script>
+<script src="js/Page_camera.js"></script>
+<script src="js/Page_settingmodes.js"></script>-->
+
+<!--<script src="js/onclickperipheriques.js"></script> 
+<script src="js/onclicktag.js"></script>
+<script src="js/onclickprog.js"></script> 
+<script src="js/onclickuser.js"></script>    
+<script src="js/onclickperipheriques.js"></script> 
+<script src="js/onclickmode.js"></script> -->
+
+<!-- <script src="js/highchart/highcharts.js"></script>
+<script src="js/ges_highcharts.js"></script> -->
+<script type="text/javascript">
+         if(isitdevice()){
+         	 document.addEventListener('deviceready',function(){
+        		//alert('ready 5');
+            	app.initialize();
+            	//window.location='./main.html';
+        	}, false);
+         } else {
+         	app.initialize();
+    		//app.receivedEvent(0);
+         }
+         
+         window.onerror = function (errorMsg, url, lineNumber) {
+        	 alert('Error: ' + errorMsg + '\n\nScript: ' + url + '\n\nLine: ' + lineNumber);
+        	    console.log('Error: ' + errorMsg + '\n\nScript: ' + url + '\n\nLine: ' + lineNumber);
+        	}
+</script>
+        
+ 
+
+
+</body>
+
+</html>

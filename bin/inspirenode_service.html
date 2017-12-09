@@ -1,0 +1,48 @@
+<html>
+<script src='//inspirelec.com/lib/jquery/jquery.min.js'></script>
+<head>
+    <title>SOAP JavaScript Client Test</title>
+    <script type="text/javascript">
+        function soap() {
+            var url= 'http://192.168.1.10:8000/wsdl';
+
+            // build SOAP request
+            var sr =
+                '<?xml version="1.0" encoding="utf-8"?>' +
+                '<soapenv:Envelope ' + 
+                    //'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+                    //'xmlns:xsd="http://www.w3.org/2001/XMLSchema" ' +
+                    'xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">' +
+                    '<soapenv:Body>' +
+                        '<api:ListeTaches soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">' +
+                            '<username xsi:type="xsd:string">login_username</username>' +
+                            '<password xsi:type="xsd:string">password</password>' +
+                        '</api:ListeTaches>' +
+                    '</soapenv:Body>' +
+                '</soapenv:Envelope>';
+
+            var res=jQuery.ajax({
+                type: 'POST',
+                url: url,
+                data: sr,
+                dataType: 'text/html',
+                async:   false,
+                success :function (data,data1){
+                	console.log(data,data1)
+                }
+                
+            });
+            console.log(res);
+            $('#result').html='<pre>'+res+'</pre>';
+        }
+    </script>
+</head>
+<body>
+    <form name="Demo" action="" method="post">
+        <div>
+            <input type="button" value="Soap" onclick="soap();" />
+        </div>
+    </form>
+    <div id="result"></div>
+</body>
+<html>

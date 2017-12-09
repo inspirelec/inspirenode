@@ -1,0 +1,94 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<dom-module id="my-liste_famillesejours">
+
+  <template>
+		<style >
+  		</style>
+  		<my-sous_liste_behavior class="parametres_zone"
+  			
+  			detail_code="my-profilfamillesejour" 
+  			
+  			title="Séjours"
+  			title_background_color="rgba(140, 40, 170, 0.5)"
+  			
+  			params="{{params_allfamillesejours}}"
+  			
+  			hideother_onedit=false
+  			hideothereditbutton_onedit=true
+  			grants="{{grants}}"
+  			
+  			scroll_actif=false
+  			max_heightliste="20vh"
+  			
+  			liste_soustable="{{liste_soustable}}"
+  			parent="{{titulaire}}"
+  			charge_table$="{{charge_table}}"
+  			dropdowntype$="{{dropdowntype}}"
+  			value_sel="{{value_sel}}"
+  			dropdown_selobj="{{dropdown_selobj}}"
+  			
+  			liste_objets="{{liste_objets}}"  		>
+	
+		</my-sous_liste_behavior>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_famillesejours',
+	  
+	  properties: {  
+  		 params_allfamillesejours:{type: Object,
+	   	 	  notify : true,
+	   	 	 computed:'_getparams_get(titulaire)'
+	        },
+	  	 grants:{type:Object,
+	  	 		 notify : true,
+	  	 		computed:'_get_grants(titulaire)'
+	  	 	 },
+		  	 titulaire:{type:Object,notify:true},
+	     liste_famillesejours:{type:Array,
+	    	 notify:true},
+	    	 
+	     dropdown_selobj:{type:Object,notify:true},
+	     value_sel:{type:Number,notify:true,value:6},
+	     charge_table:{type:Boolean,notify:true}
+	  },
+	 
+
+	  _getparams_get:function(titulaire){
+		  if (titulaire) {
+			  return  {type:'get',action:'listsejour',titulaire_id:'='+titulaire.id} ;
+		  } else {
+			  return null;
+		  }
+		  
+	  },
+	  _get_grants:function(titulaire){
+		  if (titulaire && titulaire.id && titulaire.id>=0){
+			  return {creation:true,
+					 modification:true,
+					 suppression:true,
+					 impression:false};
+		  } else {
+			  return {creation:false,
+					 modification:false,
+					 suppression:false,
+					 impression:false};
+		  }
+	  }
+	  
+
+
+  })
+  </script>
+
+</dom-module>

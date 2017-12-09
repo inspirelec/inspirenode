@@ -1,0 +1,92 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+
+<dom-module id="my-doc_listefamilles_selection">
+
+  <template>
+		<style >
+		 .print-button{
+		 	position:absolute;
+		 	bottom:-20px;
+		 	right:25px;
+		 	--paper-fab-background: var(--paper-red-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-red-900);
+		    z-index:10;
+		 }
+		 .item-title {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color: rgba(125, 40, 25, 0.5);
+          color: white;
+          font-weight: 400;
+          padding: 16px;
+        }
+        .card {
+        	display :block;
+            
+            padding:5px;
+            padding-bottom: 20px;
+          	max-width: 500px;
+          	margin-right: auto;
+          	margin-left: auto;
+          	position: relative;
+            background-color: white;
+        	color: var(--paper-blue-800);
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	        
+	     }
+	     .cardprinc{
+		 	padding-top:60px;
+		 	margin-top: 40px;
+		 	position: relative;
+		 }
+  		</style>
+
+		<div class="card cardprinc" >
+			<div class="item-title" >Impression liste des familles</div>
+		    <paper-input id="nom" label="Nom" type="text" value="{{selection.nom}}"> </paper-input>
+
+			<paper-fab class="print-button"  mini icon="print" title="Imprimer" on-tap="print"></paper-fab>
+		</div>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-doc_listefamilles_selection',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	     
+  		 selection:{type:Object, 
+  			 notify:true,
+  			 value:{}}
+	  },
+	  ready:function(){
+	        this.app = document.querySelector('#app');
+	  },
+                
+	  print:function(){
+		  var selnom=this.$.nom.value;
+		  if (!selnom) selnom='';
+		this.app.$.location.path="/appliairevoyage/docPrint/query?doc=doc_listefamilles&nom="+selnom;  
+		 
+	  }
+
+  })
+  </script>
+
+</dom-module>

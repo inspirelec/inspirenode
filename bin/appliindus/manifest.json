@@ -1,0 +1,7 @@
+{
+  "name": "applihotel",
+  "short_name": "applihotel",
+  "description": "appli hotel",
+  "start_url": "/",
+  "display": "standalone"
+}

@@ -1,0 +1,121 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="/library/bower_components/highcharts-chart/highcharts-chart.html">
+
+<dom-module id="my-liste_graphique_highchart">
+
+  <template>
+		<style include="app-grid-style">
+
+  		</style>
+
+       <template is="dom-repeat" items="[[periphs_regroup]]">
+	       <my-graphique_highchart infosgraphique="[[item.infosgraphique]]" periphs="[[item.listperiph]]"></my-graphique_highchart>
+       </template>
+  </template>
+  <script>
+  
+  Polymer({
+
+	  is: 'my-liste_graphique_highchart',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    	 
+
+	     periphs:{type:String,notify:true},
+	     periphs_regroup:{type:Array,notify:true,computed:'_get_regroupement(periphs)'},
+
+	  },
+	  observers:[],
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+	  },
+	  
+	  _get_regroupement:function(periphs){
+		var series_regr={};
+		for (var p in periphs){
+			/*colonne etat*/
+			var colonnesgraph=['etat','expr1','expr2','expr3','expr4','expr5','expr6','expr7'];
+			
+			for (var c in colonnesgraph){
+				var graphique_regr=null;
+				var col=colonnesgraph[c];
+				if(periphs[p]['lecture_'+col+'_graph'] && periphs[p]['lecture_'+col+'_graph'].Graph_regroupe) {
+					graphique_regr=periphs[p]['lecture_'+col+'_graph'].Graph_regroupe;
+				} else if(periphs[p]['lecture_'+col+'_graph']) {
+					graphique_regr=periphs[p]['lecture_'+col+'_graph'];
+				}
+				if (graphique_regr && !series_regr['graph_'+graphique_regr.id]){
+					var regroup={};
+					regroup.infosgraphique=graphique_regr;
+					regroup.listperiph=[];
+					series_regr['graph_'+graphique_regr.id]=regroup;
+					
+				}
+				if(graphique_regr && series_regr['graph_'+graphique_regr.id]){
+					var info_periph={uuid:periphs[p].uuid,nom:periphs[p].nom,colonne:col,infosserie:periphs[p]['lecture_'+col+'_graph']};
+					series_regr['graph_'+graphique_regr.id].listperiph.push(info_periph);
+				}
+			}
+
+		}
+		var series_array=[];
+		for(var s in series_regr){
+			series_array.push(series_regr[s]);
+		}
+		return series_array;
+	  },
+	  
+		sort_by : function() {
+			   var fields = [].slice.call(arguments),
+			       n_fields = fields.length;
+
+			   return function(A,B) {
+			       var a, b, field, key, primer, reverse, result, i;
+
+			       for(i = 0; i < n_fields; i++) {
+			           result = 0;
+			           field = fields[i];
+
+			           key = typeof field === 'string' ? field : field.name;
+
+			           a = A[key];
+			           b = B[key];
+
+			           if (typeof field.primer  !== 'undefined'){
+			               a = field.primer(a);
+			               b = field.primer(b);
+			           }
+
+			           reverse = (field.reverse) ? -1 : 1;
+
+			           if (a<b) result = reverse * -1;
+			           if (a>b) result = reverse * 1;
+			           if(result !== 0) break;
+			       }
+			       return result;
+			   }
+			}	 ,
+
+		  _toArray(obj){
+		    	  return this.app._toArray(obj);
+		      },
+		  _disconnect(obj){
+		    	  this.app = document.querySelector('#app');
+		    	  return this.app.disconnect();
+		      },
+	      
+  })
+  </script>
+
+</dom-module>

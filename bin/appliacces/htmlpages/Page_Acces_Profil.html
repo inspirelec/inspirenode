@@ -1,0 +1,122 @@
+	<div id="Acces_Profil_Page" data-role="page" data-theme="c">
+	
+		<div id ="entete" data-role="header" data-theme="c" data-position="fixed">
+			<div class='topuser' style="margin-left:10px;margin-right:15px;float:left;display:none;border:none;width:40%" >
+		  		<input class='user' name="usersel" id="usersel" style="background-color:white" placeholder="Selection client">
+		  	</div><div><h1 style="text-align:center" id="titre"></h1></div>
+			<a href="#Acces_Info_Page" data-transition="slide" class="ui-btn-right ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-info ui-btn-icon-notext" >Button</a>
+		</div>
+		<div data-role="content" data-theme="c" style="padding:0px 0px;margin:5px 20px 5px 20px">
+
+			<div style="display:none;">
+				<input type="text" >
+	        	<input type="password"  >
+	        	<input type="text" id="id" >
+	        	<input type="text" id="uuid" >
+        	</div>
+
+			
+
+			<div data-role="fieldcontain" data-mini="true" style="border:0px;margin:5px;" >
+				<label for="name" >Nom *</label>
+				<input type="text" name="name" id="nom" value="" placeholder="" required="required" >
+			</div>
+			<div data-role="fieldcontain" data-mini="true"  style="border:0px;margin:5px;">
+				<label for="prenom">Prénom *</label>
+				<input type="text" name="prenom" id="prenom" value="" placeholder="" required="required">
+			</div>
+			<div data-role="fieldcontain" data-mini="true" style="border:0px;margin:5px;" >
+				<label for="societe" >Société</label>
+				<input type="text" name="societe" id="societe" value="" placeholder="" >
+			</div>
+			<div data-role="fieldcontain" data-mini="true"  style="border:0px;margin:5px;" >
+				<label for="descriptif_activite">Descriptif d'activité *</label>
+				<input type="text" name="descriptif_activite" id="descriptif_activite" value="" placeholder="" required="required"> 
+			</div>
+			<div data-role="fieldcontain" data-mini="true"  style="border:0px;margin:5px;" >
+				<label for="siret">Siret</label>
+				<input type="text" name="siret" id="siret" value="" placeholder="exemple : 254 851 369 54218"  pattern="[0-9]{3}[ \.\-]?[0-9]{3}[ \.\-]?[0-9]{3}[ \.\-]?[0-9]{5}"> 
+			</div>
+			<div data-role="fieldcontain" data-mini="true"  style="border:0px;margin:5px;" >
+				<label for="adresse1">Adresse 1 *</label>
+				<input type="text" name="adresse1" id="adresse1" value="" placeholder="" required="required">
+			</div>
+			<div data-role="fieldcontain" data-mini="true"  style="border:0px;margin:5px;" >
+				<label for="adresse2">Adresse 2</label>
+				<input type="text" name="adresse2" id="adresse2" value="" placeholder="">
+			</div>
+			<div data-role="fieldcontain" data-mini="true"  style="border:0px;margin:5px;" >
+				<label for="ville">Ville *</label>
+				<input type="text" name="ville" id="ville" value="" placeholder="" required="required">
+			</div>
+			<div data-role="fieldcontain" data-mini="true"  style="border:0px;margin:5px;" >
+				<label for="telephone">Téléphone *</label>
+				<input type="tel" name="telephone" id="telephone" value="" placeholder="" required="required" pattern="^(?:0|\(?\+[1-9]{2}\)?\s?|00[1-9]{2}\s?)[1-79](?:[\.\-\s]?\d\d){4}$" >
+			</div>
+			<div data-role="fieldcontain" data-mini="true"  style="border:0px;margin:5px;" >
+				<label for="telephone_portable">Téléphone portable</label>
+				<input type="tel" name="telephone_portable" id="telephone_portable" value="" placeholder="" pattern="^(?:0|\(?\+[1-9]{2}\)?\s?|00[1-9]{2}\s?)[1-79](?:[\.\-\s]?\d\d){4}$" >
+			</div>
+			<div data-role="fieldcontain" data-mini="true"  style="border:0px;margin:5px;" >
+				<label for="email">Courriel *</label>
+				<input type="email" name="email" id="email" class="validation" value="" placeholder="" required="required" pattern="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$" >
+			</div>
+			<div data-role="fieldcontain" data-mini="true" style="border:0px;margin:5px;" >
+				<label for="password" >Mot de passe *</label>
+				<input type="password" name="password" id="password" value="" placeholder="Minimum 6 caractères avec minuscule, majuscule et chiffre" required="required" >
+			</div>
+			<div data-role="fieldcontain" data-mini="true" style="border:0px;margin:5px;" >
+				<label for="passwordconfirm" >Confirmation *</label>
+				<input type="password" name="passwordconfirm" id="passwordconfirm" value="" placeholder="Minimum 6 caractères avec minuscule, majuscule et chiffre" required="required"  >
+			</div>
+			<div data-role="fieldcontain" data-mini="true" style="border:0px;margin:5px;" class="adminprofilreadonly" >
+				<label for="codeacces" >Code acces</label>
+				<input type="text" name="codeacces" id="codeacces" value="" placeholder="5 chiffres" pattern="^[0-9]{5}$">
+			</div>
+			<div data-role="fieldcontain" data-mini="true" style="border:0px;margin:5px;" class="adminprofilreadonly" >
+				<label for="badge_numero" >Badge N°</label>
+				<input type="text" name="badge_numero" id="badge_numero" value="" placeholder=""  ><!--pattern="^[0-9]{10}$"-->
+			</div>
+			<div data-role="fieldcontain" data-mini="true" style="border:0px;margin:5px;" class="adminprofilreadonly" >
+				<label for="badge_abonnement_date_fin" >Date de validité</label>
+				<input type="date" name="badge_abonnement_date_fin" id="badge_abonnement_date_fin" value="" placeholder="" >
+			</div>
+			<div data-role="fieldcontain" data-mini="true" style="border:0px;display:none;margin:5px;" class="adminprofil" >
+				<label for="type" >Type de compte</label>
+				<select type="text" name="type" id="type" value="" placeholder="" >
+					<option value="CLIENT">Client</option>
+					<option value="SERVICE">Service</option>
+					<option value="ADMINISTRATEUR">Administrateur</option>
+				</select>
+			</div>
+			<div style="display:flex;margin-left:22% ">			    
+			    <input style="margin-left:30%" type="checkbox" name="agree" id="agree" data-mini="true" style="float:left" required="required">
+			    <div style="margin-left:45px">J'accepte les <a href="https://www.google.com/intl/fr/policies/terms/">conditions d'utilisations</a></div>
+			</div>
+			<div style="margin:20px">
+				<button id="validprofil" type="submit" onclick="sendprofil();return false;">Enregistrer</a>
+			</div>
+	    </div>		
+		<div  id ="pied"  data-role="footer" data-theme="c" data-position="fixed" >
+			<div data-role="navbar">
+				<ul id="accueilmenulist1" class="accueilmenulist1" style="display: none;">
+					<li><a href="#" id="button1" data-transition="slide" class="button1 ui-btn-active ui-state-persist"></a></li>
+				</ul>
+				<ul id="accueilmenulist2" class="accueilmenulist2" style="display: none;">
+					<li><a href="#" id="button1" data-transition="slide" class="button1"></a></li>
+					<li><a href="#" id="button2" data-transition="slide" class="button2 ui-btn-active ui-state-persist" data-prefetch="true"></a></li>
+				</ul>
+				<ul id="accueilmenulist3" class="accueilmenulist3" style="display: none;" >
+					<li><a href="#" id="button1" data-transition="slide" class="button1"></a></li>
+					<li><a href="#" id="button2" data-transition="slide" class="button2 ui-btn-active ui-state-persist" data-prefetch="true"></a></li>
+					<li><a href="#" id="button3" data-transition="slide" class="button3" data-prefetch="true"></a></li>
+				</ul>
+				<ul id="accueilmenulist4" class="accueilmenulist4" style="display: none;">
+					<li><a href="#" id="button1" data-transition="slide" class="button1"></a></li>
+					<li><a href="#tagListPage" id="button2" class="button2 ui-btn-active ui-state-persist" data-transition="slide" data-prefetch="true"></a></li>
+					<li><a href="#progmodepage" id="button3" class="button3  " data-transition="slide" data-prefetch="true"></a></li>
+					<li><a href="#" id="button4" class="button4" data-transition="slide" data-prefetch="true"></a></li>
+				</ul>
+			</div>
+		</div>
+	</div>

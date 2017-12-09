@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Réglages Acces</title>
+<meta name="viewport" content="width=device-width,user-scalable=no"/>
+<link rel="shortcut icon" type="image/png" href="icon_camping.png"/>
+
+<link rel="stylesheet" href="../lib_jquery/jquery/jquery.mobile-1.4.5.css" />
+<link rel="stylesheet" href="../lib_jquery/jqueryui/jquery-ui.css" />
+<link rel="stylesheet" href="../lib_jquery/leaflet-0.7.3/leaflet.css" /> 
+<link rel="stylesheet" href="js/styles.css" />
+
+<script src="../lib_jquery/jquery/jquery-1.11.3.js"></script>
+<script src="../lib_jquery/jqueryui/external/jquery/jquery.js"></script>
+<script src="../lib_jquery/jqueryui/jquery-ui.js"></script>
+<script src="../lib_jquery/jquery/jquery.mobile-1.4.5.js"></script>
+<script src="../lib_jquery/jquery.ui.touch.punch-0.2.3.js"></script>
+
+<script type="text/javascript">
+var port_web=0;
+var port_api=0;
+$.getJSON("../config_app_acces.json", function(data){
+	  port_web=data.httpport;
+	  port_api=data.apiport;
+	}); 
+</script>
+</head>
+<body>
+
+	<div id="loginPage" data-role="page" style="background: #333333" data-add-back-btn="true"  >
+	
+		<div  id ="entete"  data-role="header" data-theme="b" data-position="fixed"  >
+			<h1>Reglages</h1>
+		</div>
+		<div data-role="content" data-theme="b">
+		<div  id="popupLogin" data-theme="a"  class="ui-corner-all">
+			<!-- data-role="popup" data-overlay-theme="b"-->	 
+			<form>
+				<div style="padding:10px 20px;">
+				  <h3>Identification</h3>
+			
+		          <label for="un" class="ui-hidden-accessible">Login:</label>
+		          <input type="text" name="user" id="un" value="" placeholder="login" data-theme="a" />
+		          
+		          <label for="pw" class="ui-hidden-accessible">Mot de passe:</label>
+		          <input type="password" name="pass" id="pw" value="" placeholder="Mot de passe" data-theme="a" />
+		          
+		    	  <button id="btnconnection" type="submit" data-theme="b" onclick="connexionappli();return false;";>Connexion</button>
+
+				</div>
+			</form>
+		</div>
+	    </div>		
+
+
+
+	</div>  
+<div id="accueilPage" data-role="page" style="background: #333333">
+	
+		<div id ="entete" data-role="header" data-theme="b" data-position="fixed">
+			
+			<h1 id="titre">Reglages</h1>
+			<!-- <a id="settingbuttona" href="#" onclick=";" data-transition="slide" class="ui-btn-right ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-user ui-btn-icon-notext">Button</a> -->
+			
+		</div>
+		<div data-role="content" data-theme="b" style="padding:0px 0px;margin:0px 0px">
+			<div class="ui-grid-a" >
+				<div class="ui-block-a">
+				    <div class="ui-bar ui-bar-b">
+						<ul id="containerD" class="connectedSortable" data-role="listview" data-filter="false" data-theme="b"></ul>
+				    </div>
+				</div>
+				<div class="ui-block-b">
+					<div class="ui-bar ui-bar-b">
+						<ul id="containerG" class="connectedSortable" data-role="listview" data-filter="false" data-theme="b"></ul>
+				    </div>
+				</div>
+			</div>
+	    </div>		
+		<div  id ="pied"  data-role="footer" data-theme="b" data-position="fixed" >
+			<div data-role="navbar">
+				<ul id="accueilmenulist3" style="display: none;" >
+					<li><a href="#" id="button1" data-transition="slide" class="ui-btn-active ui-state-persist"></a></li>
+					<li><a href="#" id="button2" data-transition="slide" data-prefetch="true"></a></li>
+					<li><a href="#" id="button3" data-transition="slide" data-prefetch="true"></a></li>
+				</ul>
+			</div>
+		</div>
+</div>
+<!-- <div class="ui-bar ui-bar-b">
+				<ul id="programmationlist" data-role="listview" data-filter="false" data-theme="b" data-inset="true" data-divider-theme="b" data-split-theme="b" data-split-icon="delete" class="ui-listview ui-listview-inset ui-corner-all ui-shadow ui-group-theme-b">
+						
+					    
+				<li data-role="list-divider" role="heading" class="ui-li-divider ui-bar-b ui-first-child">Programmation</li><li class="ui-li-has-alt"><a href="#" class="ui-btn">0h00 -&gt; 20 ( Lu Ma Me Je Ve Sa Di )</a><a href="#" onclick="deleteprog(0);return false" data-rel="popup" data-position-to="window" data-transition="pop" title="delete" class="ui-btn ui-btn-icon-notext ui-icon-delete ui-btn-b"></a></li><li class="ui-last-child"><a href="#" onclick="addprog();return false;" class="ui-btn ui-btn-icon-right ui-icon-carat-r">Ajouter</a></li></ul>
+			</div> -->
+			
+<div id="listPage" data-role="page" style="background: #333333">
+		<div id ="entete" data-role="header" data-theme="b" data-position="fixed">
+			<h1 id="titre">Reglages liste</h1>	
+			<form class="ui-filterable">
+			  <input id="myFilter" data-type="search" placeholder="Filtre de recherche">
+			</form>	
+		</div>
+		<div data-role="content" data-theme="b" style="padding:0px 0px;margin:0px 0px">
+			<div class="ui-bar ui-bar-b">
+				<ul id="container" data-role="listview" data-input="#myFilter" data-filter="true" data-theme="b" data-inset="true" data-divider-theme="b" >    
+					<li><a href="#" onclick="addligne();return false;" class="ui-btn ui-btn-icon-right ui-icon-carat-r">Ajouter</a></li>
+				</ul>
+			</div>
+	    </div>		
+		<!-- <div  id ="pied"  data-role="footer" data-theme="b" data-position="fixed" >	</div>-->
+</div>			
+
+<div id="detailPage" data-role="page" style="background: #333333">
+		<div id ="entete" data-role="header" data-theme="b" data-position="fixed">
+			<h1 id="titre">Reglages détail</h1>		
+		</div>
+		<div data-role="content" data-theme="b" style="padding:0px 0px;margin:0px 0px">
+			<div id ="sidebar" class="content-primary"></div>
+			<div style="position:absolute;top:-1000px;opacity:0;height:0px">
+				<input type="text" id="user" >
+	        	<input type="password" id ="password" >
+	        	<input type="text" id="id" >
+	        	<input type="text" id="uuid" >
+        	</div>
+			<div id="content" class="content-secondary"></div>
+
+	    </div>		
+		<!-- <div  id ="pied"  data-role="footer" data-theme="b" data-position="fixed" >	</div> -->
+</div>	
+
+
+<div id="reponsePage" data-role="page" style="background: #333333">
+		<div id ="entete" data-role="header" data-theme="b" data-position="fixed">
+			<h1 id="titre">Reglages reponse action</h1>		
+		</div>
+		<div data-role="content" data-theme="b" style="padding:0px 0px;margin:0px 0px">
+			<div id="content"></div>
+	    </div>		
+		<div  id ="pied"  data-role="footer" data-theme="b" data-position="fixed" >	</div>
+</div>	
+
+<div id="testPage" data-role="page" style="background: #333333">
+		<div class="wrapper jsc-sidebar-content jsc-sidebar-pulled">
+		    <nav>	<a href="#" class="icon-menu link-menu jsc-sidebar-trigger"></a>
+		
+		    </nav>
+		    <section class="main-content">
+		        <div class="main-content-header">
+		            	<h1 class="headline"><span class="headline-main">Sidebar</span>JS</h1>
+		
+		            <p class="version">v 0.2.0</p>
+		            <p>SidebarJS is a jQuery plugin for side navigation.</p>
+		            <ul class="btn-list">
+		                <li><a href="#testPage" class="btn">get test</a>
+		
+		                </li>
+		                <li><a href="http://github.com/makotot/sidebar/releases/0.2.0" class="btn">Download</a>
+		
+		                </li>
+		            </ul>
+		        </div>
+		        <div class="main-content-body">
+		            <div class="main-content-body-inner">
+		                	<h2>Public API</h2>
+		
+		                <ul>
+		                    <li>
+		                        	<h3>.push()</h3>
+		
+		                        <p><a href="#" id="api-push">Open</a> Sidebar content from JavaScript.</p>
+		                    </li>
+		                    <li>
+		                        	<h3>.pull()</h3>
+		
+		                        <p><a href="#" id="api-pull">Close</a> Sidebar content from JavaScript.</p>
+		                    </li>
+		                </ul>
+		            </div>
+		        </div>
+		    </section>
+		</div>
+		<nav class="sidebar jsc-sidebar" id="jsi-nav" data-sidebar-options="">
+		    <ul class="sidebar-list">
+		        <li><a href="./" class="current">SidebarJS</a>
+		
+		        </li>
+		        <li><a href="http://github.com/makotot/sidebar/">View on Github</a>
+		
+		        </li>
+		        <li><a href="http://github.com/makotot/sidebar/releases">Download</a>
+		
+		        </li>
+		    </ul>
+		</nav>
+</div>	
+
+<script src="js/loginPage.js"></script>
+<script src="js/accueilPage.js"></script>
+<script src="js/listPage.js"></script>
+<script src="js/detailPage.js"></script>
+<script src="js/reponsePage.js"></script>
+<script src="js/comm.js"></script>
+<script src="../dbmodel_acces.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+#!/bin/bash
+#date du jour
+JOUR=$(date +%y%m%d)
+HEURE=$(date +%H:%M:%S)
+#service
+service=inspirenode
+fichier=app.js
+
+if (( $(ps -ef | grep -v grep | grep $fichier | wc -l) > 0 ))
+then
+ echo "$service is running!!!"
+else
+ 
+ echo "$HEURE : $service non démarré" >> /var/www/inspirenode/log/$JOUR$service.log
+ /etc/init.d/$service start
+ echo "$HEURE : $service démarré" >> /var/www/inspirenode/log/$JOUR$service.log
+fi

@@ -1,0 +1,133 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../element/my-profilcompteur.html">
+
+<dom-module id="my-liste_compteurs">
+
+  <template>
+		<style >
+		 .add-button{
+		 	/*position:fixed;
+		 	bottom:50px;
+		 	left:50px;*/
+		 	float:right;
+		 	--paper-fab-background: var(--paper-blue-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-blue-900);
+		 }
+		 .item-title {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color: rgba(60, 10, 45, 0.5);
+          color: white;
+          font-weight: 400;
+          padding: 16px;
+        }
+  		</style>
+
+  	<iron-ajax
+		id="charge_allcompteurs"
+	    method="GET"
+	    url="{{charge_allcompteurs_url}}"
+	    headers="{{app.header_auth}}"
+	    params="{{params_allcompteurs}}"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    last-response="{{compteurs_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+		<div class="item-title" >compteurs</div>
+    <template is="dom-repeat" items="{{titulaire.compteurs}}">
+    		
+			<my-profilcompteur objet="{{item}}" selcompteur="{{selcompteur}}" editbuttonhide="{{editbuttonhide}}"></my-profilcompteur>
+	</template>
+	<paper-fab class="add-button" hidden$="[[editbuttonhide]]" mini icon="add" title="Créer" on-tap="add"></paper-fab>
+
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_compteurs',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    
+  		 params_allcompteurs:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {type:'get',action:'listrelevecompteur',titulaire_id:-1}},
+	   	 charge_allcompteurs_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+	     editbuttonhide:{type:Boolean,
+	    	 	notify : true,
+	    	 	value:false },	     
+	     seltitulaire:{type:Number,
+		    	 	notify : true,
+		    	 	value :-1},
+		 selcompteur:{type:Number,
+	    	 	notify : true,
+	    	 	value :-1},
+		 titulaire:{type: Object,
+	    	 notify : true,
+	    	 value:{}
+	     },
+	     compteurs_Response:{type: Object,
+	    	 notify : true
+	     }
+	  },
+	  listeners: {
+          'reply_compteur': 'handleReply',
+        },
+     observers: [
+                  '_titulairechange(seltitulaire,titulaire)',
+                  '_titulairecompteurchange(compteurs_Response)'
+                ],
+                
+	  add : function(){
+		  if (!this.titulaire.compteurs) {
+			  this.set('titulaire.compteurs',[]);
+		  }
+		 this.push('titulaire.compteurs', {newobjet:true,id:-1});
+		 this.set('seltitulaire',-1);
+		 this.set('editmode',true);
+		 this.set('editbuttonhide',true);
+	  },
+	  handleReply:function(e,detail){
+		  if (detail.id==-1 && this.titulaire.compteurs.indexOf(detail)>-1) {
+			  this.splice('titulaire.compteurs', this.titulaire.compteurs.indexOf(detail), 1);
+		  }
+	  },
+	  _titulairechange:function(seltitulaire,titulaire){
+		  if(seltitulaire==titulaire.id){
+		        this.app = document.querySelector('#app');
+		        this.set('params_allcompteurs.titulaire_id',seltitulaire);
+		    	this.charge_allcompteurs_url=this.app.url_api+':'+this.app.port_api+'/index'
+		    	this.$.charge_allcompteurs.generateRequest();
+		  }
+	  },
+	  _titulairecompteurchange:function(compteurs_Response){
+		  this.set('titulaire.compteurs',compteurs_Response);
+		  this.notifyPath('titulaire.compteurs');
+	  },
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+
+  })
+  </script>
+
+</dom-module>

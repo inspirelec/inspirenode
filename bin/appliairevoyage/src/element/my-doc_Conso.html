@@ -1,0 +1,551 @@
+<link rel="import" href="/library/bower_components/polymer/polymer.html">
+
+<dom-module id="my-doc_Conso">
+		  		  <template>
+			  <style>
+			  
+			  	div {font-size: 10px;
+					text-align: center;}
+				td {font-size: 10px;
+					text-align: center;}
+			    .databrutes { color:grey;white-space: pre;width:500px; font-family: monospace; font-size: 10px;}
+			  	
+			  	.cadre {
+		        	display :block;
+		            margin: 5px;
+		            padding:5px;
+		          	position: relative;
+		            background-color: white;
+			        box-shadow: 1px 1px 1px 1px;
+			        border-radius: 3px;
+			     }
+			  	.facture{
+			  		color:green;
+			  	}
+			  	.titre{
+			  		color:black;
+					font-size: 14px;
+					text-align: center;
+					margin:3px
+				}
+				.sejour{
+					color:red;
+					margin-left:10px
+				}
+				.famille{
+					color:blue;
+					margin-left:20px;
+				}
+			  </style>
+			  
+			
+			<!-- <iron-ajax
+				id="charge_ecriture"			    method="GET"
+			    url="{{charge_ecriture_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_ecriture}}"    handle-as="json"   	on-error="_disconnect"
+			    last-response="{{ecritures}}"   		debounce-duration="300">
+			</iron-ajax>	-->
+			<iron-ajax
+				id="charge_sejour"	    		method="GET"
+			    url="{{charge_sejour_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_sejours}}"		    handle-as="json"    on-error="_disconnect"
+			    last-response="{{sejours}}"			    debounce-duration="300">
+			</iron-ajax>	
+			<iron-ajax
+				id="charge_tag"	    		method="GET"
+			    url="{{charge_tag_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_tag}}"		    handle-as="json"    on-error="_disconnect"
+			    last-response="{{tag}}"			    debounce-duration="300">
+			</iron-ajax>
+			<iron-ajax
+				id="charge_histojour"	    		method="GET"
+			    url="{{charge_histojour_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_histojour}}"		    handle-as="json"    on-error="_disconnect"
+			    last-response="{{histojour}}"			    debounce-duration="300">
+			</iron-ajax>
+			<iron-ajax
+				id="charge_periph"	    		method="GET"
+			    url="{{charge_periph_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_periph}}"		    handle-as="json"    on-error="_disconnect"
+			    last-response="{{periph}}"			    debounce-duration="300">
+			</iron-ajax>
+			<iron-ajax
+				id="charge_tarif"	    		method="GET"
+			    url="{{charge_tarif_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_tarif}}"		    handle-as="json"    on-error="_disconnect"
+			    last-response="{{tarif}}"			    debounce-duration="300">
+			</iron-ajax>
+
+			<div class="cadre">
+				  <p class="titre">
+					<b>Bilan des consommations par emplacement</b>
+					</br>	
+					<b>Extraction du {{selection_query.date1}} au {{selection_query.date2}}</b>
+				  </p>			 
+		  	</div>
+			<div class="cadre">
+				  				 
+				 <table style=" border-radius:4px; border:1px solid #636363;width: 100%">
+				    <thead>
+						<tr>
+							<th> Emplacement </th>
+							<th> Séjour </th>
+							<th> Eau </th>
+							<th> Electricité </th>
+							<th> Total </th>
+						</tr>
+					</thead>
+					<tbody>						
+						<tr>
+							   <td style="width: 20%">
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.id}}<br/>
+									</template>
+								</td>		
+								
+							   
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.empl_qt}} jrs {{lig.empl_mt}} €<br/>
+									</template>
+								
+							   </td>
+							   
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.eau_qt}} m3 {{lig.eau_mt}} €<br/>
+									</template>
+								
+							   </td>
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.elec_qt}} kWh {{lig.elec_mt}} €<br/>
+									</template>
+								
+							   </td>	
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.total}} €<br/>
+									</template>
+								
+							   </td>			
+						</tr>	
+						
+					</tbody>
+					<tfoot>
+						<tr>
+							<th> Total </th>
+							<th> {{total_empl_qt}} jrs {{total_empl_mt}} € </th>
+							<th> {{total_eau_qt}} m3 {{total_eau_mt}} € </th>
+							<th> {{total_elec_qt}} kWh {{total_elec_mt}} € </th>
+							<th> {{total_mt}} € </th>
+						</tr>
+					</tfoot>
+				</table>	
+		  	 </div>
+			<highcharts-chart
+					      hidden="{{graph.is_hide}}"
+						  id="graphique"
+						  data="{{graph.grap_histo_data}}"
+						  title='{{graph.titre_graphique}}'
+						  type="{{graph.type_graphique}}"
+						  x-zoom
+						  legend
+						  loading="{{loading}}"
+						  loading-message="{{graph.loadingmessage}}"
+						  vs-time="{{graph.X_axis_is_time}}"
+						  x-label="{{graph.titreX_graphique}}"
+						  y-label="{{graph.titreY_graphique}}"
+						  x-axis="{{graph.xAxis}}"
+				  >
+			</highcharts-chart>
+			<table style=" border-radius:4px; border:1px solid #636363;width: 100%">
+					<tr>
+				   <th style="width: 40%">
+					signature du gestionnaire<br/><br/><br/><br/><br/><br/>
+				   </th>	
+				   <th style=" width: 20%">
+					
+				   </th>	
+				   <th style="width: 40%">
+					signature de l'usager<br/><br/><br/><br/><br/><br/>
+				   </th>	
+				</tr>		
+			</table>
+		  
+		  </template>
+		
+		  <script>
+		    Polymer({
+		
+		      is: 'my-doc_Conso',
+
+		      properties: {
+		 	     app: {
+			          type: Object
+		        	},    
+		    	 selection_query:{type : Object,
+	  				  notify:true/*,
+	  				  value:{}*/},
+				 /*action: detail.... pour un enregistrement
+				           list...    pour plusieurs enregistrements*/
+		  		
+		  		/* params_get_ecriture:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listcompte_ecriture'}},*/
+				 params_get_histojour:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listhistorique_jour'}},
+		  		 params_get_sejours:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listsejour'}},
+		  		 params_get_tag:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listtag'}},
+		  		 params_get_periph:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listperipherique'}},
+		  		 params_get_tarif:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listtarif'}},
+
+			      ecriture_sel:{type:Object,
+			    	  notify:true,
+			    	  computed: 'computeecriture_sel( sejours,tag, histojour, periph, selection_query, tarif)'},
+			     /*tables de la base de donnée*/
+				 /*ecritures:{type:Array,notify:true},*/
+				 histojour:{type:Array,notify:true},
+			     sejours:{type:Array,notify:true},
+			     tag:{type:Array,notify:true},
+			     periph:{type:Array,notify:true},
+			     tarif:{type:Array,notify:true},
+
+				 /*nombres calculés*/
+				 total_elec_mt:{type:Number,notify:true,value:0},
+				 total_eau_mt:{type:Number,notify:true,value:0},
+				 total_empl_mt:{type:Number,notify:true,value:0},
+				 total_elec_qt:{type:Number,notify:true,value:0},
+				 total_eau_qt:{type:Number,notify:true,value:0},
+				 total_empl_qt:{type:Number,notify:true,value:0},
+				 total_mt:{type:Number,notify:true,value:0},
+                  graph:{type:Object,notify:true}
+		      },
+	    	  observers: [
+		                  '_selection_query_change(selection_query, params_get_sejours, params_get_tag, params_get_histojour, params_get_periph)',
+                        'calculinfosgraphique(ecritures,selection_query)'],
+		      
+		      _selection_query_change: function(selection_query, params_get_sejours,params_get_tag, params_get_histojour, params_get_periph, params_get_tarif) {
+			        this.app = document.querySelector('#app');
+					 if (this.params_get_sejours && selection_query && selection_query.date1 && selection_query.date2) {
+			        	this.params_get_sejours.date_debut="<='"+selection_query.date2+"'";
+			        	this.params_get_sejours.date_fin=">='"+selection_query.date1+"'";
+			        } else if (this.params_get_sejours && selection_query && selection_query.date1) {
+			        	this.params_get_sejours.date_fin=">='"+selection_query.date1+"'";
+			        } else if (this.params_get_sejours && selection_query && selection_query.date2) {
+			        	this.params_get_sejours.date_debut="<='"+selection_query.date2+"'";
+			        } else if (this.params_get_sejours) {
+			        	this.params_get_sejours.date_debut='';
+			        }
+
+					if (params_get_sejours && selection_query && selection_query.famille_id) {
+						params_get_sejours.titulaire_id=" = '"+selection_query.famille_id+"'";
+					}else if(this.params_get_sejours){
+						params_get_sejours.titulaire_id='';
+					}
+					
+					if (params_get_sejours && selection_query && selection_query.emplacement_id) {
+			        	params_get_sejours.emplacement_id=" = '"+selection_query.emplacement_id+"'";
+					}else if(this.params_get_sejours){
+						params_get_sejours.emplacement_id='';
+					}
+					
+					if (params_get_tag && selection_query && selection_query.emplacement_id) {
+			        	params_get_tag.id=" = '"+selection_query.emplacement_id+"'";
+						params_get_tag.nom =" like 'emplacement%'";
+					}else{
+						params_get_tag.nom =" like 'emplacement%'";
+					}
+
+					if (params_get_histojour && selection_query && selection_query.date1 && selection_query.date2) {
+			        	//params_get_histojour.timestamp=" between '"+selection_query.date1+"' and '"+selection_query.date2+"'";+
+						params_get_histojour.req = "and ((timestamp >= '"+selection_query.date1+"' and timestamp <= ('"+selection_query.date2+"' +1)) )";
+			        } else if (params_get_histojour && selection_query && selection_query.date1) {
+			        	params_get_histojour.timestamp=">='"+selection_query.date1+"'";
+			        } else if (params_get_histojour && selection_query && selection_query.date2) {
+			        	params_get_histojour.timestamp="<='"+selection_query.date2+"'";
+			        } else if (params_get_histojour) {
+			        	params_get_histojour.timestamp='';
+			        }
+
+					/*if (params_get_ecriture && selection_query && selection_query.date1 && selection_query.date2) {
+			        	params_get_ecriture.date=" between '"+selection_query.date1+"' and '"+selection_query.date2+"'";
+			        } else if (params_get_ecriture && selection_query && selection_query.date1) {
+			        	params_get_ecriture.date=">='"+selection_query.date1+"'";
+			        } else if (params_get_ecriture && selection_query && selection_query.date2) {
+			        	params_get_ecriture.date="<='"+selection_query.date2+"'";
+			        } else if (params_get_ecriture) {
+			        	params_get_ecriture.date='';
+			        }
+					if (params_get_ecriture && selection_query && selection_query.famille_id) {
+						params_get_ecriture.titulaire_id=" = '"+selection_query.famille_id+"'";
+					}	*/
+					
+			    	//params_get_ecriture.type_operation = '9';
+					
+					/*// info des ecritures
+			        this.charge_ecriture_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_ecriture.generateRequest();	*/
+					// info des sejour
+			        this.charge_sejour_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_sejour.generateRequest();			
+					// info des tags
+			        this.charge_tag_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_tag.generateRequest();
+					// info des histo
+			        this.charge_histojour_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_histojour.generateRequest();
+					// info des periph
+			        this.charge_periph_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_periph.generateRequest();
+					// info des tarifs
+			        this.charge_tarif_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_tarif.generateRequest();
+					
+			  },
+                calculinfosgraphique:function(ecritures,selection_query){
+
+                    var infosgraphique={
+                        titre_graphique:"Consommations",
+                        titreX_graphique:"Temps",
+                        X_axis_is_time:false,
+                        xAxis: {   categories: ['A', 'B', 'C','D','E']      },
+                        titreY_graphique:"Kw",
+                        loadingmessage:"Chargement des consos",
+                        type_graphique:"line",
+						is_hide:false,
+                        grap_histo_data:[
+                            {name: 'legende serie 1',type:'area' ,data: [['A',10],['B',12],['C',25]]
+						          ,zones:[{value:5,color:'#90ed7d'},{value:15,color:'#7cb5ec'}]},
+                            {name: 'legende serie 2',type:'line' ,color: '#f7a35c',lineWidth: 8,data: [['A',21],['B',5],['C',15]]},
+                            {name: 'legende serie 3',type:'line' ,data: [['A',38],['B',35],['C',42],['D',21],['R',21]]}
+                        ]
+                    };
+
+
+                    if (selection_query.emplacement_id && selection_query.emplacement_id!="") {
+                        infosgraphique.is_hide=false;
+
+					} else {
+                        infosgraphique.is_hide=true;
+					}
+					/*exemple de point si axe X is time  (X_axis_is_time:true  et xAxis:null) */
+					/*var point=[(new Date(historiques[h].timestamp)).getTime(),1500];
+					 res_serie1.push(point);*/
+
+                    this.set('graph',infosgraphique);
+                },
+			  /*calcul des lignes*/
+			  computeecriture_sel:function(sejour, emplacement, histojour, periph, selection_query, tarif){
+				 var total_elec_mt=0;
+				 var total_eau_mt=0;
+				 var total_empl_mt=0;
+				 var total_elec_qt=0;
+				 var total_eau_qt=0;
+				 var total_empl_qt=0;
+				 var total_mt=0;
+				 for (var i in emplacement){
+					emplacement[i].elec_mt=0;
+					emplacement[i].elec_qt=0;
+					emplacement[i].total=0;
+					emplacement[i].eau_mt=0;
+					emplacement[i].eau_qt=0;
+					emplacement[i].empl_mt=0;
+					emplacement[i].empl_qt=0;
+				 }
+				 for (var d in sejour){
+					var empl_sej=this._getobjinliste(emplacement,sejour[d].emplacement_id);
+				    var periph_eau=this._getobjinliste(periph,empl_sej.periph_eau_id);
+				    var periph_elec=this._getobjinliste(periph,empl_sej.periph_elec_id);
+
+					//selection des indices début et fin
+					var index_eau_deb=0;
+					var index_eau_fin=0;
+					var index_elec_deb=0;
+					var index_elec_fin=0;
+					var index_jr_deb=0;
+					var index_jr_fin=0;
+					if (selection_query && selection_query.date1 && selection_query.date2) {
+						var date_selection_deb = new Date(selection_query.date1);
+						date_selection_deb.setHours(0, 0, 0, 0);
+						var date_sejour_deb = new Date(sejour[d].date_debut);
+						date_sejour_deb.setHours(0, 0, 0, 0);
+						if(date_selection_deb<=date_sejour_deb){
+							index_eau_deb=sejour[d].valeur1;
+							index_elec_deb=sejour[d].valeur0;
+						}
+						var date_selection_fin= new Date(selection_query.date2);
+						date_selection_fin.setHours(0, 0, 0, 0);
+						var date_sejour_fin = new Date(sejour[d].date_fin);
+						date_sejour_fin.setHours(0, 0, 0, 0);
+						if(date_selection_fin>=date_sejour_fin){
+							index_eau_fin=sejour[d].valeur3;
+							index_elec_fin=sejour[d].valeur2;
+						}
+
+			        	for (var h in histojour){
+							var date_histo= new Date(histojour[h].timestamp);
+							date_histo.setHours(0, 0, 0, 0);
+							var diff_date = date_histo-date_selection_deb;
+
+							if( diff_date == 0){
+								//eau
+								if(histojour[h].uuid==periph_eau.uuid){
+									index_eau_deb=histojour[h].etat;
+								}
+								//elec
+								if(histojour[h].uuid==periph_elec.uuid){
+									index_elec_deb=histojour[h].etat;
+								}
+							}
+
+							var diff_date = date_histo-date_selection_fin;
+							if( diff_date == 0){
+								//eau
+								if(histojour[h].uuid==periph_eau.uuid){
+									index_eau_fin=histojour[h].etat;
+								}
+								//elec
+								if(histojour[h].uuid==periph_elec.uuid){
+									index_elec_fin=histojour[h].etat;
+								}
+							}
+						}
+						var diff_date = date_selection_deb-date_sejour_deb;
+						if(diff_date<=0){
+							index_eau_deb=sejour[d].valeur1;
+							index_elec_deb=sejour[d].valeur0;
+							index_jr_deb=date_sejour_deb;
+						}else{
+							index_jr_deb=date_selection_deb;
+						}
+						var diff_date = date_selection_fin-date_sejour_fin;
+						if(diff_date>=0){
+							index_eau_fin=sejour[d].valeur3;
+							index_elec_fin=sejour[d].valeur2;
+							index_jr_fin=date_sejour_fin;
+						}else{
+							index_jr_fin=date_selection_fin;
+						}
+
+						var conso_eau=index_eau_fin-index_eau_deb;
+						var conso_eau_mt=conso_eau*this._getobjinliste(tarif,sejour[d].type_tarif).prix_eau_m3;
+						var conso_elec=index_elec_fin-index_elec_deb;
+						var conso_elec_mt=conso_elec*this._getobjinliste(tarif,sejour[d].type_tarif).prix_elec_kwh;
+						var conso_jr=index_jr_fin-index_jr_deb;
+						conso_jr = Math.floor((conso_jr/1000/60/60/24)+1);
+						var conso_jr_mt=conso_jr*this._getobjinliste(tarif,sejour[d].type_tarif).prix_empl_jour;
+						var empl_id = (sejour[d].emplacement_id*1)-1;
+
+						emplacement[empl_id].elec_mt += Number((conso_elec_mt));
+						total_elec_mt += Number((conso_elec_mt));
+						emplacement[empl_id].elec_qt += Number((conso_elec));
+						total_elec_qt += Number((conso_elec));
+						emplacement[empl_id].total += Number((conso_elec_mt));
+						total_mt += Number((conso_elec_mt));
+
+						emplacement[empl_id].eau_mt += Number(conso_eau_mt);
+						total_eau_mt += Number(conso_eau_mt);
+						emplacement[empl_id].eau_qt += Number(conso_eau);
+						total_eau_qt += Number(conso_eau);
+						emplacement[empl_id].total += Number(conso_eau_mt);
+						total_mt += Number(conso_eau_mt);
+
+						emplacement[empl_id].empl_mt += Number(conso_jr_mt);
+						total_empl_mt += Number(conso_jr_mt);
+						emplacement[empl_id].empl_qt += Number(conso_jr);
+						total_empl_qt += Number(conso_jr);
+						emplacement[empl_id].total += Number(conso_jr_mt);
+						total_mt += Number(conso_jr_mt);
+
+
+			        } else if (selection_query && selection_query.date1) {
+			        	// a definir ou rendre obligatoire les dates
+			        } else if (selection_query && selection_query.date2) {
+						// a definir ou rendre obligatoire les dates
+					}
+				}
+/*				 for (var s in ecritures){
+					for (var d in sejour){
+						if (ecritures[s].sejour_id == sejour[d].id){
+						    //emplacement[sejour[d].emplacement_id].id = sejour[d].emplacement_id;
+							if (ecritures[s].libelle == 'Electricité'){
+								emplacement[sejour[d].emplacement_id].elec_mt += Number((ecritures[s].montant));
+								total_elec_mt += Number((ecritures[s].montant));
+								emplacement[sejour[d].emplacement_id].elec_qt += Number((ecritures[s].qte));
+								total_elec_qt += Number((ecritures[s].qte));
+								emplacement[sejour[d].emplacement_id].total += Number((ecritures[s].montant));
+								total_mt += Number((ecritures[s].montant));
+							}
+							else if (ecritures[s].libelle == 'Eau'){
+								emplacement[sejour[d].emplacement_id].eau_mt += Number(ecritures[s].montant);
+								total_eau_mt += Number(ecritures[s].montant);
+								emplacement[sejour[d].emplacement_id].eau_qt += Number(ecritures[s].qte);
+								total_eau_qt += Number(ecritures[s].qte);
+								emplacement[sejour[d].emplacement_id].total += Number(ecritures[s].montant);
+								total_mt += Number(ecritures[s].montant);
+							}
+							else if (ecritures[s].libelle == 'Emplacement'){
+								emplacement[sejour[d].emplacement_id].empl_mt += Number(ecritures[s].montant);
+								total_empl_mt += Number(ecritures[s].montant);
+								emplacement[sejour[d].emplacement_id].empl_qt += Number(ecritures[s].qte);
+								total_empl_qt += Number(ecritures[s].qte);
+								emplacement[sejour[d].emplacement_id].total += Number(ecritures[s].montant);
+								total_mt += Number(ecritures[s].montant);
+							}
+						}
+					}
+				  }
+				  */
+				  for (var i in emplacement){
+					emplacement[i].elec_mt=(emplacement[i].elec_mt).toFixed(2);
+					emplacement[i].elec_qt=(emplacement[i].elec_qt).toFixed(0);
+					emplacement[i].total=(emplacement[i].total).toFixed(2);
+					emplacement[i].eau_mt=(emplacement[i].eau_mt).toFixed(2);
+					emplacement[i].eau_qt=(emplacement[i].eau_qt).toFixed(3);
+					emplacement[i].empl_mt=(emplacement[i].empl_mt).toFixed(2);
+					emplacement[i].empl_qt=(emplacement[i].empl_qt).toFixed(0);
+				 }
+			  
+				  this.set('total_elec_mt',(total_elec_mt).toFixed(2));
+				  this.set('total_eau_mt',(total_eau_mt).toFixed(2));
+				  this.set('total_empl_mt',(total_empl_mt).toFixed(2));
+				  this.set('total_elec_qt',(total_elec_qt).toFixed(0));
+				  this.set('total_eau_qt',(total_eau_qt).toFixed(3));
+				  this.set('total_empl_qt',(total_empl_qt).toFixed(0));
+				  this.set('total_mt',(total_mt).toFixed(2));
+				  return emplacement;
+			  },
+			  
+			  _getobjinliste:function(liste,searchval,searchcolumn){
+				  if(!liste){
+					  return {};
+				  }
+				  if (!searchcolumn){
+					  searchcolumn='id';
+				  }
+				  for (var o in liste){
+					  if(liste[o][searchcolumn]==searchval){
+						  return liste[o];
+					  }
+				  }
+				  return {};
+				  
+			  },
+			  
+			  _disconnect: function(obj){
+		    	  this.app = document.querySelector('#app');
+		    	  return this.app.disconnect();
+		      }
+		    });
+		  </script>
+		</dom-module>

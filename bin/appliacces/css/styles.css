@@ -1,0 +1,197 @@
+#employeePic {
+	float: left;
+	padding-right: 10px;
+	padding-bottom: 16px;
+}
+
+#employeeDetails p {
+	margin-top: 0px;
+	margin-bottom: 8px;
+}
+
+#actionList {
+	clear: both;
+}
+
+
+
+#Gerant_Plan_Page {
+    height: calc(100% - 60px);
+}
+
+#map {
+	height: 100%;
+}
+
+#map-content{
+	height: 100%;
+	padding: 0px; 
+	margin:0px;
+	z-index: -1;
+}
+#curLoc{
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+}
+#container_periph{
+    position: absolute;
+    top: 70px;
+    right: 5px;
+    min-height:40px;
+    min-width:25%;
+    z-index:50;
+    opacity:0.8;
+    background-color:#1d1d1d /*{b-bar-background-color}*/;
+    display:none;
+}
+
+#colLeft{
+	position: fixed;
+	top:60px;
+	left:0px;
+	width:49%;
+	height:90%;
+	overflow-y:auto;
+	overflow-x: hidden;
+	direction:rtl;
+}
+#colRight{
+	position: fixed;
+	top:60px;
+	right:0px;
+	width:49%;
+	float:left;
+	height:90%;
+	overflow-y:auto;
+	overflow-x: hidden;
+}
+.sans_scroll{
+	overflow-y:hidden;
+	overflow-x: hidden;
+	min-heigth:80px;
+}
+#contenuL{
+	top:0px;
+	width:100px;
+	height:1000px;
+	background:blue;
+}
+#contenuD{
+	top:0px;
+	width:100px;
+	height:1000px;
+	background:cyan;
+}
+  .connectedSortable {
+    border: 1px solid #eee;
+    width: 90%;
+    min-height: 20px;
+    
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0 0 0;
+    float: left;
+    margin-right: 10px;
+    direction:ltr;
+  }
+  .connectedSortable li {
+    margin: 0 5px 5px 5px;
+    padding: 5px;
+    font-size: 1.2em;
+    width: 90%;
+    z-index:100;
+    text-align:left;
+    direction:ltr;
+  }
+  
+#ui-datepicker-div{
+	background:rgb(255,255,255)	
+}
+  
+.ui-timepicker-div dl{ text-align: left; }
+.ui-timepicker-div dl dt{ height: 25px; }
+.ui-timepicker-div dl dd{ margin: -25px 0 10px 65px; }
+
+
+.ui-timepicker-wrapper {
+	overflow-y: auto;
+	height: 150px;
+	width: 6.5em;
+	background: #fff;
+	border: 1px solid #ddd;
+	-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+	-moz-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+	box-shadow:0 5px 10px rgba(0,0,0,0.2);
+	outline: none;
+	z-index: 10001;
+	margin: 0;
+}
+
+.ui-timepicker-wrapper.ui-timepicker-with-duration {
+	width: 13em;
+}
+
+.ui-timepicker-wrapper.ui-timepicker-with-duration.ui-timepicker-step-30,
+.ui-timepicker-wrapper.ui-timepicker-with-duration.ui-timepicker-step-60 {
+	width: 11em;
+}
+
+.ui-timepicker-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ui-timepicker-duration {
+	margin-left: 5px; color: #888;
+}
+
+.ui-timepicker-list:hover .ui-timepicker-duration {
+	color: #888;
+}
+
+.ui-timepicker-list li {
+	padding: 3px 0 3px 5px;
+	cursor: pointer;
+	white-space: nowrap;
+	color: #000;
+	list-style: none;
+	margin: 0;
+}
+
+.ui-timepicker-list:hover .ui-timepicker-selected {
+	background: #fff; color: #000;
+}
+
+li.ui-timepicker-selected,
+.ui-timepicker-list li:hover,
+.ui-timepicker-list .ui-timepicker-selected:hover {
+	background: #1980EC; color: #fff;
+}
+
+li.ui-timepicker-selected .ui-timepicker-duration,
+.ui-timepicker-list li:hover .ui-timepicker-duration {
+	color: #ccc;
+}
+
+.ui-timepicker-list li.ui-timepicker-disabled,
+.ui-timepicker-list li.ui-timepicker-disabled:hover,
+.ui-timepicker-list li.ui-timepicker-selected.ui-timepicker-disabled {
+	color: #888;
+	cursor: default;
+}
+
+.ui-timepicker-list li.ui-timepicker-disabled:hover,
+.ui-timepicker-list li.ui-timepicker-selected.ui-timepicker-disabled {
+	background: #f2f2f2;
+}
+  
+.ui-state-active {
+	background-color: #28afe6 /*{c-bar-background-color}*/;
+	color:black;
+}
+.ui-state-default {
+	background-color:#aed0ea;
+	color:black;
+}

@@ -1,0 +1,183 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/library/bower_components/app-layout/app-grid/app-grid-style.html">
+
+<dom-module id="my-liste_tags">
+
+  <template>
+		<style include="app-grid-style">
+  		  :host {
+          display: block;
+          --app-grid-columns: 6;
+          --app-grid-gutter: 10px;
+          --app-grid-expandible-item-columns: 4;
+          --paper-icon-button-ink-color: white;
+          --paper-dropdown-menu: {  width: 300px; max-width:0    };
+        }
+        app-header {
+          background-color: #0b8043;
+          color: white;
+        }
+        ul {
+          padding: 0;
+          list-style: none;
+        }
+        paper-button{
+          width:100%;
+          height:100%;
+        }
+        .centered-container {
+          margin-top: 40px;
+          max-width: 1000px;
+          margin: 40px auto;
+        }
+        .item {
+          height: 200px;
+          position: relative;
+          background-color: white;
+          background-size: 130px;
+          background-repeat: no-repeat;
+          background-position: center bottom;
+        }
+        .card {
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	     }
+        .item-title {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color: rgba(0, 0, 0, 0.2);
+          color: white;
+          font-weight: 400;
+          padding: 16px;
+        }
+        @media(max-width: 1199px) {
+          .centered-container {
+            margin: 10px 5px;
+          }
+          :host {
+            --app-grid-columns: 4;
+            --app-grid-gutter: 8px;
+            --app-grid-item-height: 170px;
+          }
+        }
+        @media(max-width: 999px) {
+          .centered-container {
+            margin: 10px 5px;
+          }
+          :host {
+            --app-grid-columns: 3;
+            --app-grid-gutter: 7px;
+            --app-grid-item-height: 170px;
+          }
+        }
+        @media(max-width: 799px) {
+          .centered-container {
+            margin: 10px 5px;
+          }
+          :host {
+            --app-grid-columns: 2;
+            --app-grid-gutter: 5px;
+            --app-grid-item-height: 150px;
+          }
+        }
+  		</style>
+
+  	<iron-ajax
+		id="charge_alltag"
+	    method="GET"
+	    url="{{charge_alltag_url}}"
+	    headers="{{app.header_auth}}"
+	    params="{{params_alltag}}"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    last-response="{{tag_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+	<my-spinner_modal></my-spinner_modal>
+	<div>
+
+		<ul class="app-grid">
+		    <template is="dom-repeat" items="[[_toArray(tag_Response.tags)]]">
+       		<!-- <template is="dom-if" if="{{item.visible}}"> -->
+				  <li class="item card"  style="background-image: url({{app.url_http}}:{{app.port_http}}/{{item.icon}});">
+	                
+	                <paper-button style="z-index:10;" id="peripherique" on-tap="get_tag_periph" tagid="{{item.id}}" uuid="{{item.uuid}}" ></paper-button>
+	                <div class="item-title" >[[item.nom]]</div>
+	               
+	              </li>
+			<!-- </template> -->
+       		</template>
+
+      	</ul>
+      	
+     </div>
+	
+       
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_tags',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    	  
+	     tagname:{type:String,
+	    	 notify :true,
+	    	 value:null},
+	     taguuid:{type:String,
+	    	 notify :true,
+	    	 value:null},
+  		 params_alltag:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'alltag',v:'voyage.1.1.1'}},
+	   	 charge_alltag_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null }
+	  },
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+	    	  this.charge_alltag_url=this.app.url_api+':'+this.app.port_api+'/index'
+	    	  this.$.charge_alltag.generateRequest();
+	      },
+      refreshdata(){
+		  this.$.charge_alltag.generateRequest();  
+	  } ,   
+	  get_tag_periph: function(e,a){
+	    	  this.taguuid=e.currentTarget.uuid;
+	    	  this.tagid=e.currentTarget.tagid;
+	    	  this.app.$.location.path="/appliairevoyage/periphListPage/"+this.tagid;
+	    	  
+	      },
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+
+	       attached: function() {
+	         this._updateGridStyles = this._updateGridStyles || function() {
+	           this.updateStyles();
+	         }.bind(this);
+	         window.addEventListener('resize', this._updateGridStyles);
+	       },
+	       detached: function() {
+	         window.removeEventListener('resize', this._updateGridStyles);
+	       }
+  })
+  </script>
+
+</dom-module>

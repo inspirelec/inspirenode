@@ -1,0 +1,108 @@
+﻿<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<dom-module id="my-groupprofil_behavior">
+		
+  <template include="app-grid-style">
+		<style >
+		
+		 :host{
+		 	--liste_maxheight:200vh;
+		 	--liste_overflow:none;
+		 	--title_background_color:rgba(50, 170, 25, 0.5);
+		 	--max_widthliste:500px
+		 	
+		 /*display:flex;*/
+			display: block;
+          --app-grid-columns: 2;
+          --app-grid-gutter: 10px;
+          --app-grid-expandible-item-columns: 6;
+          --paper-icon-button-ink-color: white;
+          margin-top :2px;
+          margin-bottom:2px;
+		 }
+
+		ul {
+		 padding:0;
+		 margin-bottom:-15px;
+		 line-height:1.2;
+		}
+		 .add-button{
+		 	/*position:fixed;
+		 	bottom:50px;
+		 	left:50px;*/
+		 	float:right;
+		 	--paper-fab-background: var(--paper-blue-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-blue-900);
+		 }
+		 .item-title {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color:var(--title_background_color) ;
+          color: white;
+          font-weight: 400;
+          padding: 16px;
+        }
+        .card {
+        	display :block;
+            
+            padding:5px;
+            padding-bottom: 20px;
+          	max-width: var(--max_widthliste);
+          	margin-right: auto;
+          	margin-left: auto;
+          	position: relative;
+            background-color: white;
+        	color: var(--paper-blue-800);
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	        
+	     }
+	     .cardprinc{
+		 	padding-top:60px;
+		 	margin-top: 40px;
+		 	position: relative;
+		 }
+		 .refresh-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:5px;
+    		color: var(--paper-blue-500);
+		 }
+		 .regionscroll {
+	        max-height: var(--liste_maxheight);
+	        overflow: var(--liste_overflow);
+	      }
+  		</style>
+  		<div class="card cardprinc" >
+			<div class="item-title" >{{title}}</div>
+			<div id="regionscroll" class="regionscroll">
+				<content select=".inforofil"></content>
+			</div>
+		</div>	
+  </template>
+
+
+  <script>
+  Polymer({
+
+	  is: 'my-groupprofil_behavior',
+	  
+	  properties: {  
+
+	  }
+  });
+  
+  </script>
+
+</dom-module>

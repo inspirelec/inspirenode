@@ -1,0 +1,323 @@
+  <script>
+  MajListe={
+
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    
+  		 params:{type: Object,
+	   	 	  notify : true
+	   	 	  },
+	   	 title:{type:String,
+	   		 notify : true
+	   	 },
+	   	 title_background_color:{type:String,
+	   		notify:true,
+	   		value:""
+	   	 },
+	   	 detail_code:{type: String,
+	   	 	  notify : true
+  	 	  },
+ 	     liste_objets:{type: Array,
+	    	 notify : true
+	     },
+	     liste_nb_column:{type:Number,
+	    	 notify:true,
+	    	 value:1
+	     },
+	     show_loading:{type:Number,
+	    	 notify : true,
+	    	 value:0
+	     },
+  	 	 grants:{type:Object,
+  	 		 notify : true,
+  	 		 value : {creation:true,
+	  	 			 modification:true,
+	  	 			 suppression:true,
+	  	 			 impression:true}
+  	 	 },
+  	 	 hideother_onedit:{type:Boolean,
+  	 		 notify:true,
+  	 		 value:false
+  	 	 },
+  	 	 hideothereditbutton_onedit:{type:Boolean,
+  	 		 notify:true,
+  	 		 value:false
+  	 	 },
+  	 	searchmode:{type:Boolean,
+  	 		notify:true,
+  	 		value:false
+  	 	},
+  	 	 edited_item_id:{type:String,
+  	 		notify:true,
+  	 		value:-2
+  	 	 },
+  	 	 limite_creation:{type:Number,
+  	 		 notify : true,
+  	 		 value:-1
+  	 	 },
+  	 	/* max_heightliste:{type:String,
+  	 		 notify:true,
+  	 		 value:0},
+  	  	 scrollactif:{type:Boolean,
+  	  	 		 notify:true,
+  	  	 		 value:true},*/
+  	  	 		 
+  	 	 grants_acces:{type:Object,
+	    	 	notify : true,
+	    	 	computed:'_grants_acces(grants,limite_creation,liste_objets.length)' }, 
+	    	 	
+	   	 charge_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+	     createbutton_hide:{type:Boolean,
+	    	 	notify : true,
+	    	 	computed:'_createbuttonishide(grants_acces.creation,edited_item_id,searchmode)'  
+	    	 },    
+	     refreshbutton_hide:{type:Boolean,
+	    	 	notify : true,
+	    	 	computed:'_refreshbuttonishide(edited_item_id)'  
+	    	 },    
+	     dropdown_selobj:{type:Object,
+	    	 	notify:true,
+	    	 	computed:'_dropdown_selobj(value_sel,liste_objets)'
+	     },
+	     
+	     dropdowntype:{type: Boolean,
+	    	 notify : true,
+	    	 value:false
+	     },
+	     searchquery:{type:String,
+	    	 notify:true,
+	    	 value:""
+	     },
+	     query:{type:String,
+	    	 notify:true
+	     },
+	     queryfields:{type:String,
+	    	 notify:true},
+	     filter:{type:String,
+	    	 notify:true
+	     },
+	     charge_table:{type:Boolean,
+	    	notify:true,
+	    	value:false},
+	   	 value_sel: {type:String, 
+	   		    notify : true},
+		 selitem:{type:String,notify:true},
+		 showwhereisnull:{type:String,notify:true}
+	  },
+	  observers:[
+		  '_show_loading(show_loading)',
+		  'params_chang(params,detail_code,charge_table)'  ,
+		  'detail_code_change(detail_code)',
+		  '_activescroll(edited_item_id)',
+		  'title_background_color_change(title_background_color)',
+		  '_changecolumnnb(liste_nb_column,edited_item_id)',
+		  '_selitemroute(selitem)'
+	  ],
+	  listeners: {
+          'reply_delete': 'handleReplydelete',
+          'searchbox-search':'handlesearch',
+          'searchbox-clear':'handleclear',
+          'searchbox-filter':'handlefilter'
+        },
+      _selitemroute:function(selitem){
+    	  if (selitem>0) {
+		 		delete this.params.query;
+  		 		delete this.params.queryfields;
+  		 		this.set('params.id',selitem);
+                this._refreshdata();
+    	  }
+    	  
+    	  if (selitem<0) {
+    		  this._refreshdata();  
+    		 // this.app.$.location.path="/appliairevoyage/famillepage/-1";
+    	  }
+    	  
+      },
+  	  handlesearch:function(e,detail){
+  		 	if (this.params && this.searchquery && this.queryfields){
+  		 		delete this.params.id;
+  		 		this.set('params.query',this.searchquery);
+  		 		this.set('params.queryfields',this.queryfields);
+  		 	} else  {
+  		 		delete this.params.query;
+  		 		delete this.params.queryfields;
+  		 		delete this.params.id;
+  		 	}
+  		 	this.set('edited_item_id',-2);
+  		 	this._refreshdata();  
+  		 	//this.app.$.location.path="/appliairevoyage/famillepage/-1";
+	  },
+	  handleclear:function(e,detail){
+		 	if (this.params){
+  		 		delete this.params.query;
+  		 		delete this.params.queryfields;
+  		 		delete this.params.id;
+  		 	}
+		 	this._refreshdata();  
+  		 	this.set('edited_item_id',-2);
+  		 	this._refreshdata();  
+  		 	//this.app.$.location.path="/appliairevoyage/famillepage/-1";
+	  },
+	  handlefilter:function(e,detail){
+		  this.set('filter',this.searchquery);
+	  },
+
+      params_chang:function(params,detail_code,charge_table){
+
+    	  if (charge_table){
+    		  this._refreshdata();  
+    	  }
+    	    
+      },
+      _changecolumnnb:function(liste_nb_column,edited_item_id){
+    	  
+    	  if (edited_item_id==-2){
+    		  this.customStyle['--app-grid-columns'] = this.liste_nb_column+"";
+              this.updateStyles();
+    	  } else {
+    		  this.customStyle['--app-grid-columns'] = '1';
+              this.updateStyles();
+    	  }
+    	  console.log('_changecolumnnb',liste_nb_column,edited_item_id);
+      },
+      detail_code_change:function(detail_code){
+    	  this.app = document.querySelector('#app');
+    	  if (!this.app.imports) {
+    		  this.app.imports={};
+    	  }
+    	  if (!this.app.imports[detail_code]){
+    		  var link= this.importHref(this.resolveUrl('../element/'+this.detail_code+'.html'), null, null, true);  
+    		  this.app.imports[detail_code]=true;
+    	  }
+    	  
+      },
+      _dropdown_selobj:function(value_sel,liste_objets){
+    	  for (var e in liste_objets){
+    		  if (liste_objets[e].id==value_sel){
+    			  return liste_objets[e];
+    		  }
+    	  }
+    	  return null;
+      },
+      _show_loading:function(show_loading){
+    	  if (show_loading>0) {
+    		  this.$.load_dialog.open();
+    	  } else {
+    		  this.$.load_dialog.close();
+    	  }
+      },
+      _activescroll:function(edited_item_id){
+    	 /* if (!this.max_heightliste){
+    		  this.set('max_heightliste',this.getComputedStyleValue('--liste_maxheight'));
+    	  }
+    	  if(this.max_heightliste && this.max_heightliste!="0"){*/
+    		  var ele = document.querySelector('#regionscroll');
+    		  if(/*scrollactif &&*/ edited_item_id<-1){
+    		   /* this.customStyle['--liste_maxheight']=this.max_heightliste;
+    		    this.customStyle['--liste_overflow']='auto';*/
+    		    /*this.updateStyles();*/
+    		    this.$.regionscroll.classList.add('regionscroll');
+    		  } else {
+    			  this.$.regionscroll.classList.remove('regionscroll');
+    		  }
+    	  /*}*/
+      },
+      title_background_color_change:function(title_background_color){
+    	  this.customStyle['--title_background_color']=title_background_color;
+		  this.updateStyles();
+      },
+      _grants_acces:function(grant_acces,limite_creation,liste_objets){
+    	  var rep={};
+    	  if(grant_acces.creation && (limite_creation<0 || (limite_creation>liste_objets))){
+    		  rep.creation= true;
+    	  } else {
+    		  rep.creation= false;
+    	  }
+    	  rep.modification=grant_acces.modification;
+    	  rep.suppression=grant_acces.suppression;
+    	  rep.impression=grant_acces.impression;
+    	  return rep;
+      },
+      _createbuttonishide:function(grants_acces_creation,edited_item_id,searchmode){
+    	  if(!grants_acces_creation || searchmode){
+    		  return true;
+    	  } else if (edited_item_id!=-2){
+    		  return true;
+    	  } else {
+    		  return false;
+    	  }
+      },
+      _refreshbuttonishide:function(edited_item_id){
+    	  if (edited_item_id!=-2){
+    		  return true;
+    	  } else {
+    		  return false;
+    	  }
+      },
+	  ready:function(){
+	        this.app = document.querySelector('#app');
+	         
+	  },
+	  refreshthis:function(){
+		  this.set('edited_item_id',-2);
+		  this._refreshdata();
+	  },
+      _refreshdata:function(){
+    	  this.set('show_loading',1);
+    	  this.app = document.querySelector('#app');
+	      this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
+	      this.$.charge.generateRequest();  
+	  } ,       
+	  charge_validate:function(){
+		  this.set('show_loading',0);
+	  },
+	  add : function(){
+		  if (!this.liste_objets) {
+			  this.set('liste_objets',[]);
+		  }
+		 this.unshift('liste_objets', {id:-1});
+		 this.set('edited_item_id',-1);
+		 
+	  },
+	  handleReplydelete:function(e,detail){
+		  this._refreshdata();
+	  },
+	  
+	  
+	  
+	  _titulairechange:function(seltitulaire,titulaire){
+		  /*if(seltitulaire==titulaire.id){*/
+		        this.app = document.querySelector('#app');
+		        /*this.set('params_alltarifs.titulaire_id',seltitulaire);*/
+		    	this.charge_alltarifs_url=this.app.url_api+':'+this.app.port_api+'/index'
+		    	this.$.charge_alltarifs.generateRequest();
+		  /*}*/
+	  },
+      show_element: function (type1,type2) {
+  	    //console.log('OK',periph.nom,periph.uuid,ecriture_type,periph.ecriture_type,periph.ecriture_type==ecriture_type);	
+
+  	    return type1==type2;
+  	 },
+     show_thisline: function (obj) {
+   	    //console.log('OK',periph.nom,periph.uuid,ecriture_type,periph.ecriture_type,periph.ecriture_type==ecriture_type);	
+		if (this.showwhereisnull && obj[this.showwhereisnull]){
+			return false;
+		} else {
+			return true;
+		}
+   	    
+   	 },
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+
+  }
+  </script>
+

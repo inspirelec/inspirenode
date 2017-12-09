@@ -1,0 +1,829 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/library/bower_components/paper-dialog/paper-dialog.html">
+
+<dom-module id="my-liste_programmation">
+
+  <template>
+		<style include="app-grid-style">
+  		  :host {
+          display: block;
+          --app-grid-columns: 3;
+          --app-grid-gutter: 10px;
+          --app-grid-expandible-item-columns: 3;
+          --paper-icon-button-ink-color: white;
+        }
+        app-header {
+          background-color: #0b8043;
+          color: white;
+        }
+        label{
+        	line-height:0px;
+        	
+        }
+        label h4{
+        	line-height:16px;
+        	margin:0;
+        }
+        label h6{
+        	margin:0;
+        }
+        ul {
+          padding: 0;
+          list-style: none;
+        }
+        paper-button{
+          width:100%;
+          height:100%;
+        }
+        paper-dialog.size-position {
+    		position: fixed;
+    		top: 50px;
+		    /*overflow: auto;*/
+    	}
+        .taglist {
+        	margin:2px;
+        }
+        .centered-container {
+          margin-top: 40px;
+          max-width: 1000px;
+          margin: 40px auto;
+        }
+        .item {
+          position: relative;
+          background-color: white;
+        }
+        .card {
+        	color: var(--paper-blue-800);
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	        
+	     }
+	    .mode_add{
+	       background: #fff;
+	       color: var(--app-primary-color);
+	       padding-left:30px;
+	       margin:0;
+	    }
+	    .mode_add iron-icon{
+	       padding-left:10px;
+	    }
+		 .mode_delete{
+		 	color:var(--app-primary-color);
+		 	position : absolute;
+		 	float:right;
+		 	right :0;
+		 	top:0;
+		 	
+		 	
+		 }
+          paper-button.green {
+		    background-color: var(--paper-red-200);
+		    color: white;
+		    width:auto;
+		    height:auto;
+		    padding:5px;
+		    
+		  }
+		  paper-button.green[active] {
+		    background-color: var(--paper-green-500);
+		    width:30px;
+		    height:auto;
+		    padding:5px;
+		  }	    
+		  .add_prog{
+	       background: #fff;
+	       color: var(--app-primary-color);
+	       padding:2px;
+	    }
+	    .add_prog iron-icon{
+	       padding-left:10px;
+	    }
+        @media(max-width: 999px) {
+          .centered-container {
+            margin: 10px 5px;
+          }
+          :host {
+            --app-grid-columns: 1;
+            --app-grid-gutter: 5px;
+           /* --app-grid-item-height: 150px;*/
+          }
+        }
+        @media(min-width: 640px ) {
+          paper-dialog.size-position {
+    		right: 260px;
+    	  }
+        }
+  		</style>
+
+
+	
+	<div>
+
+		<ul class="app-grid">
+			<li class="item card">			          
+			  <paper-menu class="dropdown-content">
+			  	 <iron-ajax
+					id="charge_allmodes"
+				    method="GET"
+				    headers="{{app.header_auth}}"
+				    params="{{params_allmodes}}"
+				    handle-as="json"
+	    			on-error="_disconnect"
+				    last-response="{{allmodes_Response}}"
+				    debounce-duration="300">
+				</iron-ajax>
+	        	<template is="dom-repeat" items="[[_toArray(allmodes_Response.modes)]]">
+		            <paper-item id="[[item.id]]" nom="[[item.nom]]" on-tap="_get_mode">
+		            <img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/[[item.icon]]" height="30" width="30"/>
+		            [[item.nom]]
+		            <paper-icon-button class="mode_delete" id="[[item.id]]" icon="delete" on-tap="_delete_mode"></paper-icon-button>
+		            </paper-item>
+	            </template>
+	            	<paper-button  class="mode_add" on-tap="_add_mode">
+	            		<div style="float:right">Ajouter un mode<iron-icon  icon="add"></iron-icon></div>
+		            </paper-button>
+	            
+	          </paper-menu>
+			</li>
+			<li class="item card">			          
+			  <paper-menu class="dropdown-content">
+			  	 <iron-ajax
+					id="charge_allcategories"
+				    method="GET"
+				    headers="{{app.header_auth}}"
+				    params="{{params_allcategmode}}"
+				    handle-as="json"
+	    			on-error="_disconnect"
+				    last-response="{{alltypeprog_Response}}"
+				    debounce-duration="300">
+				</iron-ajax> 
+	        	<template is="dom-repeat" items="[[_toArray(alltypeprog_Response)]]">
+		            <paper-item id="[[item.id]]" nom="[[item.nom]]" iconmax="[[item.iconmax]]" iconmidle="[[item.iconmidle]]" iconmin="[[item.iconmin]]" on-tap="_get_categorie">
+		            <img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/[[item.iconmax]]" height="30" width="30"/>
+		            [[item.nom]]</paper-item>
+	            </template>
+	          </paper-menu>
+			</li>
+			<li class="item card">		
+			   <paper-menu class="dropdown-content">
+			  	 <iron-ajax
+					id="charge_alltagmode"
+				    method="GET"
+				    headers="{{app.header_auth}}"
+				    params="{{params_alltagmode}}"
+				    handle-as="json"
+	    			on-error="_disconnect"
+				    last-response="{{alltagmode_Response}}"
+				    debounce-duration="300">
+				</iron-ajax>
+				<iron-ajax
+					id="charge_programmation"
+				    method="GET"
+				    headers="{{app.header_auth}}"
+				    params="{{params_getprogrammation}}"
+				    handle-as="json"
+	    			on-error="_disconnect"
+				    last-response="{{programmation_Response}}"
+				    debounce-duration="300">
+				</iron-ajax>
+				<paper-menu class="dropdown-content">
+		        	<template is="dom-repeat" items="[[alltagmode_Response.tagsmode]]">
+			        	<paper-item class="taglist" id="[[item.id]]" periph_id="[[item.periphs]]" nom="[[item.nom]]" ecriture_type="[[item.ecriture_type]]" on-tap="_get_modetag" >
+							<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+							<label id="lab"><h4 id="nom">[[item.nom]]</h4>
+							<h6 id="etat_[[item.id]]" style="font-size: 9px"></h6>
+							</label>
+						</paper-item>
+						<template is="dom-if" if="{{!show(item.ecriture_type,'TEMPERATURECONSIGNE')}}">
+							<template is="dom-repeat" items="[[item.periphs]]" as="item_periph" >
+					        	<paper-item class="taglist" periph_id="[[item_periph.id]]" nom="[[item_periph.nom]]" id="[[item.id]]" ecriture_type="[[item_periph.ecriture_type]]" on-tap="_get_modetag">
+									<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+									<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{iconmax_sel}}" height="30" width="30"/>
+									<label id="lab"><h4 id="nom">[[item_periph.nom]]</h4>
+									<h6 id="etat_[[item_periph.id]]" style="font-size: 9px"></h6>
+									</label>
+								</paper-item>
+			            	</template>
+			            </template>
+						<template is="dom-repeat" items="[[item.enfants]]" as="enfant1" >
+				        	<paper-item class="taglist" id="[[enfant1.id]]" periph_id="[[enfant1.periphs]]" nom="[[enfant1.nom]]" ecriture_type="[[enfant1.ecriture_type]]" on-tap="_get_modetag">
+								<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+								<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+								<label id="lab"><h4 id="nom">[[enfant1.nom]]</h4>
+								<h6 id="etat_[[enfant1.id]]" style="font-size: 9px"></h6>
+								</label>
+							</paper-item>
+							<template is="dom-if" if="{{!show(enfant1.ecriture_type,'TEMPERATURECONSIGNE')}}">
+								<template is="dom-repeat" items="[[enfant1.periphs]]" as="enfant1_periph" >
+						        	<paper-item class="taglist" periph_id="[[enfant1_periph.id]]" nom="[[enfant1_periph.nom]]" id="[[enfant1.id]]" ecriture_type="[[enfant1_periph.ecriture_type]]" on-tap="_get_modetag">
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{iconmax_sel}}" height="30" width="30"/>
+										<label id="lab"><h4 id="nom">[[enfant1_periph.nom]]</h4>
+										<h6 id="etat_[[enfant1_periph.id]]" style="font-size: 9px"></h6>
+										</label>
+									</paper-item>
+				            	</template>
+			            	</template>
+							<template is="dom-repeat" items="[[enfant1.enfants]]" as="enfant2" >
+					        	<paper-item class="taglist" id="[[enfant2.id]]" periph_id="[[enfant2.periphs]]" nom="[[enfant2.nom]]" ecriture_type="[[enfant2.ecriture_type]]" on-tap="_get_modetag">
+									<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+									<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+									<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+									<label id="lab"><h4 id="nom">[[enfant2.nom]]</h4>
+									<h6 id="etat_[[enfant2.id]]" style="font-size: 9px"></h6>
+									</label>
+								</paper-item>
+								<template is="dom-if" if="{{!show(enfant2.ecriture_type,'TEMPERATURECONSIGNE')}}">
+									<template is="dom-repeat" items="[[enfant2.periphs]]" as="enfant2_periph" >
+							        	<paper-item class="taglist" periph_id="[[enfant2_periph.id]]" nom="[[enfant2_periph.nom]]" id="[[enfant2.id]]" ecriture_type="[[enfant2_periph.ecriture_type]]" on-tap="_get_modetag">
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{iconmax_sel}}" height="30" width="30"/>
+											<label id="lab"><h4 id="nom">[[enfant2_periph.nom]]</h4>
+											<h6 id="etat_[[enfant2_periph.id]]" style="font-size: 9px"></h6>
+											</label>
+										</paper-item>
+					            	</template>
+				            	</template>
+				            	<template is="dom-repeat" items="[[enfant2.enfants]]" as="enfant3" >
+									<paper-item class="taglist" id="[[enfant3.id]]" periph_id="[[enfant3.periphs]]" nom="[[enfant3.nom]]" ecriture_type="[[enfant3.ecriture_type]]" on-tap="_get_modetag">
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+										<label id="lab"><h4 id="nom">[[enfant3.nom]]</h4>
+										<h6 id="etat_[[enfant3.id]]" style="font-size: 9px"></h6>
+										</label>
+									</paper-item>
+									<template is="dom-if" if="{{!show(enfant3.ecriture_type,'TEMPERATURECONSIGNE')}}">
+										<template is="dom-repeat" items="[[enfant3.periphs]]" as="enfant3_periph" >
+											<paper-item class="taglist" periph_id="[[enfant3_periph.id]]" nom="[[enfant3_periph.nom]]" id="[[enfant3.id]]" ecriture_type="[[enfant3_periph.ecriture_type]]" on-tap="_get_modetag">
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{iconmax_sel}}" height="30" width="30"/>
+												<label id="lab"><h4 id="nom">[[enfant3_periph.nom]]</h4>
+												<h6 id="etat_[[enfant3_periph.id]]" style="font-size: 9px"></h6>
+												</label>
+											</paper-item>
+										</template>
+									</template>
+									<template is="dom-repeat" items="[[enfant3.enfants]]" as="enfant4" >
+										<paper-item class="taglist" id="[[enfant4.id]]" periph_id="[[enfant4.periphs]]" nom="[[enfant4.nom]]" ecriture_type="[[enfant4.ecriture_type]]" on-tap="_get_modetag">
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant4.icon}}" height="30" width="30"/>
+											<label id="lab"><h4 id="nom">[[enfant4.nom]]</h4>
+											<h6 id="etat_[[enfant4.id]]" style="font-size: 9px"></h6>
+											</label>
+										</paper-item>
+										<template is="dom-if" if="{{!show(enfant4.ecriture_type,'TEMPERATURECONSIGNE')}}">
+											<template is="dom-repeat" items="[[enfant4.periphs]]" as="enfant4_periph" >
+												<paper-item class="taglist" periph_id="[[enfant4_periph.id]]" nom="[[enfant4_periph.nom]]" id="[[enfant4.id]]" ecriture_type="[[enfant4_periph.ecriture_type]]" on-tap="_get_modetag">
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant4.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{iconmax_sel}}" height="30" width="30"/>
+													<label id="lab"><h4 id="nom">[[enfant4_periph.nom]]</h4>
+													<h6 id="etat_[[enfant4_periph.id]]" style="font-size: 9px"></h6>
+													</label>
+												</paper-item>
+											</template>
+										</template>
+										<template is="dom-repeat" items="[[enfant4.enfants]]" as="enfant5" >
+											<paper-item class="taglist" id="[[enfant5.id]]" periph_id="[[enfant5.periphs]]" nom="[[enfant4.nom]]" ecriture_type="[[enfant4.ecriture_type]]" on-tap="_get_modetag">
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant4.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant5.icon}}" height="30" width="30"/>
+												<label id="lab"><h4 id="nom">[[enfant5.nom]]</h4>
+												<h6 id="etat_[[enfant5.id]]" style="font-size: 9px"></h6>
+												</label>
+											</paper-item>
+											<template is="dom-if" if="{{!show(enfant5.ecriture_type,'TEMPERATURECONSIGNE')}}">
+												<template is="dom-repeat" items="[[enfant5.periphs]]" as="enfant5_periph" >
+													<paper-item class="taglist" periph_id="[[enfant5_periph.id]]" nom="[[enfant5_periph.nom]]" id="[[enfant5.id]]" ecriture_type="[[enfant5_periph.ecriture_type]]" on-tap="_get_modetag">
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant4.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant5.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{iconmax_sel}}" height="30" width="30"/>
+														<label id="lab"><h4 id="nom">[[enfant5_periph.nom]]</h4>
+														<h6 id="etat_[[enfant5_periph.id]]" style="font-size: 9px"></h6>
+														</label>
+													</paper-item>
+												</template>
+											</template>
+										</template>
+									</template>
+								</template>
+			            	</template>
+			            	
+		            	</template>
+		            </template>
+	          </paper-menu>
+			</li>
+      	</ul>
+      	
+     </div>
+	<paper-dialog id="delete_mode_dialog">
+	  <h2>Suppression</h2>
+	  <p>Voulez vous supprimer le mode <b>[[mode_sel_nom]]</b></p>
+	  <div class="buttons">
+	    <paper-button dialog-dismiss>Annuler</paper-button>
+	    <paper-button dialog-confirm autofocus on-tap="_send_delete_mode">Supprimer</paper-button>
+	  </div>
+	</paper-dialog>
+	<iron-ajax
+		id="send_delete_mode"
+	    method="GET"
+	    headers="{{app.header_auth}}"
+	    params="{{params_delete_mode}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    on-response="reload_mode"
+	    last-response="{{delete_mode_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+	
+	<paper-dialog id="add_mode_dialog">
+	  <h2>Ajouter un mode</h2>
+	  <paper-input type="text" id="new_mode" label="Nom du mode"></paper-input>
+	  <div class="buttons">
+	    <paper-button dialog-dismiss>Annuler</paper-button>
+	    <paper-button dialog-confirm autofocus on-tap="_send_add_mode">Creer</paper-button>
+	  </div>
+	</paper-dialog>
+	<iron-ajax
+		id="send_add_mode"
+	    method="GET"
+	    headers="{{app.header_auth}}"
+	    params="{{params_add_mode}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    on-response="reload_mode"
+	    last-response="{{add_mode_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+	<paper-dialog id="modif_prog_dialog">
+		<!-- <img style = "float:left;margin:0"  src="{{app.url_http}}:{{app.port_http}}/[[iconmax_sel]]" height="30" width="30"/> -->
+		    <p style="font-size:18px"><b>{{tag_sel_nom}} ({{mode_sel_nom}})</b></p>
+		    
+			<div style="padding:10px">
+				<paper-button toggles raised class="green" id="Lu">Lu</paper-button>
+				<paper-button toggles raised class="green" id="Ma">Ma</paper-button>
+				<paper-button toggles raised class="green" id="Me">Me</paper-button>
+				<paper-button toggles raised class="green" id="Je">Je</paper-button>
+				<paper-button toggles raised class="green" id="Ve">Ve</paper-button>
+				<paper-button toggles raised class="green" id="Sa">Sa</paper-button>
+				<paper-button toggles raised class="green" id="Di">Di</paper-button>
+				<paper-button toggles raised class="green" id="VA">Vacances</paper-button>
+				<paper-button toggles raised class="green" id="FE">Fériés</paper-button>
+			</div>
+			<ul class="app-grid" style="margin-bottom:2px">
+		    	  <li class="item" >
+					<paper-input type="time" id="heures" label="Heures Minutes" type="number"></paper-input>
+	              </li>
+				  <template is="dom-if" if="{{show(ecriture_type_sel,'TEMPERATURECONSIGNE')}}">
+		              <li class="item" >
+		               <paper-input id="TEMPERATURECONSIGNE" minlength=1 maxlength=2 max=99 min=0 label="Consigne" step="0.5" type="number"> 
+		               <iron-icon prefix height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>
+		              	</paper-input>
+		              </li>
+	              </template> 
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'CONSIGNE')}}">
+		              <li class="item" >
+		               <paper-input id="CONSIGNE" minlength=1 maxlength=2 max=99 min=0 label="Consigne" step="0.5" type="number"> 
+		               <iron-icon prefix height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>
+		              	</paper-input>
+		              </li>
+	              </template> 
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'BINAIRE')}}">
+		              <li class="item" >
+						<paper-button id="BINAIRE" on-tap="change_etat_BINAIRE" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
+		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
+		              </li>
+	              </template> 
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'BINVAR')}}">
+		              <li class="item" >
+						<paper-button id="BINVAR" on-tap="change_etat_BINAIRE" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
+		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
+		              </li>
+	              </template> 
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'VOLETRVARIABLE')}}">
+		              <li class="item" >
+						<paper-button id="VOLETRVARIABLE" on-tap="change_etat_VOLET" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
+		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
+		              </li>
+	              </template>
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'VOLETR')}}">
+		              <li class="item" >
+						<paper-button id="VOLETR" on-tap="change_etat_VOLET" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
+		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
+		              </li>
+	              </template>
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'CHAUDIERE')}}">
+		              <li class="item" >
+						<paper-button id="CHAUDIERE" on-tap="change_etat_BINAIRE" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
+		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
+		              </li>
+	              </template>
+
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'VARIABLE')}}">
+		              <li class="item" >
+						<paper-button id="VARIABLE" on-tap="change_etat_BINAIRE" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
+		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
+		              </li>
+	              </template> 
+	              <li class="item" >
+	              	<paper-button  class="add_prog" on-tap="_add_prog_ligne">Ajouter<iron-icon  icon="add"></iron-icon> </paper-button>
+	              </li>
+       		</ul>
+       		
+       		<paper-dialog-scrollable style="margin-top:0px">
+				<template is="dom-repeat" items="[[programmation_sel]]" as="item" >
+					<div class="card" style="margin-top:2px;margin-left:10px;margin-right:10px"id="[[item.id]]"><paper-icon-button id="[[item.id]]" icon="delete" on-tap="_delete_prog_ligne"></paper-icon-button>[[item.heure]] -> [[item.valeur]] ([[item.jours]])</div>
+				</template>
+			</paper-dialog-scrollable>
+		
+		<div class="buttons">
+		<paper-button dialog-dismiss on-tap="reload_programmation">Annuler</paper-button>
+		<paper-button dialog-confirm autofocus on-tap="savereload_programmation">Valider</paper-button>
+		</div>
+	</paper-dialog>
+	<iron-ajax
+		id="save_programmation"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_save_prog.body}}"
+	    params="{{params_save_prog.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    on-response="reload_programmation"
+	    last-response="{{save_prog_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+
+    
+    
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_programmation',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    	  
+	     mode_sel:{type:String,
+	    	 notify:true},
+	     categorie_sel:{type:String,
+	    	 notify:true},
+	   	 tag_sel:{type:String,
+		   	 notify:true},
+		 ecriture_type_sel:{type:String,
+			 notify:true},
+		 iconmax_sel:{type:String,
+			 notify:true},
+		 iconmidle_sel:{type:String,
+			 notify:true},
+		 iconmin_sel:{type:String,
+			 notify:true},
+		 value_icon_sel:{type:String,
+				 notify:true,
+				 computed: 'computeicon_sel(value_sel,iconmax_sel,iconmidle_sel,iconmin_sel)'},
+		 value_sel:{type:String,
+			 notify:true,
+			 value:'ON'},
+		 programmation_sel:{type:String,
+		   	 notify:true,
+		   	 computed: 'computeprog_sel(programmation_Response,mode_sel,categorie_sel,tag_sel,periph_sel)'},
+	     mode_sel_nom:{type:String,
+	    	 notify:true},
+	     categorie_sel_nom:{type:String,
+	    	 notify:true},
+	   	 tag_sel_nom:{type:String,
+		   	 notify:true},
+	     periph_sel:{type:String,
+	    	 notify:true},
+/*	     tagmodes_sel:{type: Object,
+	    	 notify : true,
+	    	 computed: 'computetagmodes_sel(mode_sel,alltagmode_Response)'
+	     },*/
+	     alltypeprog_Response:{type:Object,
+	    	 notify:true,
+	    	 value:{consignes:{id:0,nom:'Consignes temp.'},on_off:{id:2,nom:'ON - OFF'}}},
+	     alltagmode_Response:{type:Object,
+	    	 notify:true,
+	    	 observer: 'charge_prog'},
+	     programmation_Response:{type:Object,
+	    	 notify:true,
+	    	 observer: 'affiche_prog'},
+	     params_save_prog:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'setprogrammation',v:'indus.1.1.1'}}},
+	   	 params_allmodes:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'allmodes',v:'indus.1.1.1'}},  
+	   	 params_delete_mode:{type:Object,
+	   		 notify:true,
+	   		 value: {action:'deletemode',v:'indus.1.1.1'}}, 
+	   	 params_add_mode:{type:Object,
+	   		 notify:true,
+	   		 value: {action:'addmode',v:'indus.1.1.1'}},
+ 	   	 params_allcategmode:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'getcategories',v:'indus.1.1.1'}}, 
+	   	 params_alltagmode:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'alltagmode',v:'indus.1.1.1'}},    	  
+ 	   	 params_getprogrammation:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'getprogrammation',v:'indus.1.1.1'}}
+	  },
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+            this.$.charge_allmodes.url=this.app.url_api+':'+this.app.port_api+'/index'
+            this.$.charge_allmodes.generateRequest();
+            this.$.charge_allcategories.url=this.app.url_api+':'+this.app.port_api+'/index'
+            this.$.charge_allcategories.generateRequest();
+            
+	      },
+	  get_tag_periph:function(e,a){
+	    	  this.taguuid=e.currentTarget.uuid;
+	    	  this.app.$.location.path="/appliindus/periphListPage/"+this.taguuid;
+	    	  
+	      },
+
+	  computeprog_sel:function(programmation_Response,mode_sel,categorie_sel,tag_sel,periph_sel){
+	        var result=[];
+	        var progsel=programmation_Response['mode_'+mode_sel]
+	    	if(progsel){
+	    		  progsel=progsel['categ_'+categorie_sel]
+	    	}
+	        if (progsel){
+		        var tag='tag_'+tag_sel;
+		      	  var etat_id=tag.substr(4,99);
+		      	  for (var l in progsel[tag]){
+					  var p=this.isperiph_sel;
+		      		  var ligne={};
+		      		  ligne.heure=progsel[tag][l].heure;
+		      		  ligne.valeur=progsel[tag][l].valeur;
+		      		  ligne.peripherique=progsel[tag][l].peripherique;
+		      		  var textejour=" ";
+		      		  for(var j in progsel[tag][l].jours){
+		      				if (progsel[tag][l].jours[j]=='1'){
+		      					textejour+=j+" ";
+		      				}
+		      		  }	    
+		      		  ligne.id=l;
+		      		  ligne.jours=textejour;
+		      		  if (Array.isArray(periph_sel) && !ligne.peripherique) {
+		      			result.push(ligne);  
+		      		  }
+		      		  if (!Array.isArray(periph_sel) && ligne.peripherique && ligne.peripherique==periph_sel) {
+		      			result.push(ligne);  
+		      		  }
+		      		  
+		      		  
+		      	  }
+	        }
+
+	        return result;
+	      },
+
+/*	  computetagmodes_sel:function(mode_sel,alltagmode_Response){
+	    	  console.log('compute',mode_sel);
+	    	  
+	    	  return alltagmode_Response.tagsmode;
+	      },*/
+	  charge_prog:function(m){
+	          this.$.charge_programmation.url=this.app.url_api+':'+this.app.port_api+'/index'
+	          this.$.charge_programmation.generateRequest();
+	          
+	      },
+	  affiche_prog:function(prog){
+	    	  var progsel=prog['mode_'+this.mode_sel]
+	    	  var etats=this.querySelectorAll('#lab h6');
+	    	  for (var e in etats){
+	    		  etats[e].innerHTML="";
+	    	  }
+	    	  if(progsel){
+	    		  progsel=progsel['categ_'+this.categorie_sel]
+	    	  }
+	    	  for (var tag in progsel){
+	    		  var etat_id=tag.substr(4,99);
+	    		  for (var l in progsel[tag]){
+	    			  if (progsel[tag][l].peripherique) {
+	    				  etat_id=progsel[tag][l].peripherique;
+	    			  }
+	    			  var ele= this.$$('#etat_'+etat_id);
+	    			  
+	    			  var textehtml="<h4>"+ progsel[tag][l].heure+" -> "+progsel[tag][l].valeur + " ( ";
+						for(var j in progsel[tag][l].jours){
+							if (progsel[tag][l].jours[j]=='1'){
+								textehtml+=j+" ";
+							}
+						}	    		  
+						textehtml+=") </h4>";
+						ele.innerHTML+=textehtml;
+	    		  }
+	    	  }
+	    	  //this.$$('#etat_37').textContent="test";
+	    	  //console.log('prog charg�e');
+	      },
+	  _delete_prog_ligne:function(e){
+	    	  delete(this.programmation_Response['mode_'+this.mode_sel]['categ_'+this.categorie_sel]['tag_'+this.tag_sel][e.currentTarget.id]);
+	    	  var mode=this.mode_sel;
+	    	  this.set('mode_sel',-1);
+	    	  this.set('mode_sel',mode);
+	    	  
+	      },
+	  _delete_mode:function(e){
+		  this.$.delete_mode_dialog.open();
+      },
+      _add_mode:function(e){
+    	  
+          this.$.add_mode_dialog.open();
+    	  
+      },
+      _send_add_mode:function(){
+    	  this.$.send_add_mode.url=this.app.url_api+':'+this.app.port_api+'/index'
+    	  this.params_add_mode.mode_nom=this.$.new_mode.value;
+    	  this.$.send_add_mode.generateRequest();
+      },
+      _send_delete_mode:function(){
+    	  this.$.send_delete_mode.url=this.app.url_api+':'+this.app.port_api+'/index'
+           this.params_delete_mode.mode_uuid=this.mode_sel;
+    	  if (this.programmation_Response){
+    		  delete(this.programmation_Response['mode_'+this.mode_sel]);
+    	  }
+    	  this.$.send_delete_mode.generateRequest();
+      },
+      reload_mode:function(){
+    	  this.$.charge_allmodes.generateRequest();
+      },
+	  _add_prog_ligne:function(e){
+	    	  if (!this.programmation_Response['mode_'+this.mode_sel]){
+	    		  this.programmation_Response['mode_'+this.mode_sel]={};
+	    	  }
+	    	  if (!this.programmation_Response['mode_'+this.mode_sel]['categ_'+this.categorie_sel]){
+	    		  this.programmation_Response['mode_'+this.mode_sel]['categ_'+this.categorie_sel]={};
+	    	  }
+	    	  if (!this.programmation_Response['mode_'+this.mode_sel]['categ_'+this.categorie_sel]['tag_'+this.tag_sel]){
+	    		  this.programmation_Response['mode_'+this.mode_sel]['categ_'+this.categorie_sel]['tag_'+this.tag_sel]={};
+	    	  }
+	    	  var l=new Date().getTime();
+	    	  
+	    	  var h=this.$.heures.value.replace(':','h');
+	    	  
+	    	  var t=this.$$('#'+this.ecriture_type_sel).value;
+						    	  
+	    	  var p
+	    	  if (!Array.isArray(this.periph_sel)){
+	    		  p=this.periph_sel;
+	    	  };
+	    	  
+	    	  var jours=this.querySelectorAll('#modif_prog_dialog .green');
+	    	  
+	    	  var ligne={heure:h,valeur:t,categorie:this.categorie_sel,peripherique:p,jours:{}};
+	    	  for (var j in jours){
+	    		  if (jours[j].id){
+		    		  if(jours[j].active==true){
+		    			  ligne.jours[jours[j].id]="1";
+		    		  } else {
+		    			  ligne.jours[jours[j].id]="0";
+		    		  }
+	    		  }
+	    	  }
+	    	  
+	    	  this.programmation_Response['mode_'+this.mode_sel]['categ_'+this.categorie_sel]['tag_'+this.tag_sel][l]=ligne;
+	    	  
+	    	  var mode=this.mode_sel;
+	    	  this.set('mode_sel',-1);
+	    	  this.set('mode_sel',mode);
+	    	  
+	      },
+	  savereload_programmation:function(){
+	    	  /*index.php?action=setprogrammation*/
+	    	  this.set('params_save_prog.body',{data:this.programmation_Response});
+	    	  this.$.save_programmation.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=indus.1.1.1';
+	          this.$.save_programmation.generateRequest();
+	      },
+	  reload_programmation:function(){
+	    	  this.$.charge_programmation.generateRequest();
+	      },
+	  
+	  _get_mode:function(e){
+	    	  this.set('mode_sel',e.currentTarget.id);
+	    	  this.set('mode_sel_nom',e.currentTarget.nom);
+	    	  this.params_alltagmode.mode=this.mode_sel;
+	    	  this.params_getprogrammation.mode=this.mode_sel;
+	    	  if (this.mode_sel && this.categorie_sel){
+	    		  this.$.charge_alltagmode.url=this.app.url_api+':'+this.app.port_api+'/index'
+		          this.$.charge_alltagmode.generateRequest();
+	    	  }
+	    	  this.$.modif_prog_dialog.close();
+	      },
+	  _get_categorie:function(e){
+	    	  this.set('categorie_sel',e.currentTarget.id);
+	    	  this.set('categorie_sel_nom',e.currentTarget.nom);
+	    	  this.set('iconmin_sel',e.currentTarget.iconmin);
+	    	  this.set('iconmidle_sel',e.currentTarget.iconmidle);
+	    	  this.set('iconmax_sel',e.currentTarget.iconmax);
+	    	  this.params_alltagmode.categorie=this.categorie_sel;
+	    	  this.params_getprogrammation.categorie=this.categorie_sel;
+	    	  //this.params_save_prog.params.categorie=this.categorie_sel;
+	    	  if (this.mode_sel && this.categorie_sel){
+	    		  this.$.charge_alltagmode.url=this.app.url_api+':'+this.app.port_api+'/index'
+		          this.$.charge_alltagmode.generateRequest();
+	    	  }
+	    	  this.$.modif_prog_dialog.close();
+	      }	,      
+	  _get_modetag:function(e){
+	    	  this.set('tag_sel',e.currentTarget.id);
+	    	  this.set('tag_sel_nom',e.currentTarget.nom);
+	    	  this.set('ecriture_type_sel',e.currentTarget.ecriture_type);
+			  this.set('periph_sel',e.currentTarget.periph_id);
+	    	  
+			  if (this.ecriture_type_sel=='VOLETR' || this.ecriture_type_sel=='VOLETRVARIABLE'){
+				  this.set('value_sel','UP');
+			  } else {
+				  this.set('value_sel','ON');
+			  }
+
+	    	  this.$.modif_prog_dialog.open();
+	      },
+
+	  change_etat_BINAIRE:function(){
+	    	  if (this.value_sel=='ON'){
+	    		  this.set('value_sel','OFF');
+	    	  } else {
+	    		  this.set('value_sel','ON');
+	    	  }
+	      },
+	  change_etat_VOLET:function(){
+    	  if (this.value_sel=='UP'){
+    		  this.set('value_sel','DOWN');
+    	  } else {
+    		  this.set('value_sel','UP');
+    	  }
+      },
+	  computeicon_sel:function(value_sel,iconmax_sel,iconmidle_sel,iconmin_sel){
+	    	  if (value_sel=='ON' || value_sel=='UP'){
+	    		  return iconmax_sel;
+	    	  } else {
+	    		  return iconmin_sel;
+	    	  }
+	    	  return null;
+	      },
+	  disconnect:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app._toArray(obj);
+	      },
+	      
+	      show: function (periph_ecriture_type,ecriture_type) {
+	    	    //console.log('OK',periph.nom,periph.uuid,ecriture_type,periph.ecriture_type,periph.ecriture_type==ecriture_type);	
+
+	    	    return periph_ecriture_type==ecriture_type;
+	    	},
+	       attached: function() {
+	         this._updateGridStyles = this._updateGridStyles || function() {
+	           this.updateStyles();
+	         }.bind(this);
+	         window.addEventListener('resize', this._updateGridStyles);
+	       },
+	       detached: function() {
+	         window.removeEventListener('resize', this._updateGridStyles);
+	       }
+  })
+  </script>
+
+</dom-module>

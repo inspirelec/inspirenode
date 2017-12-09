@@ -1,0 +1,118 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/library/bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../majcore/my-liste_behavior.html">
+<link rel="import" href="../element/my-liste_sexes.html">
+<link rel="import" href="/library/bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="/library/bower_components/paper-radio-group/paper-radio-group.html">
+ 
+<dom-module id="my-liste_familles">
+
+  <template>
+		<style >
+  		</style>
+  		
+		<my-combo_select id="charge_sexe" hidden charge_table liste="{{liste_soustable.sexe}}"   table="sexe" ></my-combo_select>
+		<my-combo_select id="charge_tag" hidden charge_table liste="{{liste_soustable.tag_voyage}}"   table="tag_voyage"  ></my-combo_select>
+		<my-combo_select id="charge_operat" hidden charge_table  liste="{{liste_soustable.type_operation}}"   table="type_operation"  ></my-combo_select>
+		<my-combo_select id="charge_typecaf" hidden charge_table liste="{{liste_soustable.typecaf}}"   table="typecaf"  ></my-combo_select>
+		<my-combo_select id="charge_paiement" hidden charge_table liste="{{liste_soustable.type_paiement}}"   table="type_paiement"  ></my-combo_select>
+		<my-combo_select id="charge_tarif" hidden charge_table liste="{{liste_soustable.tarif}}"   table="tarif"  ></my-combo_select>
+		
+  		<my-liste_behavior 
+  			id="liste_behavior"
+  			detail_code="my-profilfamille" 
+  			
+  			title="Familles"
+  			title_background_color="rgba(90, 120, 46, 0.5)"
+  			
+  			params="{{params_allfamilles}}"
+  			
+  			hideother_onedit=false
+  			hideothereditbutton_onedit=true
+  			grants="{{grants}}"
+  			
+  			scrollactif=false
+  			
+  			liste_nb_column=3
+  			selitem="{{selitem}}"
+  			queryfields="nom;prenom1;prenom2;prenom3;ville;adresse;codepostal"
+  			liste_soustable="{{liste_soustable}}"
+  			charge_table$="{{charge_table}}"
+  			dropdowntype$="{{dropdowntype}}"
+  			value_sel="{{value_sel}}"
+  			dropdown_selobj="{{dropdown_selobj}}"
+  		>
+  		<!-- limite_creation=1 
+  			dropdowntype=false-->
+  			<div class="selection">
+  				<label id="label1">Etat:</label>
+	  			<paper-radio-group aria-labelledby="label1" attrForSelected="name" selected="{{etat_sel}}">
+				  <paper-radio-button name="" >Tous</paper-radio-button>
+				  <paper-radio-button name="actif" >Actifs</paper-radio-button>
+				  <paper-radio-button name="clos" >Clos</paper-radio-button>
+				 <!--  <paper-radio-button name="alerte" >Alertes</paper-radio-button> -->
+				</paper-radio-group>
+  			</div>
+		</my-liste_behavior>
+		
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_familles',
+	  
+	  properties: {  
+  		 params_allfamilles:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {type:'get',action:'listpersonne',limit:25,etat:"actif",titulaire_id:"isnull"} 
+	        },
+	     etat_sel:{type:String,notify:true,value:'actif',observer: 'selection_etat_change'},
+	  	 grants:{type:Object,
+	  	 		 notify : true,
+	  	 		 value : {creation:true,
+		  	 			 modification:true,
+		  	 			 suppression:true,
+		  	 			 impression:false}
+	  	 	 },
+	     liste_familles:{type:Array,
+	    	 notify:true},
+	     liste_soustable:{type:Object,
+	    	 notify:true,
+	    	 value:{}
+	     },
+		  observers:[
+			  '_selection_etat_change(etat_sel)'
+		  ],
+	     restriction_operation:{type:Array,notify:true,value:[{column:'code_annulation',value:" !='O'"}]},
+	     selitem:{type:String,notify:true},
+	     dropdown_selobj:{type:Object,notify:true},
+	     value_sel:{type:Number,notify:true,value:6},
+	     charge_table:{type:Boolean,notify:true}
+	  },
+	     selection_etat_change:function(new_etat,old_etat){
+	    	 this.set('params_allfamilles.etat',new_etat);
+	    	 this.$.liste_behavior.handlesearch();
+	     }
+	/*  observers:[
+		  '_liste_operationchange(liste_soustable.type_operation)'  
+		  ],
+	   _liste_operationchange:function(liste_type_operation){
+		   for (var t in liste_type_operation){
+			   if(liste_type_operation[t].code_annulation=='O'){
+					this.splice('liste_soustable.type_operation', liste_type_operation.indexOf(liste_type_operation[t]), 1);
+			   }
+		   }
+	   }*/
+
+  })
+  </script>
+
+</dom-module>

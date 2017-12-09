@@ -1,0 +1,29 @@
+	<div id="Acces_Recupmotpasse_Page" data-role="page" data-theme="c" data-add-back-btn="true"  >
+	
+		<div  id ="entete"  data-role="header" data-theme="c" data-position="fixed"  >
+			<h1>InspirAcces</h1>
+			<a href="#Acces_Info_Page" data-transition="slide" class="ui-btn-right ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-info ui-btn-icon-notext" >Button</a>
+		<!--	<a href="#settingListPage" data-transition="slide" class="ui-btn-right ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-gear ui-btn-icon-notext" >Button</a>-->
+		</div>
+		<div data-role="content" data-theme="c">
+		<div  id="popupLogin" data-theme="a"  class="ui-corner-all">
+			<!-- data-role="popup" data-overlay-theme="b"-->	 
+			<form>
+				<div style="padding:10px 20px;">
+				  <h3  data-i18n=""> </h3>
+			
+		          <label for="un" class="ui-hidden-accessible">Login:</label>
+		          <input type="text" name="user" id="email" value="" placeholder="Email" autocapitalize="off" autocorrect="off" autocomplete="off" data-theme="a" />
+
+		    	  <button id="btnsendmdp" type="submit" data-theme="b" data-i18n="sendmepassword" onclick="senddemanderecup();return false;";>Envoyer un nouveau mot de passe</button>
+
+				</div>
+			</form>
+			
+
+		</div>
+	    </div>		
+
+
+
+	</div>  

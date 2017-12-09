@@ -1,0 +1,206 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../majcore/my-combo_select2.html">
+<link rel="import" href="../majcore/my-combo_select.html">
+
+<dom-module id="my-liste_compte_ecritures">
+
+  <template>
+		<style >
+		 .other-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:55px;
+    		color: var(--paper-red-500);
+		 }
+  		</style>
+  		<my-combo_select id="charge_sexe" hidden charge_table liste="{{liste_soustable.sexe}}"   table="sexe" ></my-combo_select>
+		<my-combo_select id="charge_tag" hidden charge_table liste="{{liste_soustable.tag_voyage}}"   table="tag_voyage"  ></my-combo_select>
+		<my-combo_select id="charge_operat" hidden charge_table  liste="{{liste_soustable.type_operation}}"   table="type_operation"  ></my-combo_select>
+		<my-combo_select id="charge_typecaf" hidden charge_table liste="{{liste_soustable.typecaf}}"   table="typecaf"  ></my-combo_select>
+		<my-combo_select id="charge_paiement" hidden charge_table liste="{{liste_soustable.type_paiement}}"   table="type_paiement"  ></my-combo_select>
+		<my-combo_select id="charge_tarif" hidden charge_table liste="{{liste_soustable.tarif}}"   table="tarif"  ></my-combo_select>
+		
+  		<my-sous_liste_behavior class="parametres_zone"
+  			
+  			detail_code="my-profilcompte_ecriture" 
+  			
+  			title="Comptabilité [[solde]]€"
+  			title_background_color="rgba(15, 40, 145, 0.5)"
+  			
+  			params="{{params_allcompte_ecritures}}"
+  			
+  			hideother_onedit=false
+  			hideothereditbutton_onedit=true
+  			grants="{{grants}}"
+  			  			
+  			liste_soustable2="{{liste_soustable2}}"
+  			liste_soustable="{{liste_soustable}}"
+  			queryfields="recu_num"
+  			searchquery="{{searchquery}}"
+  			parent="{{titulaire}}"
+  			
+  			charge_table$="{{charge_table}}"
+  			dropdowntype$="{{dropdowntype}}"
+  			value_sel="{{value_sel}}"
+  			dropdown_selobj="{{dropdown_selobj}}"
+  			
+  			edited_item_id="{{edited_item_id}}"
+  			liste_objets="{{liste_objets}}"  	
+  			showwhereisnull="[[showwhereisnull]]"
+  			searchmode="[[searchmode]]"
+		   	 >
+			<div class="selection" hidden="{{hidesearchbox}}" style="display:flex">
+  				<my-combo_select2 hiderefresh style="padding:0 16px;" limit=8 fullnamefields="nom;prenom1" queryfields="nom;prenom1;ville" charge_table dropdown_selobj="{{titulairesel}}" class="input3cols" table="personne" id="personne_id" label="Famille" value_sel="{{famille_id}}"></my-combo_select2>
+  				<my-searchbox placeholder="Numéro de reçu" query="{{searchquery}}"></my-searchbox>	
+   				
+  			</div>
+  			
+  			<!-- <paper-icon-button  class="button_top_right other-button"  mini icon="cached" title="Recalculer" on-tap="recalculthis"></paper-icon-button>-->
+  			
+		</my-sous_liste_behavior>
+		
+			<iron-ajax
+				id="launchcalcul"
+			    method="GET"
+			    url="{{calcul_url}}"
+			    headers="{{app.header_auth}}"
+			    params="{{params_calcul_ecritures}}"
+			    handle-as="json"
+			    on-error="_disconnect"
+	    		on-response="calcul_validate"
+			    debounce-duration="300">
+			</iron-ajax>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_compte_ecritures',
+	  
+	  properties: {  
+		     app: {
+		          type: Object
+		        },    
+  		 params_allcompte_ecritures:{type: Object,
+	   	 	  notify : true,
+	   	 	 computed:'_getparams_get(titulaire)'
+	        },
+	     params_calcul_ecritures:{type: Object,
+		   	 	  notify : true,
+		   	 	 computed:'_getcalcul_get(titulaire)'
+		    },
+		   	 charge_url: {type:String, 
+		   		    notify : true,
+		   		  	value:null },
+	  	 grants:{type:Object,
+	  	 		 notify : true,
+	  	 		computed:'_get_grants(titulaire)'
+	  	 	 },
+		  	 titulaire:{type:Object,notify:true},
+		 liste_objets:{type:Array,
+	    	 notify:true},
+	     liste_soustable:{type:Object,
+	    	 notify:true,value:{}
+	     },
+	     titulairesel:{type:Object,notify:true},
+	  	 edited_item_id:{type:String,
+	   	 		notify:true,},
+	   	 hidesearchbox:{type:Boolean,notify:true},
+	   	 
+	     dropdown_selobj:{type:Object,notify:true},
+	     value_sel:{type:Number,notify:true,value:6},
+	     charge_table:{type:Boolean,notify:true},
+	     searchquery:{type:String,
+	    	 notify:true,
+	    	 value:""
+	     },
+		 showwhereisnull:{type:String,notify:true,
+			computed:'_showwhereisnull(liste_objets,titulaire)'},
+   		 solde:{type:Number,
+	    	 	notify : true,
+	    	 	computed: '_compute_solde(liste_objets,liste_objets.length,edited_item_id)'},
+	  },
+	  observers:[
+		  '_selection_titulaire(titulairesel,searchmode)',
+	  ],
+	  recalculthis(){
+    	  this.set('show_loading',1);
+    	  this.app = document.querySelector('#app');
+	      this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
+	      this.$.charge.generateRequest();  
+	  },
+	  _selection_titulaire(titulairesel,searchmode){
+		  if (searchmode) {
+			  this.set('titulaire',titulairesel);	  
+		  } 
+		  
+	  },
+      _showwhereisnull : function(liste_objets,titulaire){
+        	for (var o in liste_objets){
+        		var d=new Date(liste_objets[o].date);
+        		var difference = (new Date-d)/1000/60/60/24;
+        		if (this.hidesearchbox && titulaire && titulaire.id!='' && liste_objets[o].facture_num && difference>7) {
+        			liste_objets[o].hide=true;	
+        		} else {
+        			liste_objets[o].hide=false;	
+        		}
+        	}
+        	return 'hide';
+        },
+	  _get_grants:function(titulaire){
+		  if (titulaire && titulaire.id && titulaire.id>=0){
+			  return {creation:true,
+					 modification:false,
+					 suppression:true,
+					 impression:true};
+		  } else {
+			  return {creation:false,
+					 modification:false,
+					 suppression:false,
+					 impression:false};
+		  }
+	  },
+
+	  _getparams_get:function(titulaire){
+		  if (titulaire) {
+			  if (titulaire.id!=''){
+				  return  {type:'get',action:'listcompte_ecriture',titulaire_id:'='+titulaire.id} ;
+			  } else {
+				  return  {type:'get',action:'listcompte_ecriture'} ;
+			  }
+		  } else if (!this.hidesearchbox){
+			  return  {type:'get',action:'listcompte_ecriture'};
+		  } else {
+			  return  {type:'get',action:'listcompte_ecriture',titulaire_id:'=-1'} ;
+		  }
+		  
+	  },
+	  _compute_solde:function(compte_ecritures_Response,nblignes,edited_item_id){
+		  var solde_calc=0;
+		  for (l in compte_ecritures_Response) {
+			  if(compte_ecritures_Response[l].montant && compte_ecritures_Response[l].calcul_solde=='O'){
+				  if (compte_ecritures_Response[l].signe=="-"){
+					  solde_calc-=compte_ecritures_Response[l].montant*1;
+				  } else {
+					  solde_calc+=compte_ecritures_Response[l].montant*1;
+				  }
+			  }
+		  }
+		  solde_calc= solde_calc.toFixed(2);
+		  return solde_calc;
+	  }
+
+
+
+  })
+  </script>
+
+</dom-module>

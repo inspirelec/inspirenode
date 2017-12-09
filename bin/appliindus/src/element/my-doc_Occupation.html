@@ -1,0 +1,517 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="my-doc_Occupation">
+		  <template>
+			  <style>
+			  
+			  	div {font-size: 10px;
+					text-align: center;}
+				td {font-size: 10px;
+					text-align: center;}
+			    .databrutes { color:grey;white-space: pre;width:500px; font-family: monospace; font-size: 10px;}
+			  	
+			  	.cadre {
+		        	display :block;
+		            margin: 5px;
+		            padding:5px;
+		          	position: relative;
+		            background-color: white;
+			        box-shadow: 1px 1px 1px 1px;
+			        border-radius: 3px;
+			     }
+			  	.facture{
+			  		color:green;
+			  	}
+			  	.titre{
+			  		color:black;
+					font-size: 14px;
+					text-align: center;
+					margin:3px
+				}
+				.sejour{
+					color:red;
+					margin-left:10px
+				}
+				.famille{
+					color:blue;
+					margin-left:20px;
+				}
+			  </style>
+			  
+
+			
+			<div class="cadre">
+				  <p class="titre">
+					<b>Bilan d'occupation</b>
+					</br>	
+					<b>Extraction du {{selection_query.date1}} au {{selection_query.date2}}</b>
+				  </p>	
+				 <div>
+					<h2>[[aire_sel.nom]]</h2>
+				 </div>				 
+		  	</div>
+			 
+			<div >
+				<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%">
+					   <td style="width: 80%">
+						Nombre total de personnes accueillies <br/>
+						Dont personnes de moins de 18 ans<br/>
+						Nombre de caravanes
+					   </td>	
+					   
+					   <td style=" width: 20%">							   
+						[[stat_age_nbage]] <br/>
+						[[stat_age_18]]<br/>
+						[[stat_duree_nbduree]]
+					   </td>				
+					</tr>		
+				</tbody></table>
+			</div>	
+			<div >
+				<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%">
+						<td style="width: 100%">
+							<p class="titre">DUREE DES SEJOUR</p>	
+						</td>
+					</tr>	
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%"><td style="width: 100%">
+						<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+							<tr>
+							   <td style="width: 50%">
+								   <template is="dom-repeat" items="[[stat_duree]]" as="lig">
+										{{lig.dur}} <br/>
+									</template>
+								<br/>
+								Total
+							   </td>	
+							   
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[stat_duree]]" as="lig">
+										{{lig.nb}} <br/>
+									</template>
+								_____<br/>
+								{{stat_duree_nbduree}}
+							   </td>
+							   
+							   <td style=" width: 30%">	
+								   <template is="dom-repeat" items="[[stat_duree]]" as="lig">
+										{{lig.pourc}} <br/>
+									</template>
+								<br/>
+								<br/>
+							   </td>				
+							</tr>	
+							</td>	
+						</tbody></table>					
+					</tr>		
+				</tbody></table>
+			</div>
+			<div >
+				<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%">					
+						<td style="width: 100%">
+							<p class="titre">ETAT CIVIL</p>		
+						</td>
+					</tr>	
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%"><td style="width: 100%">
+						<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+							<tr>
+							   <td style="width: 50%">
+								   <template is="dom-repeat" items="[[stat_etatcivil]]" as="lig">
+										{{lig.nom}} <br/>
+									</template>
+								<br/>
+								Total
+							   </td>	
+							   
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[stat_etatcivil]]" as="lig">
+										{{lig.nb}} <br/>
+									</template>
+								_____<br/>
+								{{stat_etatcivil_nbpersonne}}
+							   </td>
+							   
+							   <td style=" width: 30%">	
+								   <template is="dom-repeat" items="[[stat_etatcivil]]" as="lig">
+										{{lig.pourc}} <br/>
+									</template>
+								<br/>
+								<br/>
+							   </td>				
+							</tr>	
+							</td>		
+						</tbody></table>					
+					</tr>		
+				</tbody></table>
+			</div>	
+			<div >
+				<table style=" border-radius:4px; border:1px solid #636363;width: 100%" ><tbody>
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%">
+						<td style="width: 100%">
+							<p class="titre">COMPOSITION DES MENAGES ACCUEILLIS</p>	
+						</td>							
+					</tr>	
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%"><td style="width: 100%">
+						<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+							<tr>
+							   <td style="width: 50%">
+								   <template is="dom-repeat" items="[[stat_caf]]" as="lig">
+										{{lig.nom}} <br/>
+									</template>
+								<br/>
+								Total
+							   </td>	
+							   
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[stat_caf]]" as="lig">
+										{{lig.nb}} <br/>
+									</template>
+								_____<br/>
+								{{stat_caf_nbtpcaf}}
+							   </td>
+							   
+							   <td style=" width: 30%">	
+								   <template is="dom-repeat" items="[[stat_caf]]" as="lig">
+										{{lig.pourc}} <br/>
+									</template>
+								<br/>
+								<br/>
+							   </td>				
+							</tr>		
+							</td>	
+						</tbody></table>					
+					</tr>		
+				</tbody></table>
+			</div>		
+			<div>
+				<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%">
+						<td style="width: 100%">
+							<p class="titre">AGE DES PERSONNES HEBERGEES</p>			
+						</td>
+					</tr>	
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%"><td style="width: 100%">
+						<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+							<tr>
+							   <td style="width: 50%">
+								   <template is="dom-repeat" items="[[stat_age]]" as="lig">
+										{{lig.nom}} <br/>
+									</template>
+								<br/>
+								Total
+							   </td>	
+							   
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[stat_age]]" as="lig">
+										{{lig.nb}} <br/>
+									</template>
+								_____<br/>
+								{{stat_age_nbage}}
+							   </td>
+							   
+							   <td style=" width: 30%">	
+								   <template is="dom-repeat" items="[[stat_age]]" as="lig">
+										{{lig.pourc}} <br/>
+									</template>
+								<br/>
+								<br/>
+							   </td>				
+							</tr>	
+							</td>		
+						</tbody></table>					
+					</tr>		
+				</tbody></table>
+			</div>
+
+			<!-- pour chargement de la table sejours suivant selection des dates -->
+				<iron-ajax
+					id="charge_famillesejours"	    		method="GET"
+				    url="{{charge_famillesejours_url}}"	    headers="{{app.header_auth}}"
+				    params="{{params_get_sejours}}"		    handle-as="json"    on-error="_disconnect"
+				    last-response="{{sejours}}"			    debounce-duration="300">
+				</iron-ajax>
+				
+			<!-- pour chargement des autres table entiere -->
+				<my-combo_select id="charge_sexe" hidden charge_table liste="{{sexes}}"   table="sexe" ></my-combo_select>
+				<my-combo_select id="charge_tag" hidden charge_table liste="{{emplacements}}"   table="tag_voyage"  ></my-combo_select>
+				<my-combo_select id="charge_operat" hidden charge_table  liste="{{type_operations}}"   table="type_operation"  ></my-combo_select>
+				<my-combo_select id="charge_typecaf" hidden charge_table liste="{{typecafs}}"   table="typecaf"  ></my-combo_select>
+				<my-combo_select id="charge_paiement" hidden charge_table liste="{{type_paiements}}"   table="type_paiement"  ></my-combo_select>
+				<my-combo_select id="charge_tarif" hidden charge_table liste="{{tarifs}}"   table="tarif"  ></my-combo_select>
+				<my-combo_select id="charge_aire" hidden charge_table liste="{{aires}}"   table="aire"  ></my-combo_select>
+				<my-combo_select id="charge_societe" hidden charge_table liste="{{societes}}"   table="societe"  ></my-combo_select>
+				<my-combo_select id="charge_personne" hidden charge_table liste="{{personnes}}"   table="personne"  ></my-combo_select>
+				
+		  </template>
+		
+		  <script>
+		    Polymer({
+		
+		      is: 'my-doc_Occupation',
+
+		      properties: {
+		 	     app: {
+			          type: Object
+		        	},    
+		    	 selection_query:{type : Object,
+	  				  notify:true/*,
+	  				  value:{}*/},
+
+		   		 params_get_sejours:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listsejour'}},
+		   		 
+			      societe_sel:{type:Object,
+			    	  notify:true,
+			    	  computed: 'computesociete_sel(societes)'},
+			      aire_sel:{type:Object,
+			    	  notify:true,
+			    	  computed: 'computeaire_sel(aires)'},
+			     
+			     /*tables de la base de donnée*/
+				 sexes:{type:Array,notify:true},
+			     sejours:{type:Array,notify:true},
+			     personnes:{type:Array,notify:true},
+				 typecafs:{type:Array,notify:true},
+				 
+				 /*autres tableaux*/
+				 /*durees:{type:Array,notify:true},*/
+			    
+				/*calcul des états*/
+			     stat_etatcivil:{type:Array,notify:true,computed: 'compute_etatcivil(sexes,personnes,sejours,selection_query)'},
+			     stat_duree:{type:Array,notify:true,computed: 'compute_duree(sejours,selection_query)'},
+			     stat_age:{type:Array,notify:true,computed: 'compute_age(personnes,sejours,selection_query)'},
+			     stat_caf:{type:Array,notify:true,computed: 'compute_caf(typecafs,sejours,selection_query)'},
+			     
+				 /*nombres calculés*/
+				 stat_etatcivil_nbpersonne:{type:Number,notify:true,value:0},
+			     stat_caf_nbtpcaf:{type:Number,notify:true,value:0},
+				 stat_duree_nbduree:{type:Number,notify:true,value:0},
+				 stat_age_nbage:{type:Number,notify:true,value:0},
+				 stat_age_18:{type:Number,notify:true,value:0}
+		      },
+	    	  observers: [
+		                  '_selection_query_change(selection_query)'	                  
+		                ],
+						
+		      /*Sélection de séjour en fonction 
+			    paramètres: date1 date de début séjour
+							date2 date de fin séjour
+				retour: 	lance l'iron-ajax avec l'id "charge_famillesejours"*/
+				
+		      _selection_query_change: function(selection_query) {
+			        /*lien entre l'application et le document (autdentification, ...)*/
+			        this.app = document.querySelector('#app');
+			        /*prise en compte des dates dans la requete envoyée au serveur pour la liste des séjours*/
+			        if (this.params_get_sejours && selection_query && selection_query.date1 && selection_query.date2) {
+			        	this.params_get_sejours.date_debut=" between '"+selection_query.date1+"' and '"+selection_query.date2+"'";
+			        } else if (this.params_get_sejours && selection_query && selection_query.date1) {
+			        	this.params_get_sejours.date_debut=">='"+selection_query.date1+"'";
+			        } else if (this.params_get_sejours && selection_query && selection_query.date2) {
+			        	this.params_get_sejours.date_debut="<='"+selection_query.date2+"'";
+			        } else if (this.params_get_sejours) {
+			        	this.params_get_sejours.date_debut='';
+			        }
+			        /*url (toujours la même structure)*/
+			        this.charge_famillesejours_url=this.app.url_api+':'+this.app.port_api+'/index'
+					/*lance l'iron-ajax avec l'id "charge_famillesejours"*/
+			    	this.$.charge_famillesejours.generateRequest();
+			  },
+			  
+			  
+			  // type de CAF
+			  // retour table des type de CAF issue de la base de donnée avec une nouvelle colonne : typecafs[]
+			  compute_caf:function(typecafs,sejours,selection_query){				  
+				  for (var s in typecafs){
+					  typecafs[s].nb=0;
+				  }
+				  var nb_tpcaf=0;
+				  for (var s in sejours){ /*boucle sejour*/
+					   
+							 this._getobjinliste(typecafs,sejours[s].type_caf).nb += 1
+							 nb_tpcaf+= 1;
+				  }
+				  
+				  for (var s in typecafs){
+					  typecafs[s].pourc=Math.round(typecafs[s].nb/nb_tpcaf*1000)/10;
+				  }
+				  this.set('stat_caf_nbtpcaf',nb_tpcaf);
+				  
+				  return typecafs;
+			  },
+			  
+			  // durée de séjour
+			  // retour table des durées : durees[]
+			  compute_duree:function(sejours,selection_query){				  
+				 
+				  var nb_duree=0;
+                                  var durees=[{},{},{},{},{},{}];
+				  durees[0].dur = "Moins d'un mois";
+				  durees[1].dur = "De 1 à 3 mois";
+				  durees[2].dur = "De 3 à 6 mois";
+				  durees[3].dur = "De 6 à 9 mois";
+				  durees[4].dur = "De 9 à 12 mois";
+				  durees[5].dur = "> 12 mois";
+				  for (var s in durees){
+					  durees[s].nb=0;
+				  }
+								
+								
+				  for (var s in sejours){ /*boucle sejour*/
+				    if (!sejours[s].clos){
+						var dateD = new Date(sejours[s].date_debut); 
+						var dateF = new Date(sejours[s].date_fin); 
+						var tmp = dateF-dateD;
+						var diff_day = Math.floor(tmp/1000/60/60/24);
+						
+						if (diff_day<=30){durees[0].nb += 1;}
+						if (diff_day>30 && diff_day<=91){durees[1].nb += 1;}
+						if (diff_day>91 && diff_day<=182){durees[2].nb += 1;}
+						if (diff_day>182 && diff_day<=273){durees[3].nb += 1;}
+						if (diff_day>273 && diff_day<=364){durees[4].nb += 1;}
+						if (diff_day>364){durees[5].nb += 1;}
+						
+						nb_duree+= 1;
+					}
+				  }
+				  /*poucentage*/
+				  for (var s in durees){
+					  durees[s].pourc=Math.round(durees[s].nb/nb_duree*1000)/10;
+				  }
+				  this.set('stat_duree_nbduree',nb_duree);
+				  
+				  return durees;
+			  },
+			  
+			  // Age des occupants
+			  // retour table des ages : ages[]
+			  compute_age:function(personnes,sejours,selection_query){				  
+				 
+				  var nb_age=0;
+                                  var ages=[{},{},{},{},{},{}];
+				  ages[0].nom = "0-17 ans";
+				  ages[1].nom = "18-24 anss";
+				  ages[2].nom = "25-39 ans";
+				  ages[3].nom = "40-65 ans";
+				  ages[4].nom = "Plus de 65 ans";
+				  ages[5].nom = "Non défini";
+				  for (var s in ages){
+					  ages[s].nb=0;
+				  }
+				  
+				  for (var s in sejours){ /*boucle sejour*/
+					  for (var t in personnes){ /*boucle titulaire*/
+						 if (!personnes[t].titulaire_id && sejours[s].titulaire_id==personnes[t].id){ /*si titulaire du sejour*/
+							var dateNaissance = new Date(personnes[t].datenaissance); 
+							if (!dateNaissance){							
+								ages[5].nb += 1;
+							}else{
+								var dateSejour = new Date(sejours[s].date_debut); 
+								var tmp = dateSejour-dateNaissance;
+								var diff_an = Math.floor(tmp/1000/60/60/24/365);					 
+								
+								if (diff_an<=17){ages[0].nb += 1;}
+								if (diff_an>17 && diff_an<=24){ages[1].nb += 1;}
+								if (diff_an>24 && diff_an<=39){ages[2].nb += 1;}
+								if (diff_an>39 && diff_an<=65){ages[3].nb += 1;}
+								if (diff_an>65){ages[4].nb += 1;}
+							}
+						 
+							 nb_age+= 1;
+							for (var m in personnes){ /*boucle membre*/
+								if (personnes[m].titulaire_id=personnes[t.id]){ /*si membre du titulaire*/
+									var dateNaissance = new Date(personnes[m].datenaissance); 
+									if (!dateNaissance){							
+										ages[5].nb += 1;
+									}else{
+										var dateSejour = new Date(sejours[s].date_debut); 
+										var tmp = dateSejour-dateNaissance;
+										var diff_an = Math.floor(tmp/1000/60/60/24/365);					 
+										
+										if (diff_an<=17){ages[0].nb += 1;}
+										if (diff_an>17 && diff_an<=24){ages[1].nb += 1;}
+										if (diff_an>24 && diff_an<=39){ages[2].nb += 1;}
+										if (diff_an>39 && diff_an<=65){ages[3].nb += 1;}
+										if (diff_an>65){ages[4].nb += 1;}
+									}
+								 
+									 nb_age+= 1;
+								}
+							} 
+						 } 
+					  }
+				  }
+
+				  /*poucentage*/
+				  for (var s in ages){
+					  ages[s].pourc=Math.round(ages[s].nb/nb_age*1000)/10;
+				  }
+				  this.set('stat_age_nbage',nb_age);
+				  this.set('stat_age_18',ages[0].nb);
+				  
+				  return ages;
+			  },
+			  
+			  // Etat civil des occupants
+			  // retour table des états civile des occupants issue de la base de donnée avec une nouvelle colonne : sexes[]
+			  compute_etatcivil:function(sexes,personnes,sejours,selection_query){				  
+				  for (var s in sexes){
+					  sexes[s].nb=0;
+				  }
+				  var nb_personnes=0;
+				  for (var s in sejours){ /*boucle sejour*/
+					  for (var t in personnes){ /*boucle titulaire*/
+						 if (!personnes[t].titulaire_id && sejours[s].titulaire_id==personnes[t].id){ /*si titulaire du sejour*/
+							 this._getobjinliste(sexes,personnes[t].sexe).nb += 1
+							 nb_personnes+= 1;
+							for (var m in personnes){ /*boucle membre*/
+								if (personnes[m].titulaire_id=personnes[t.id]){ /*si membre du titulaire*/
+									this._getobjinliste(sexes,personnes[t].sexe).nb += 1;
+									nb_personnes+= 1;
+								}
+							} 
+						 } 
+					  }
+				  }
+				  
+				  for (var s in sexes){
+					  sexes[s].pourc=Math.round(sexes[s].nb/nb_personnes*1000)/10;
+				  }
+				  this.set('stat_etatcivil_nbpersonne',nb_personnes);
+				  
+				  return sexes;
+			  },
+			  
+			  computeaire_sel:function(aires){
+				  return this._getobjinliste(aires,0);
+			  },
+			  computesociete_sel:function(societes){
+				  return this._getobjinliste(societes,0);
+			  },
+			  
+			  
+			  
+			  _getobjinliste:function(liste,searchval,searchcolumn){
+				  if(!liste){
+					  return {};
+				  }
+				  if (!searchcolumn){
+					  searchcolumn='id';
+				  }
+				  for (var o in liste){
+					  if(liste[o][searchcolumn]==searchval){
+						  return liste[o];
+					  }
+				  }
+				  return {};
+				  
+			  },
+			  _disconnect: function(obj){
+		    	  this.app = document.querySelector('#app');
+		    	  return this.app.disconnect();
+		      }
+		    });
+		  </script>
+		</dom-module>

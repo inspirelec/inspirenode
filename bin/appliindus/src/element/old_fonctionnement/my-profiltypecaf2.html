@@ -1,0 +1,346 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<dom-module id="my-profiltypecaf">
+
+  <template>
+		<style include="app-grid-style">
+  		 :host {
+			
+        }
+        .item {
+          
+        }
+        .card {
+        	display :block;
+            margin-top: 40px;
+            padding:5px;
+            padding-bottom: 20px;
+          	max-width: 500px;
+          	margin: 5px auto;
+          	position: relative;
+            background-color: white;
+        	color: var(--paper-blue-800);
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	        
+	     }
+	     .ligne{
+	     	display:flex;
+	     }
+		 .input2cols {
+		 	margin:0 10px;
+		 	width:66%;
+		 }
+		 .input1col {
+		 	margin:0 10px;
+		 	width:33%;
+		 }
+		 .input05cols {
+		 	margin:0 10px;
+		 	width:50%;
+		 }
+		 .input3cols {
+		 	margin:0 10px;
+		 	width:100%;
+		 }
+		 .valid-button{
+		 	position:absolute;
+		 	bottom:-20px;
+		 	right:5px;
+		 	--paper-fab-background: var(--paper-green-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-green-900);
+		    z-index:10;
+		 }
+		 .reply-button{
+		 	position:absolute;
+		 	bottom:-20px;
+		 	right:50px;
+		 	--paper-fab-background: var(--paper-red-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-red-900);
+		    z-index:10;
+		 }
+		 .edit-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:5px;
+    		color: var(--paper-blue-500);
+		 }
+		 .delete-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:50px;
+		 	color: var(--paper-blue-500);
+		 }
+		 
+  		</style>
+
+	<div class="card" hidden$="[[cardtexte_hidden]]" >		
+		<paper-icon-button hidden$="[[editbuttonhide]]" class="edit-button" mini icon="create" title="Edit" on-tap="edit"></paper-icon-button>
+		<paper-icon-button hidden$="[[editbuttonhide]]" class="delete-button" mini icon="delete" title="Edit" on-tap="deletethis"></paper-icon-button>
+		{{objet.code}} ({{objet.nom}})
+	</div>
+
+	<div class="card" hidden$="[[!editmode]]">		
+	
+	    <paper-fab  class="reply-button" mini icon="reply" title="Annuler" on-tap="reply"></paper-fab>
+		<paper-fab  class="valid-button" mini icon="check" title="Valider" on-tap="submit"></paper-fab>
+	    <paper-input id="id" label="id" hidden type="text" value="{{objet_temp.id}}"> </paper-input>
+	    <paper-input id="uuid" label="uuid" hidden type="text" value="{{objet_temp.uuid}}">     </paper-input>              
+		<div class="ligne">
+		    <paper-input class="input05cols" id="code" label="Code" type="text" value="{{objet_temp.code}}"></paper-input>
+		   	<paper-input class="input05cols" id="nom" label="Libelle" type="text" value="{{objet_temp.nom}}"> 
+              <!-- <iron-icon prefix height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon> -->
+            </paper-input>
+ 		</div>
+
+		<!-- <div class="ligne">
+            <paper-input class="input3cols" id="adresse" label="Adresse" type="text" value="{{objet_temp.adresse}}"></paper-input>
+        </div>
+        <div class="ligne">
+        	<paper-input class="input1col" id="pays" label="Pays" type="text" value="{{objet_temp.pays}}"><iron-icon icon="social:public" prefix></paper-input>
+            <paper-input class="input1col" id="codepostal" label="Code Postal" type="number" value="{{objet_temp.codepostal}}"></paper-input>
+            <paper-input class="input1col" id="ville" label="Ville" type="text" value="{{objet_temp.ville}}"></paper-input>
+        </div>
+        <div class="ligne">
+            <paper-input class="input1col" id="phone" label="Telephone" type="text" value="{{objet_temp.phone}}"><iron-icon icon="communication:phone" prefix></iron-icon></paper-input>
+            <paper-input class="input1col" id="email" label="Courriel" type="text" value="{{objet_temp.email}}"><iron-icon icon="communication:email" prefix></iron-icon></paper-input>
+            <paper-input class="input1col" id="profession" label="Profession" type="text" value="{{objet_temp.profession}}"></paper-input>
+        </div>
+        <div class="ligne">
+            <paper-input class="input1col" id="datenaissance" label="Date de naissance" type="date" value="{{objet_temp.datenaissance}}"><iron-icon icon="event-available" prefix></iron-icon></paper-input>
+            <paper-input class="input2cols" id="lieunaissance" label="Lieu de naissance" type="text" value="{{objet_temp.lieunaissance}}"></paper-input>
+        </div>
+        <div class="ligne">
+            <paper-input class="input2cols" id="cartegrise" label="N� Carte grise" type="text" value="{{objet_temp.cartegrise}}"><iron-icon icon="airport-shuttle" prefix></iron-icon></paper-input>
+            <paper-input class="input1col" id="immatriculation" label="Immatriculation" type="text" value="{{objet_temp.immatriculation}}"></paper-input>
+        </div>
+        <div class="ligne">
+            <paper-input class="input3cols" id="commentaire" label="Commentaires" type="textarea" value="{{objet_temp.commentaire}}"></paper-input>
+      </div> -->  
+        
+   </div>
+     
+	
+	<iron-ajax
+		id="save"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_save.body}}"
+	    params="{{params_save.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    on-response="save_validate"
+	    last-response="{{save_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+	<iron-ajax
+		id="delete"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_delete.body}}"
+	    params="{{params_delete.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    on-response="delete_validate"
+	    last-response="{{delete_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+    
+        <paper-dialog id="delete_dialog">
+	  <h2>Suppression</h2>
+	  <p>Voulez vous supprimer cette ligne</p>
+	  <div class="buttons">
+	    <paper-button dialog-dismiss>Annuler</paper-button>
+	    <paper-button dialog-confirm autofocus on-tap="_send_delete">Supprimer</paper-button>
+	  </div>
+	</paper-dialog>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-profiltypecaf',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	     params_save:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'typecaf'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_delete:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'delete',type:'maj',element:'typecaf'/*v:'voyage.1.1.1'*/}}
+	        },
+	     objet:{type: Object,
+	    	 notify : true,
+	    	 value:{}
+	     },
+	     objet_temp:{type: Object,
+	    	 notify : true,
+	    	 value:{}
+	     },
+	     selitem:{type:Number,
+	    	 	notify : true},
+	    editmode:{type:Boolean,
+	    	notify : true,
+	    	value:false
+	    },
+	    editbuttonhide:{type:Boolean,
+	    	notify : true
+	    },
+		seltypecaf:{type:Number,
+	    	 	notify : true,
+	    	 	value :-1},
+	    hideme:{type:Boolean,
+	    		notify:true,
+	    		value:false},
+   	    cardtexte_hidden:{type:Boolean,
+    		notify:true,
+    		computed: '_computecardtexte_hidden(hideme, editmode)'},
+
+	  },
+	     observers: [
+	                  '_objetchange(selitem,objet)',
+	                  '_seltypecaf(seltypecaf,objet)'
+	                ],
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+	      },
+	  submit:function (event) {
+		  var datainputs=this.querySelectorAll('paper-input');
+		  var datas=this.objet_temp;
+		  this.set('params_save.body',{data:datas});
+		  this.$.save.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save.generateRequest();
+
+      },
+      save_validate:function(e,r,t){
+		  if (this.save_Response.element){
+			  for (var p in this.save_Response.element){
+				  this.set('objet.'+p,this.save_Response.element[p]);
+				  //this.notifyPath('objet.'+p);
+			  }	
+		  }
+		  this.reply();
+	  },
+	  
+      _edit : function (etat){
+    	  this.set('editmode',etat);
+		  this.set('editbuttonhide',etat);
+		  if (!this.objet  || this.objet.id<0){
+			  this.set('objet_temp',{});
+		  }
+		/*  if (etat && this.objet.id){
+			  //this.set('seltypecaf',this.objet.id);
+		  } else {
+			  //this.set('seltypecaf',-1);
+		  }*/
+		  
+      },
+      _seltypecaf:function(seltypecaf,objet){
+    	  if (this.objet.newobjet){
+    		  delete (objet.newobjet);
+    		  this._edit(true);
+    		  this.set('seltypecaf',-2);
+    	  } else if (seltypecaf>-1){
+    		  if(seltypecaf==objet.id){
+    			  this.set('hideme',false);
+    		  } else {
+    			  this.set('hideme',true);
+    		  }
+    	  } else {
+    		  this.set('hideme',false);
+    	  }
+      },
+      _objetchange:function(selitem,objet){
+    	  if (this.objet.newobjet){
+    		  delete (objet.newobjet);
+    		  this._edit(true);
+    		  this.set('selitem',-2);
+    	  } else if (selitem>-1){
+    		  if(selitem==objet.id){
+    			  this.set('hideme',false);
+    		  } else {
+    			  this.set('hideme',true);
+    		  }
+    	  } else {
+    		  this.set('hideme',false);
+    	  }
+      },
+	  reply:function (event) {
+		  if (this.objet.id!=-2 && !(this.objet.id>=0)){
+			  this.set('objet.id',-1);
+		  }
+		 
+		  this.fire('reply_typecaf', this.objet);
+		  this._edit(false);
+      },
+	  validatereply:function (event) {
+		  if (this.objet.id<=0){
+			  delete (this.objet.id);  
+		  }
+		  this.fire('reply_typecaf', this.objet);
+		  this._edit(false);
+      },
+      _computecardtexte_hidden:function(hideme, editmode){
+    	if(hideme || editmode){
+    		return true;
+    	}  else {
+    		return false;
+    	}
+      },
+	  edit:function (event) {
+		  this._edit(true);
+		  
+		  if (!this.objet.id){
+			  this.set('objet.id',-2);
+		  }
+		  for (var p in this.objet){
+			  this.set('objet_temp.'+p,this.objet[p]);
+			  //this.notifyPath('objet_temp.'+p);
+		  }		  
+      },
+      deletethis:function (event) {
+		  this.$.delete_dialog.open();
+      },
+      _send_delete:function (event) {
+		  this.$.delete_dialog.open();
+      },
+      _send_delete:function (event) {
+		  this.set('params_delete.body',{data:this.objet});
+		  this.$.delete.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.delete.generateRequest();
+
+      },
+      delete_validate:function(e,r,t){
+    	  this.objet.id=-1;
+		  this.fire('reply_typecaf', this.objet);
+		  this._edit(false);
+		  this.reply();
+	  },
+	  
+	  disconnect:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app._toArray(obj);
+	      }
+  });
+  
+  </script>
+
+</dom-module>

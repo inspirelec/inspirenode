@@ -1,0 +1,488 @@
+﻿<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<dom-module id="my-profil_behavior">
+
+  <template>
+		<style include="app-grid-style">
+  		 :host {
+
+		 }
+
+		::content ul {
+		 padding:0;
+		 margin-bottom:-15px;
+		 line-height:1.2;
+		}
+        .item {
+          
+        }
+        .card {
+        	display :block;
+            margin-top: 40px;
+            padding:5px;
+            padding-bottom: 20px;
+          	/*max-width: 500px;*/
+          	margin: 5px auto;
+          	position: relative;
+            background-color: white;
+        	color: var(--paper-blue-800);
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	        
+	     }
+	     ::content .ligne{
+	     	display:flex;
+	     }
+		 ::content .input2cols {
+		 	margin:0 10px;
+		 	width:66%;
+		 }
+		 ::content .input1col {
+		 	margin:0 10px;
+		 	width:33%;
+		 }
+		 ::content .input05cols {
+		 	margin:0 10px;
+		 	width:50%;
+		 }
+		 ::content .input3cols {
+		 	margin:0 10px;
+		 	width:100%;
+		 }
+		 .valid-button{
+		 	position:absolute;
+		 	bottom:-20px;
+		 	right:50px;
+		 	--paper-fab-background: var(--paper-green-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-green-900);
+		    z-index:10;
+		 }
+		 .reload-button{
+		 	position:absolute;
+		 	bottom:-20px;
+		 	right:5px;
+		 	--paper-fab-background: var(--paper-blue-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-green-900);
+		    z-index:10;
+		 }
+		 .reply-button{
+		 	position:absolute;
+		 	bottom:-20px;
+		 	right:95px;
+		 	--paper-fab-background: var(--paper-red-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-red-900);
+		    z-index:10;
+		 }
+		 .edit-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:5px;
+    		color: var(--paper-blue-500);
+		 }
+		 .delete-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:50px;
+		 	color: var(--paper-blue-500);
+		 }
+		 .print-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:95px;
+		 	color: var(--paper-blue-500);
+		 }
+  		</style>
+	<div class="card" hidden$="[[reduitmodehide]]" >
+		<paper-icon-button hidden$="[[impressionbutton_hide]]" class="print-button" mini icon="print" title="Imprimer" on-tap="printthis"></paper-icon-button>
+		<paper-icon-button hidden$="[[modificationbutton_hide]]" class="edit-button" mini icon="create" title="Edit" on-tap="editthis"></paper-icon-button>
+		<paper-icon-button hidden$="[[suppressionbutton_hide]]" class="delete-button" mini icon="delete" title="Edit" on-tap="deletethis"></paper-icon-button>
+		<div on-tap="consultethis">
+			<content id="{{obj_id}}" select=".reduit"></content>
+		</div>
+	</div>
+
+	<div class="card" hidden$="[[editmodehide]]">
+	    <paper-fab hidden$="[[hidealwaysbottombutton]]" class="reply-button" mini icon="reply" title="Annuler" on-tap="reply"></paper-fab>
+		<paper-fab hidden$="[[refreshbuttonint_hide]]" class="reload-button"  mini icon="cached" title="Réactualiser" on-tap="refreshthis"></paper-fab>
+		<paper-fab hidden$="[[modificationbuttonint_hide]]" class="valid-button" mini icon="check" title="Valider" on-tap="savethis"></paper-fab>
+			<content id="{{obj_id}}" select=".edition"></content>
+   </div>
+     
+	 <iron-ajax
+		id="charge"
+	    method="GET"
+	    url="{{charge_url}}"
+	    headers="{{app.header_auth}}"
+	    params="{{params_get}}"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    last-response="{{liste_objet}}"
+	    on-response="set_objet"
+	    debounce-duration="300">
+	</iron-ajax>
+	<iron-ajax
+		id="save"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_save.body}}"
+	    params="{{params_save.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    on-response="save_validate"
+	    last-response="{{save_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+	<iron-ajax
+		id="delete"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_delete.body}}"
+	    params="{{params_delete.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    on-response="delete_validate"
+	    last-response="{{delete_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+    
+    <paper-dialog id="delete_dialog">
+	  <h2>Suppression</h2>
+	  <p>Voulez vous supprimer cette ligne</p>
+	  <div class="buttons">
+	    <paper-button dialog-dismiss>Annuler</paper-button>
+	    <paper-button dialog-confirm autofocus on-tap="_send_delete">Supprimer</paper-button>
+	  </div>
+	</paper-dialog>
+	<paper-dialog id="load_dialog" >
+		<paper-spinner active style="z-index:100"></paper-spinner>	
+	</paper-dialog>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-profil_behavior',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	   	 charge_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+	  	 params_get:{type: Object,
+		   	 	  notify : true
+		   	 	  },
+	     params_save:{type: Object,
+	   	 	  notify : true
+	        },
+	     params_delete:{type: Object,
+	   	 	  notify : true
+	        },
+		  savfireeventonly:{
+	         type:Boolean,
+			  notify:true,
+			  value:false
+		  },
+	     objet:{type: Object,
+	    	 notify : true
+	     },
+	     show_loading:{type:Number,
+	    	 notify : true,
+	    	 value:0
+	     },
+  	 	searchmode:{type:Boolean,
+  	 		notify:true,
+  	 		value:false
+  	 	},
+	     obj_id:{type:String,
+	    	 	notify : true},
+	     doc_print_link:{notify:true},	 	
+	     edited_item_id:{notify : true},
+	     consulte_mode:{type:Boolean,notify : true,value:false},
+	     hideother_onedit:{notify : true },
+	     hideothereditbutton_onedit:{notify : true },
+	     hidealwaysbottombutton:{type:Boolean,notify:true,value:false},
+	     return_onsave:{notify:true},
+	   	 editmodehide:{type:Boolean,
+	    	 	notify : true,
+	    	 	computed:'_editmodehide(obj_id,edited_item_id)'
+	     } ,
+	   	 reduitmodehide:{type:Boolean,
+	    	 	notify : true,
+	    	 	computed:'_reduitmodehide(obj_id,edited_item_id,hideother_onedit)'
+		 } ,
+	   	 on_delete_fire:{type:Boolean,
+	    	 	notify : true
+		 } ,
+   	 	 grants_acces:{type:Object,
+    	 		 notify : true,
+    	 		 value : {creation:true,
+  	  	 			 modification:true,
+  	  	 			 suppression:true,
+  	  	 			 impression:true}
+    	 	 },
+    	 
+    	 modificationbutton_hide:{type:Boolean,
+    		 notify:true,
+    		 computed:'_modificationbutton_hide(grants_acces.modification,hideothereditbutton_onedit,obj_id,edited_item_id,consulte_mode)'
+    	 },
+    	 modificationbuttonint_hide:{type:Boolean,
+    		 notify:true,
+    		 computed:'_modificationbuttonint_hide(grants_acces.modification,hideothereditbutton_onedit,obj_id,edited_item_id,consulte_mode,hidealwaysbottombutton,searchmode)'
+    		
+    	 },
+    	 refreshbuttonint_hide:{type:Boolean,
+    		 notify:true,
+    		 computed:'_refreshbuttonint_hide(hidealwaysbottombutton,edited_item_id)'
+    		
+    	 },
+
+    	 group_modificationbuttonint_hide:{type:Boolean,
+    		 notify:true,
+    		 computed:'_group_modificationbuttonint_hide(grants_acces.modification,hideothereditbutton_onedit,obj_id,edited_item_id,consulte_mode,hidealwaysbottombutton,searchmode)'
+    		 },
+    	 group_refreshbuttonint_hide:{type:Boolean,
+    		 notify:true,
+    		 computed:'_group_refreshbuttonint_hide(obj_id,edited_item_id,hidealwaysbottombutton)'
+    		 },
+       	 suppressionbutton_hide:{type:Boolean,
+       		 notify:true,
+       		 computed:'_suppressionbutton_hide(grants_acces.suppression,hideothereditbutton_onedit,obj_id,edited_item_id,searchmode)'
+       	 },
+       	 impressionbutton_hide:{type:Boolean,
+       		 notify:true,
+       		 computed:'_impressionbutton_hide(grants_acces.impression,hideothereditbutton_onedit,obj_id,edited_item_id,searchmode)'
+       	 } 
+    	 
+	  },
+	  observers: [
+          			'_show_loading(show_loading)'
+	                ],
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+	      },
+      _show_loading:function(show_loading){
+    	  if (show_loading>0) {
+    		  this.$.load_dialog.open();
+    	  } else {
+    		  this.$.load_dialog.close();
+    	  }
+      },
+	  _modificationbutton_hide:function(acces_modification,hideothereditbutton_onedit,obj_id,edited_item_id,consulte_mode){
+		  if (consulte_mode){
+			  return true;
+		  } else if (edited_item_id>=-1 && obj_id!=edited_item_id && hideothereditbutton_onedit) {
+			  return true;
+		  }  else if (!acces_modification){
+			  return true;
+		  } else {
+			  return false;
+		  }
+	    },
+	  _refreshbuttonint_hide:function(hidealwaysbottombutton,edited_item_id){
+			if(hidealwaysbottombutton){
+				return true;
+			}  else if (edited_item_id<0){
+				return true;
+			} else {
+				return false;
+			}
+	  },
+	  _modificationbuttonint_hide:function(acces_modification,hideothereditbutton_onedit,obj_id,edited_item_id,consulte_mode,hidealwaysbottombutton,searchmode){
+		  var table=this.table_code;
+		  //var id=this.objet.id;
+		  if (consulte_mode || searchmode){
+			  return true;
+		  } else if (hidealwaysbottombutton){
+			  return true;
+		  } else if (edited_item_id>=-1 && obj_id!=edited_item_id && hideothereditbutton_onedit) {
+			  return true;
+		  } else if (edited_item_id==-1){
+			  return false;
+		  } else if (!acces_modification){
+			  return true;
+		  } else {
+			  return false;
+		  }
+	    },
+	  _group_modificationbuttonint_hide:function(acces_modification,hideothereditbutton_onedit,obj_id,edited_item_id,consulte_mode,hidealwaysbottombutton,searchmode){
+		  var table=this.table_code;
+		  //var id=this.objet.id;
+		  if (consulte_mode || searchmode){
+			  return true;
+		  } /*else if (hidealwaysbottombutton){
+			  return true;
+		  }*/ else if (edited_item_id>=-1 && obj_id!=edited_item_id && hideothereditbutton_onedit) {
+			  return true;
+		  } else if (edited_item_id==-1){
+			  return false;
+		  } else if (!acces_modification){
+			  return true;
+		  } else {
+			  return false;
+		  }
+	    },
+	    _group_refreshbuttonint_hide:function(obj_id,edited_item_id,hidealwaysbottombutton){
+	    	if ((edited_item_id<0 && obj_id==edited_item_id) ) {
+				  return true;
+			  } else {
+				  return false;
+			  }
+	    },
+	  _suppressionbutton_hide:function(acces_suppression,hideothereditbutton_onedit,obj_id,edited_item_id,searchmode){
+			  if (edited_item_id>=-1 && obj_id!=edited_item_id && hideothereditbutton_onedit) {
+				  return true;
+			  } else if (!acces_suppression || searchmode){
+				  return true;
+			  } else {
+				  return false;
+			  }
+		},
+	  _impressionbutton_hide:function(acces_impression,hideothereditbutton_onedit,obj_id,edited_item_id,searchmode){
+		  if (searchmode){
+			  return false;
+		  } else if ((edited_item_id>=-1 && obj_id!=edited_item_id && hideothereditbutton_onedit) && obj_id<0) {
+			  return true;
+		  } else if (!acces_impression){
+			  return true;
+		  } else {
+			  return false;
+		  }
+	    },    
+	  _editmodehide:function(obj_id,edited_item_id){
+		  if (obj_id==edited_item_id) {
+			  return false;
+		  } else {
+			  return true;
+		  }
+	  },
+	  _reduitmodehide:function(obj_id,edited_item_id,hideother_onedit){
+		  if (obj_id==edited_item_id) {
+			  return true;
+		  } else if (edited_item_id>=-1 && hideother_onedit){
+			  return true;
+		  } else if (edited_item_id>=-1){
+			  return false;
+		  }
+	  },
+	  printthis : function(){
+		  this.app.$.location.path="/appliairevoyage/docPrint/query?doc="+this.doc_print_link;  
+	  },
+	  editthis:function(event){
+			this.set('edited_item_id',this.obj_id)  ;
+			this.set('consulte_mode',false)  ;
+
+	  },
+	  consultethis:function(event){
+			this.set('edited_item_id',this.obj_id)  ;
+			this.set('consulte_mode',true)  ;
+	  },
+	  refreshthis:function(){
+		  this._refreshdata();
+	  },
+      _refreshdata:function(){
+    	  this.set('show_loading',1);
+    	  this.app = document.querySelector('#app');
+	      this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
+	      this.$.charge.generateRequest();  
+	  } , 
+	  set_objet:function(){
+		  if (this.liste_objet && this.liste_objet[0]){
+			  this.set('objet',this.liste_objet[0]);
+			 /* for (var p in  this.liste_objet[0]){
+				  this.set('objet.'+p,this.liste_objet[0][p]);
+			  }	*/
+			  this.set('show_loading',0);
+		  } else if (this.objet && this.objet.id<0){
+			  this._send_delete();
+		  }
+	  },
+	  savethis:function (event) {
+
+
+		  if ( this.parent && this.parent.id){
+			  this.set('objet.titulaire_id',this.parent.id);
+		  }
+          if (this.savfireeventonly==false){
+			   this.sendsaveobj(this.objet);
+		  }
+		  this.fire('save_requested',this.objet);
+
+      },
+      sendsaveobj:function(obj){
+          this.set('show_loading',1);
+          this.set('params_save.body',{data:obj});
+          this.$.save.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save.generateRequest();
+	  },
+      save_validate:function(e,r,t){
+		  if (this.save_Response && this.save_Response.element){
+			  this.set('objet',this.save_Response.element);
+			  
+			  /*for (var p in this.save_Response.element){
+				  this.set('objet.'+p,this.save_Response.element[p]);
+				  //this.notifyPath('objet.'+p);
+			  }	*/
+			  this.set('edited_item_id',this.save_Response.element.id);
+			  this.set('show_loading',0);
+		  }
+		  if (this.return_onsave){
+			  this.reply();
+		  }
+		  this.fire('save_validate');
+	  },
+
+	  reply:function (event) {
+		  
+		  this._refreshdata();
+		  this.set('edited_item_id',-2) ;
+		  this.set('consulte_mode',false)  ;
+      },
+
+      deletethis:function (event) {
+		  this.$.delete_dialog.open();
+      },
+      _send_delete:function (event) {
+    	  if (this.on_delete_fire && this.objet && this.objet.id>=0) {
+			  this.fire('delete');
+    	  }else {
+    		  this._send_delete2(event);
+    	  }
+
+      },
+      _send_delete2:function (event){
+    	  this.set('show_loading',1);
+		  this.set('params_delete.body',{data:this.objet});
+		  this.$.delete.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.delete.generateRequest();
+      },
+      delete_validate:function(e,r,t){
+    	  this.set('show_loading',0);
+    	  this.set('objet.id',-10);
+		  this.fire('reply_delete', this.objet);
+	  },
+	  
+	  disconnect:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app._toArray(obj);
+	      }
+  });
+  
+  </script>
+
+</dom-module>

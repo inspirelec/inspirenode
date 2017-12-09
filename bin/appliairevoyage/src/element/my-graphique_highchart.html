@@ -1,0 +1,373 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="/library/bower_components/highcharts-chart/highcharts-chart.html">
+
+<dom-module id="my-graphique_highchart">
+
+  <template>
+		<style include="app-grid-style">
+			#modal { 
+			    z-index:99999;    
+			}
+  		</style>
+
+     
+     <iron-ajax
+		id="charge_historique"			    method="GET"
+	    url="{{charge_historique_url}}"	    headers="{{app.header_auth}}"
+	    params="{{params_get_historique}}"    handle-as="json"   	on-error="_disconnect"
+	    last-response="{{historiques}}"   		debounce-duration="300">
+	</iron-ajax>
+		<paper-fab hidden="{{hidegraphique}}" style="z-index:1000;position:absolute;margin-top:-15px;margin-left:30px" mini icon="arrow-back" title="Reculer" on-tap="_back"></paper-fab>
+		<paper-fab hidden="{{hidegraphique}}" disabled$="[[hideforward]]" style="z-index:1000;position:absolute;margin-top:-15px;margin-left:80px" mini icon="arrow-forward" title="Avancer" on-tap="_forward"></paper-fab>
+	 	<paper-fab hidden="{{hidegraphique}}" disabled$="[[hide_zoom_in]]" class="green" style="z-index:1000;position:absolute;margin-top:-15px;right:0px;margin-right:80px" mini icon="zoom-in" title="+ détaillé" on-tap="_zoom_in">Zoom in</paper-fab>
+		<paper-fab hidden="{{hidegraphique}}" disabled$="[[hide_zoom_out]]" class="green" style="z-index:1000;position:absolute;margin-top:-15px;right:0px;;margin-right:30px" mini icon="zoom-out" title="- détaillé" on-tap="_zoom_out">Zoom out</paper-fab>
+		<!-- <paper-fab hidden="{{hidegraphique}}" class="green" style="z-index:1000;position:absolute;margin-top:-15px;right:0px;;margin-right:130px" mini icon="settings-overscan" title="plein écran" on-tap="_full_screen">Plein écran</paper-fab> -->
+	 	<div hidden="{{hidegraphique}}" style="z-index:1000;position:absolute;margin-top:25px;right:0px;margin-right:35px">par [[resolution]]</div>
+	 	
+	    <highcharts-chart 
+	           id="graph"
+	           hidden="{{hidegraphique}}"
+	           data="{{grap_histo_data}}" 
+	           title='{{titre_graphique}}' 
+	           type="{{type_graphique}}"
+	           x-zoom 
+	           legend
+	           loading="{{loading}}"
+	           loading-message="{{loadingmessage}}"
+	           vs-time="true"
+	           x-label="{{titreX_graphique}}" 
+	           y-label="{{titreY_graphique}}"
+	          >
+	           
+	    </highcharts-chart>
+   <paper-dialog id="modal" withBackdrop>
+	  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+	  <div class="buttons">
+	    <paper-button dialog-confirm autofocus>Tap me to close</paper-button>
+	  </div>
+	</paper-dialog>
+  </template>
+  <script>
+  
+  Polymer({
+
+	  is: 'my-graphique_highchart',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    	 
+	     resolution:{type:String,notify:true,computed:'_getresolution(resolution_number)'},
+	     resolution_number:{type:Number,notify:true,value:1},
+	     uuids:{type:String,notify:true},
+	     periphs:{type:String,notify:true},
+	     infosgraphique:{type:Object,notify:true},
+	     type_graphique:{type:String,
+	    	             notify:true,
+	    	             value:'line'},
+   	     titre_graphique:{type:String,
+			             notify:true,
+			             value:''},
+   	     titreX_graphique:{type:String,
+			             notify:true,
+			             value:''},
+   	     titreY_graphique:{type:String,
+			             notify:true,
+			             value:''},
+	     position:{type:Number,notify:true,value:0},
+         params_get_historique:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {type:'get',action:'listhistorique_jour',timestamp:">date('now','-15 day')"}},
+	   	 charge_historique_url:{type:String,notify:true},
+	   	 historiques:{type: Array,
+	   	 	  notify : true},
+	   	 loading:{type:Boolean,notify:true,value:false},
+	   	 loadingmessage:{type:String,notify:true,value:'Chargement'},
+	   	 hidegraphique:{type:Boolean,notify:true,value:false},
+	   	 hideforward:{type:Boolean,
+	   		  notify : true,
+	   		  computed : '_gethidefoward(position)'},
+	   	 hide_zoom_in:{type:Boolean,
+	   		  notify : true,
+	   		  computed : '_get_hide_zoom_in(resolution_number)'},
+ 	   	 hide_zoom_out:{type:Boolean,
+	   		  notify : true,
+	   		  computed : '_get_hide_zoom_out(resolution_number)'},
+	   	 grap_histo_data:{type:Array,
+	   		  notify : true,
+	   		  computed : '_getdata(historiques,periphs,infosgraphique)'}
+	  },
+	  observers:['_chargedata(uuids,resolution,position)' ,
+		         '_receivelisteperiphs(periphs)'],
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+	  },
+	  
+	  _back:function(){
+		  this.set('position',this.position+1);
+	  },
+	  _forward:function(){
+		  if (this.position>0) {
+			  this.set('position',this.position-1);
+		  }
+	  },
+	  _full_screen:function(){
+		  this.$.modal.open();
+	  },
+	  _zoom_out:function(){
+		  if (this.resolution_number<4) {
+			  this.set('resolution_number',this.resolution_number+1);
+			 
+		  } 
+	  },
+	  _zoom_in:function(){
+		  if (this.resolution_number>0) {
+			  this.set('resolution_number',this.resolution_number-1);
+
+		  } 
+		  
+	  },
+	  _getresolution:function(resolition_number){
+		  	this.set('position',0);
+			switch (resolition_number) {
+				 case 0:
+					  return 'detail';
+					break;
+				 case 1:
+					 return 'heure';
+					break;
+				 case 2:
+					 return 'jour';
+					break;
+				 case 3:
+					 return 'mois';
+					break;
+				 case 4:
+					 return 'an';
+					break;
+				default:
+					break;
+				}
+
+	  },
+
+	  _gethidefoward:function(position){
+		  if(position>0) {
+			  return false;
+		  } else {
+			  return true;
+		  }
+	  },
+	  _get_hide_zoom_in:function(resolution_number){
+		  if (this.resolution_number>0 ) {
+			  return false;
+		  } else {
+			  return true;
+		  }
+	  },
+	  _get_hide_zoom_out:function(resolution_number){
+		  if (this.resolution_number<4 ) {
+			  return false;
+		  } else {
+			  return true;
+		  }
+	  },
+	  _receivelisteperiphs:function(periphs){
+		  var uuids_sel="";
+		  if (periphs && periphs.length){
+			  for (var p in periphs){
+				  if (uuids_sel!="") uuids_sel+=',';
+				  uuids_sel+="'"+periphs[p].uuid+"'";
+			  }
+		  }
+		  this.set('uuids',uuids_sel);
+	  },
+       _chargedata(uuids,resolution,position){
+		  this.app = document.querySelector('#app');
+		  this.params_get_historique.uuid=" in ("+uuids+")";
+		  this.set('loadingmessage','Chargement ('+resolution+')');
+		  this.set('loading',true);
+
+		  if (resolution=='detail'){
+			  if (position<0) position=0;
+			  var position_back=position*-3-3;
+			  var position_last=position*-3+1;
+			  this.params_get_historique.action='listhistorique';
+			  this.params_get_historique.timestamp=" between date('now','"+position_back+" day') and date('now','"+position_last+" day')";   
+		  }
+		  if (resolution=='heure'){
+			  if (position<0) position=0;
+			  var position_back=position*-15-15;
+			  var position_last=position*-15+1;
+			  this.params_get_historique.action='listhistorique_heure';
+			  this.params_get_historique.timestamp=" between date('now','"+position_back+" day') and date('now','"+position_last+" day')";   
+		  }
+		  if (resolution=='jour'){
+			  if (position<0) position=0;
+			  var position_back=position*-93-93;
+			  var position_last=position*-93+1;
+			  this.params_get_historique.action='listhistorique_jour';
+			  this.params_get_historique.timestamp=" between date('now','"+position_back+" day') and date('now','"+position_last+" day')";   
+		  }
+		  if (resolution=='mois'){
+			  if (position<0) position=0;
+			  var position_back=position*-730-730;
+			  var position_last=position*-730+1;
+			  this.params_get_historique.action='listhistorique_mois';
+			  this.params_get_historique.timestamp=" between date('now','"+position_back+" day') and date('now','"+position_last+" day')";   
+		  }
+		  if (resolution=='an'){
+			  if (position<0) position=0;
+			  var position_back=position*-1460-1460;
+			  var position_last=position*-1460+1;
+			  this.params_get_historique.action='listhistorique_an';
+			  this.params_get_historique.timestamp=" between date('now','"+position_back+" day') and date('now','"+position_last+" day')";   
+		  }
+	      this.charge_historique_url=this.app.url_api+':'+this.app.port_api+'/index'
+		  this.$.charge_historique.generateRequest();
+	      
+	  },
+		_getdata:function (historiques,periphs,infosgraphique){
+
+			historiques.sort(this.sort_by('uuid','timestamp')) ;
+
+			var res=[];
+			var res_tag=[];
+			if (historiques && historiques[0]) {
+				//this.set('hidegraphique',false);
+				this.set('titre_graphique',infosgraphique.nom);
+				this.set('titreY_graphique',infosgraphique.titreY);
+				this.set('titreX_graphique',infosgraphique.titreX);
+
+				for (var p in periphs) {
+					var p_uuid=periphs[p].uuid;
+					var periph=periphs[p];
+					var nom=periphs[p].nom;
+					res_tag=[];
+					var last_point_max=null;
+					for (var h in historiques){
+						
+						if (p_uuid==historiques[h].uuid){
+							if (this.resolution=='detail' || !periph.infosserie.type_valeur){
+								/*sans colonne max, min, moy*/
+								if (periph.infosserie.type_valeur=='max' || periph.infosserie.type_valeur=='min' || periph.infosserie.type_valeur=='moy'){
+									var point=[(new Date(historiques[h].timestamp)).getTime(),historiques[h][periph.colonne]*1];
+									res_tag.push(point);
+								} else if(periph.infosserie.type_valeur=='ecart_compteur_max' && last_point_max){
+									var point=[(new Date(historiques[h].timestamp)).getTime(),historiques[h][periph.colonne]*1-last_point_max];
+									res_tag.push(point);
+								}
+								last_point_max=historiques[h][periph.colonne]*1;
+							} else {
+								
+								/*if (periph.infosserie.type=='arearange'){
+							arearange pas disponible
+									var point=[(new Date(historiques[h].timestamp)).getTime(),historiques[h][periph.colonne+'_min']*1,historiques[h][periph.colonne+'_max']*1];
+									res_tag.push(point);
+								} else*/
+								/*avec colonne max, min, moy*/
+								 if (periph.infosserie.type_valeur=='max'){
+									var point=[(new Date(historiques[h].timestamp)).getTime(),historiques[h][periph.colonne+'_max']*1];
+									res_tag.push(point);
+								} else if (periph.infosserie.type_valeur=='min'){
+									var point=[(new Date(historiques[h].timestamp)).getTime(),historiques[h][periph.colonne+'_min']*1];
+									res_tag.push(point);
+								} else if (periph.infosserie.type_valeur=='moy'){
+									var point=[(new Date(historiques[h].timestamp)).getTime(),historiques[h][periph.colonne+'_moy']*1];
+									res_tag.push(point);
+								} else if (periph.infosserie.type_valeur=='ecart_compteur_max' && last_point_max){
+									var point=[(new Date(historiques[h].timestamp)).getTime(),historiques[h][periph.colonne+'_max']*1-last_point_max];
+									res_tag.push(point);
+								}
+								last_point_max=historiques[h][periph.colonne+'_max']*1;
+							}
+							
+						}
+					}
+					if (res_tag && res_tag.length>0){
+						 res.push({name: periph.infosserie.legende+' ' +periph.nom,type:periph.infosserie.type ,data: res_tag});
+					}
+				}
+
+				
+
+				
+			} else if (this.position==0){
+				//this.set('hidegraphique',true);
+			}
+
+			this.set('loading',false);
+			return res;
+	    },
+	  
+	  
+	  		_getobjinliste:function(liste,searchval,searchcolumn){
+				  if(!liste){
+					  return {};
+				  }
+				  if (!searchcolumn){
+					  searchcolumn='id';
+				  }
+				  for (var o in liste){
+					  if(liste[o][searchcolumn]==searchval){
+						  return liste[o];
+					  }
+				  }
+				  return {};
+				  
+			  },
+	  
+	  
+	  
+		sort_by : function() {
+			   var fields = [].slice.call(arguments),
+			       n_fields = fields.length;
+
+			   return function(A,B) {
+			       var a, b, field, key, primer, reverse, result, i;
+
+			       for(i = 0; i < n_fields; i++) {
+			           result = 0;
+			           field = fields[i];
+
+			           key = typeof field === 'string' ? field : field.name;
+
+			           a = A[key];
+			           b = B[key];
+
+			           if (typeof field.primer  !== 'undefined'){
+			               a = field.primer(a);
+			               b = field.primer(b);
+			           }
+
+			           reverse = (field.reverse) ? -1 : 1;
+
+			           if (a<b) result = reverse * -1;
+			           if (a>b) result = reverse * 1;
+			           if(result !== 0) break;
+			       }
+			       return result;
+			   }
+			}	 ,
+
+		  _toArray(obj){
+		    	  return this.app._toArray(obj);
+		      },
+		  _disconnect(obj){
+		    	  this.app = document.querySelector('#app');
+		    	  return this.app.disconnect();
+		      },
+	      
+  })
+  </script>
+
+</dom-module>

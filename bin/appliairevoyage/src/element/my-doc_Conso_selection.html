@@ -1,0 +1,130 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/library/bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="/library/bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="/library/bower_components/vaadin-combo-box/vaadin-combo-box.html">
+
+<dom-module id="my-doc_Conso_selection">
+
+  <template>
+		<style >
+		 .print-button{
+		 	position:absolute;
+		 	bottom:-20px;
+		 	right:25px;
+		 	--paper-fab-background: var(--paper-red-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-red-900);
+		    z-index:10;
+		 }
+		 .item-title {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color: rgba(125, 40, 25, 0.5);
+          color: white;
+          font-weight: 400;
+          padding: 16px;
+        }
+        .card {
+        	display :block;
+            
+            padding:5px;
+            padding-bottom: 20px;
+          	max-width: 500px;
+          	margin-right: auto;
+          	margin-left: auto;
+          	position: relative;
+            background-color: white;
+        	color: var(--paper-blue-800);
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	        
+	     }
+	     .cardprinc{
+		 	padding-top:60px;
+		 	margin-top: 40px;
+		 	position: relative;
+		 }
+		 .ligne{
+	     	display:flex;
+	     }
+		 .input2cols {
+		 	margin:0 10px;
+		 	width:66%;
+		 }
+		 .input1col {
+		 	margin:0 10px;
+		 	width:33%;
+		 }
+		 .input05cols {
+		 	margin:0 10px;
+		 	width:50%;
+		 }
+		 .input3cols {
+		 	margin:0 10px;
+		 	width:100%;
+		 }
+  		</style>
+
+		<div class="card cardprinc" >
+			<div class="item-title" >Impression liste des consommations</div>
+			<div class="ligne">
+		    	<paper-input class="input05cols" id="date1" label="Date du" type="date" value="{{selection.date1}}"> </paper-input>
+		    	<paper-input class="input05cols" id="date2" label="jusqu'au" type="date" value="{{selection.date2}}"> </paper-input>
+			</div>
+			<div class="ligne">
+				<my-combo_select2 fullnamefields="nom" queryfields="nom" charge_table dropdown_selobj="{{emplobj_sel}}" class="input3cols" table="tag_voyage" id="emplacement_id" label="Emplacement" value_sel="{{selection.emplacement_id}}"></my-combo_select2>
+			</div>
+			<div class="ligne">
+				<my-combo_select2 limit=8 fullnamefields="nom;prenom1" queryfields="nom;prenom1;ville" charge_table dropdown_selobj="{{personne_sel}}" class="input3cols" table="personne" id="personne_id" label="Famille" value_sel="{{selection.famille_id}}"></my-combo_select2>
+			</div>
+			
+
+		
+		<paper-fab class="print-button"  mini icon="print" title="Imprimer" on-tap="print"></paper-fab>
+		</div>
+  </template>
+  <script>
+  Polymer({
+/**/
+	  is: 'my-doc_Conso_selection',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+
+  		 selection:{type:Object, 
+  			 notify:true,
+  			 value:{}}
+	  },
+
+	  ready:function(){
+	        this.app = document.querySelector('#app'); 
+
+	  },
+    
+	  print:function(){
+		  var date1=this.$.date1.value;
+		  var date2=this.$.date2.value;
+		  if (!date1) date1='';
+		  if (!date2) date2='';
+		  var emplacement_id=this.selection.emplacement_id;
+		  var famille_id=this.selection.famille_id;
+		  if (!emplacement_id) emplacement_id='';
+		  if (!famille_id) famille_id='';
+		this.app.$.location.path="/appliairevoyage/docPrint/query?doc=doc_Conso&date1="+date1+"&date2="+date2+"&emplacement_id="+emplacement_id+"&famille_id="+famille_id;  
+		 
+	  }
+  })
+  </script>
+
+</dom-module>

@@ -1,0 +1,87 @@
+﻿<link rel="import" href="/library/bower_components/polymer/polymer.html">
+
+<dom-module id="my-doc_listefamilles">
+		  <template>
+			  <style>
+				
+				table
+				{
+				    border-collapse: collapse;
+				}
+				td, th 
+				{
+				    border: 1px solid black;
+				}
+			  </style>
+			  
+			 <iron-ajax
+				id="charge_familles"			    method="GET"
+			    url="{{charge_familles_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_familles}}"    handle-as="json"   	on-error="_disconnect"
+			    last-response="{{familles}}"   		debounce-duration="300">
+			</iron-ajax>
+			
+			
+			<b>Liste des familles</b>
+			<table>
+			
+			   <tr>
+			       <th>Nom</th>
+			       <th>Prénom</th>
+			       <th>Adresse</th>
+			       <th>Pays</th>
+			   </tr>
+			
+				<template is="dom-repeat" items="[[familles]]" as="famille">
+				   <tr>
+				       <td>[[famille.nom]]</td>
+				       <td>[[famille.prenom1]]</td>
+				       <td>[[famille.adresse]]</td>
+				       <td>[[famille.pays]]</td>
+				   </tr>
+			   	</template>
+			</table>
+				
+		  </template>
+		
+		  <script>
+		    Polymer({
+		
+		      is: 'my-doc_listefamilles',
+
+		      properties: {
+		 	     app: {
+			          type: Object
+		        	},    
+		    	 selection_query:{type : Object,
+	  				  notify:true/*,
+	  				  value:{}*/},
+		  		 params_get_familles:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listpersonne',titulaire_id:"isnull"}},
+		      },
+	    	  observers: [
+		                  '_selection_query_change(selection_query)'	                  
+		                ],
+		      
+		      _selection_query_change: function(selection_query) {
+			        this.app = document.querySelector('#app');
+			        if (this.params_get_familles && selection_query && selection_query.nom ) {
+			        	this.params_get_familles.nom="like '%"+selection_query.nom+"%'";
+			        } else if (this.params_get_familles) {
+			        	this.params_get_familles.nom='';
+			        }
+			        
+			        this.charge_familles_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_familles.generateRequest();
+			  },
+			  
+			  
+			  
+			  _disconnect: function(obj){
+		    	  this.app = document.querySelector('#app');
+		    	  return this.app.disconnect();
+		      }
+		    });
+		  </script>
+		</dom-module>

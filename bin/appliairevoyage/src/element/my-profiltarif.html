@@ -1,0 +1,124 @@
+﻿<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/library/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/library/bower_components/paper-fab/paper-fab.html">
+
+<dom-module id="my-profiltarif">
+
+  <template>
+		<style>
+  		</style>
+  	 	 <my-profil_behavior 
+	  		table_code="tarif" 
+	  		params_get="{{params_get}}"
+	  		params_save="{{params_save}}"
+	  		params_delete="{{params_delete}}"
+	  		edited_item_id="{{edited_item_id}}"
+  	 	 	objet="{{objet}}" 
+  	 	 	obj_id="{{objet.id}}"
+  	 	 	grants_acces="{{grants_acces}}"
+  	 	 	hideother_onedit="{{hideother_onedit}}"
+  	 	 	hideothereditbutton_onedit="{{hideothereditbutton_onedit}}"
+  	 	 	return_onsave=true
+  	 	 	
+  		> 
+  		
+  			<div class="dropdownitem">
+	  				{{objet.nom}} ({{objet.id}})
+	  		</div> 
+	  		<div class="reduit">
+	  				{{objet.nom}} ({{objet.type}})</br>
+					{{objet.prix_elec_kwh}}/Kwh, {{objet.prix_eau_m3}}/M3, {{objet.prix_empl_jour}}/Jour
+	  		</div>
+	  		
+	  		
+	  		<div class="edition">
+	  		
+			  		<paper-input id="id" label="id" hidden type="text" value="{{objet.id}}"> </paper-input>
+				    <paper-input id="uuid" label="uuid" hidden type="text" value="{{objet.uuid}}">     </paper-input>              
+					<div class="ligne">
+					   	<paper-input class="input05cols" id="nom" label="Libelle" type="text" value="{{objet.nom}}"> 
+			              <!-- <iron-icon prefix height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon> -->
+			            </paper-input>
+			 		    <paper-input class="input05cols" id="type" label="Code" type="text" value="{{objet.type}}"></paper-input>
+					</div>
+					<div class="ligne">
+			             <paper-input class="input1col" id="prix_empl_jour" label="Prix par jour" type="number" suffixe="Euros" step=0.01 value="{{objet.prix_empl_jour}}">
+			             	<!-- <iron-icon icon="mail" prefix></iron-icon>
+						  	<div suffix>@email.com</div>
+						  	<paper-icon-button suffix onclick="clearInput()" icon="clear" alt="clear" title="clear">
+						   -->
+						   <div suffix>€</div>
+			             </paper-input>
+			             <paper-input class="input1col" id="prix_elec_kwh" label="Prix du Kwh" type="number" step=0.01 value="{{objet.prix_elec_kwh}}">
+			             <div suffix>€</div>
+			             </paper-input>
+			             <paper-input class="input1col" id="prix_eau_m3" label="Prix du M3" type="number" step=0.01 value="{{objet.prix_eau_m3}}">
+			             <div suffix>€</div>
+			             </paper-input>
+			
+					</div>
+					<div class="ligne">
+			             <paper-input class="input05cols" id="seuil_alerte" label="Seuil alerte" type="number" step=0.01 value="{{objet.seuil_alerte}}">
+			             <div suffix>€</div>
+			             </paper-input>
+			             <paper-input class="input05cols" id="seuil_coupure" label="Seuil coupure" type="number" step=0.01 value="{{objet.seuil_coupure}}">
+			             <div suffix>€</div>
+			             </paper-input>
+			 
+					</div>
+	  		
+	  		</div>
+  		 		 
+  		
+  		</my-profil_behavior>
+	  		
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-profiltarif',
+	  
+	  properties: {  
+	  	 params_get:{type: Object,
+		   	 	  notify : true,
+		   	 	  computed:'_getparams_get(objet.id,objet)'
+		     },
+	     params_save:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'tarif'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_delete:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'delete',type:'maj',element:'tarif'/*v:'voyage.1.1.1'*/}}
+	        },
+	     edited_item_id:{notify : true},
+	     
+	     doc_print_link:{type:String,
+	    	 notify:true,
+	    	 computed:'_getprintlink(objet)'}
+	     
+	  },
+	  _getprintlink:function(objet){
+		  if (objet && objet.id) {
+			  return "doc_tarif&id="+objet.id;
+		  } else {
+			  return null;
+		  }
+		  
+	  },
+	  _getparams_get:function(obj_id,objet){
+		  return {type:'get',action:'detailtarif',id:obj_id}
+	  }
+  });
+  
+  </script>
+
+</dom-module>

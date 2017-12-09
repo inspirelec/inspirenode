@@ -1,0 +1,32 @@
+
+
+<dom-module id="my-globaldata">
+
+
+	<script>
+  Polymer({
+	  is: 'my-globaldata',
+      properties: {
+          ignoreGlobalProperties: {
+              type: Boolean,
+              value: true
+          }
+      },
+
+	  set:function(variableName,data){
+	      console.log('set data',variableName);
+          Polymer.globalsManager.set(variableName, data);
+	  },
+	  get:function(variableName){
+          console.log('_____get data',variableName);
+          return Polymer.globalsManager.get(variableName);
+	  },
+	  getAll:function(){
+	      return Polymer.globalsManager.getAll();
+	  }
+  });
+  
+  </script>
+
+</dom-module>
+		

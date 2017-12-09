@@ -1,0 +1,270 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../element/my-periph_manager.html">
+<link rel="import" href="/library/bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="/library/bower_components/iron-collapse/iron-collapse.html">
+
+<link rel="import" href="../element/my-liste_periphs_accordion.html">
+
+<dom-module id="my-liste_periphs_tag">
+
+  <template>
+	  <!--include="app-grid-style"-->
+		<style>
+  		  :host {
+          display: block;
+          --app-grid-columns: 5;
+          --app-grid-gutter: 10px;
+          --app-grid-expandible-item-columns: 4;
+          --paper-icon-button-ink-color: white;
+
+
+        }
+        app-header {
+          background-color: #0b8043;
+          color: white;
+        }
+        ul {
+          padding: 0;
+          list-style: none;
+        }
+        paper-button{
+          width:100%;
+          /*height:100%;*/
+        }
+        .centered-container {
+          margin-top: 40px;
+          max-width: 1000px;
+          margin: 40px auto;
+        }
+       .item {
+          height: 150px;
+          position: relative;
+          background-color: white;
+          background-size: 130px;
+          background-repeat: no-repeat;
+          background-position: center bottom;
+        }
+        @media(max-width: 1299px) {
+          .centered-container {
+            margin: 10px 5px;
+          }
+          :host {
+            --app-grid-columns: 4;
+            --app-grid-gutter: 8px;
+            --app-grid-item-height: 150px;
+          }
+        }
+        @media(max-width: 1199px) {
+          .centered-container {
+            margin: 10px 5px;
+          }
+          :host {
+            --app-grid-columns: 3;
+            --app-grid-gutter: 8px;
+            --app-grid-item-height: 150px;
+          }
+        }
+        @media(max-width: 999px) {
+          .centered-container {
+            margin: 10px 5px;
+          }
+          :host {
+            --app-grid-columns: 2;
+            --app-grid-gutter: 8px;
+            --app-grid-item-height: 150x;
+          }
+        }
+        @media(max-width: 799px) {
+          .centered-container {
+            margin: 10px 5px;
+          }
+          :host {
+            --app-grid-columns: 2;
+            --app-grid-gutter: 8px;
+            --app-grid-item-height: 150px;
+          }
+        }
+  		</style>
+  	<iron-ajax
+		id="charge_allconfiglite"
+	    method="GET"
+	    url="{{charge_allconfiglite_url}}"
+	    headers="{{app.header_auth}}"
+	    params="{{params_allconfiglite}}"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    last-response="{{periphs_tag_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+	
+	
+	<div>
+		<template is="dom-repeat" items="[[periphs_tag_by_categ]]">
+		
+		    <my-liste_periphs_accordion
+		    	accordionname="[[item.categ.nom]]"
+		    	periphs_liste="[[item.periphs]]"
+		    	accordionicon="[[item.categ.iconMax]]"
+		    	periph_temp_uuid="[[periph_temp_uuid]]"
+				ecriture_type="[[item.ecriture_type]]" 
+				lastupdatetime="{{lastupdatetime}}"
+		      >
+		    </my-liste_periphs_accordion>
+
+	     </template>
+	     
+     </div>
+    
+
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_periphs_tag',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    	  
+	     tagname:{type:String,
+	    	 notify :true,
+	    	 value:null,
+	    	 observer: '_chargenewtagname'},
+	     tagid:{type:String,
+	    	 notify :true,
+	    	 value:null,
+	    	 observer: '_chargenewtagid'},
+	    	 
+	     periph_temp_uuid:{type:String,notify:true},
+	     
+  		 params_allconfiglite:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'allconfiglite',v:'indus.1.1.1'}},
+	   	 charge_allconfiglite_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+	     periphs_tag_Response:{type:Array,notify:true},
+	     periphs_tag_by_categ:{type:Array,notify:true,computed:'get_periphs_tag_by_categ(periphs_tag_Response)'},
+	     
+
+	  },
+	  observers:[
+		  '_periphcharge(tagid,periphs_tag_Response)'
+		  ],
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+	    	  this.charge_allconfiglite_url=this.app.url_api+':'+this.app.port_api+'/index'
+	      },
+	  get_periphs_tag_by_categ:function(periphs_tag_Response){
+		      periphs_tag_Response.sort(this.sort_by('categorie_id')) ;
+	    	  var categs=[];
+	    	  var categ_periphs={categ:null,periphs:[]};
+	    	  for (var p in periphs_tag_Response){
+	    		  var periph= periphs_tag_Response[p];
+	    		  if (categ_periphs.categ && categ_periphs.categ.id!=periph.categorie.id){
+	    			  categs.push(categ_periphs);
+	    			  categ_periphs={categ:periph.categorie,periphs:[]};
+	    		  }
+	    		  categ_periphs.categ=periph.categorie;
+	    		  categ_periphs.periphs.push(periph);
+	    	  }
+	    	  if (categ_periphs.categ) {
+	    		  categs.push(categ_periphs);
+	    	  }
+		     return categs;
+	      },
+	 categ_toggle:function(e,b,c){
+		 var categ_id=e.currentTarget.categ_id;
+		 this.$['categorie_periph_'+categ_id].toggle();
+	 },
+ 	 _chargenewtagname:function(tagname){
+    	  this.periphs_tag_Response=[];
+    	  if (this && this.params_allconfiglite) {
+	    	  if (tagname)
+	    		  this.params_allconfiglite.tagname=tagname;
+	    	  if ( tagname)
+	    	  	   this.$.charge_allconfiglite.generateRequest();
+    	  }
+
+      },
+	 _chargenewtagid:function(tagid){
+	    	  this.periphs_tag_Response=[];
+	    	  if (this && this.params_allconfiglite) {
+		    	  
+		    	  if (tagid) {
+		    		  this.params_allconfiglite.tagid=this.tagid;
+		    		  this.params_allconfiglite.tagname=null;
+			    		
+
+		    	  }
+		    	  if (tagid )
+		    	  	   this.$.charge_allconfiglite.generateRequest();
+	    	  }
+ 
+	      },
+	  _periphcharge:function(tagid,periphs_tag_Response){
+
+	    	  this.set('periph_temp_uuid','tag_'+this.tagid);  
+	    	  
+	  },
+	  _toArray:function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+	  _disconnect:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+
+       attached: function() {
+         this._updateGridStyles = this._updateGridStyles || function() {
+           this.updateStyles();
+         }.bind(this);
+         window.addEventListener('resize', this._updateGridStyles);
+       },
+       detached: function() {
+         window.removeEventListener('resize', this._updateGridStyles);
+       }	, 
+	      
+		sort_by : function() {
+			   var fields = [].slice.call(arguments),
+			       n_fields = fields.length;
+
+			   return function(A,B) {
+			       var a, b, field, key, primer, reverse, result, i;
+
+			       for(i = 0; i < n_fields; i++) {
+			           result = 0;
+			           field = fields[i];
+
+			           key = typeof field === 'string' ? field : field.name;
+
+			           a = A[key];
+			           b = B[key];
+
+			           if (typeof field.primer  !== 'undefined'){
+			               a = field.primer(a);
+			               b = field.primer(b);
+			           }
+
+			           reverse = (field.reverse) ? -1 : 1;
+
+			           if (a<b) result = reverse * -1;
+			           if (a>b) result = reverse * 1;
+			           if(result !== 0) break;
+			       }
+			       return result;
+			   }
+			},
+  })
+  </script>
+
+</dom-module>

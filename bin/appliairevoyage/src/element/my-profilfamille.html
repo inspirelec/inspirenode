@@ -1,0 +1,247 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<<link rel="import" href="../element/my-liste_famillemembres.html">
+<link rel="import" href="../element/my-liste_famillesejours.html">
+<link rel="import" href="../element/my-liste_compte_ecritures.html">
+<link rel="import" href="../element/my-liste_factures.html">
+
+<link rel="import" href="../majcore/my-combo_select.html">
+<link rel="import" href="../majcore/my-groupprofil_behavior.html">
+
+<dom-module id="my-profilfamille">
+
+  <template>
+		<style>
+	  		 :host {
+				/*display:flex;*/
+				display: block;
+	          --app-grid-columns: 2;
+	          --app-grid-gutter: 10px;
+	          --app-grid-expandible-item-columns: 6;
+	          --paper-icon-button-ink-color: white;
+	          margin-top :2px;
+	          margin-bottom:2px;
+	        }
+	        ul {
+	        	margin-bottom:0;
+	        }
+		     .profil {
+		     	min-width: 350px;
+		     	max-width:500px;
+		     }
+		     .liste_compte_ecritures {
+		        --liste_maxheight:30vh;
+				--liste_overflow:auto;
+		     }
+		     .listemembre {
+		     	/*margin : 5px auto;*/
+		     	min-width: 350px;
+		     	
+		     }
+		     .listesejour {
+		     	margin-top : 25px;
+		     	min-width: 350px;
+		     	--liste_maxheight:30vh;
+				--liste_overflow:auto;
+		     }
+		     .listefacture {
+		     	margin-top : 25px;
+		     	min-width: 350px;
+		     	--liste_maxheight:30vh;
+				--liste_overflow:auto;
+		     }
+		 .valid-button{
+		 	position:absolute;
+		 	bottom:-20px;
+		 	right:50px;
+		 	--paper-fab-background: var(--paper-green-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-green-900);
+		    z-index:10;
+		 }
+		 .reload-button{
+		 	position:absolute;
+		 	bottom:-20px;
+		 	right:5px;
+		 	--paper-fab-background: var(--paper-blue-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-green-900);
+		    z-index:10;
+		 }
+		 .reply-button{
+		 	position:absolute;
+		 	top:-20px;
+		 	right:5px;
+		 	--paper-fab-background: var(--paper-red-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-red-900);
+		    z-index:10;
+		 }
+  		</style>
+
+
+
+
+  	 	<my-profil_behavior id="profilfamille"
+	  		table_code="personne" 
+	  		params_get="{{params_get}}"
+	  		params_save="{{params_save}}"
+	  		params_delete="{{params_delete}}"
+	  		edited_item_id="{{edited_item_id}}"
+  	 	 	objet="{{objet}}" 
+  	 	 	obj_id="{{objet.id}}"
+  	 	 	grants_acces="{{grants_acces}}"
+  	 	 	hideother_onedit="{{hideother_onedit}}"
+  	 	 	hideothereditbutton_onedit="{{hideothereditbutton_onedit}}"
+  	 	 	hidealwaysbottombutton=true
+  	 	 	return_onsave$=false
+  	 	 	group_modificationbuttonint_hide="{{modificationbuttonint_hide}}"
+  	 	 	group_refreshbuttonint_hide="{{refreshbuttonint_hide}}"
+  		> 
+  		
+		
+	  		
+	  		<div class="reduit">
+					{{objet.nom}} {{objet.prenom1}}<div style="float:right;margin-right:110px">Solde : {{soldecompta}}€</div>
+					</br>
+					<div style="font-size:smaller">
+					{{objet.adresse}}</br> {{objet.codepostal}} {{objet.ville}} {{objet.pays}}</br>
+					
+					{{objet.commentaire}} </div>
+					
+	  		</div>
+	  		<div class="edition" style="display:flex">
+	  			<li style="display:block;max-width:1000px;margin:auto;margin-top:-40px">
+					<my-groupprofil_behavior title="Titulaire">
+						<div class="inforofil">
+						    <paper-input id="id" label="id" hidden type="text" value="{{objet.id}}"> </paper-input>
+						    <paper-input id="uuid" label="uuid" hidden type="text" value="{{objet.uuid}}">     </paper-input>              
+							<div class="ligne">
+							   	<paper-input class="input2cols" id="nom" label="Nom" type="text" value="{{objet.nom}}"> 
+					            </paper-input>
+					           <!--  <my-liste_sexes dropdowntype dropdown_selobj="{{dropdown_selobj}}" class="input1col" id="sexe" label="Genre" value_sel="{{objet.sexe}}"></my-liste_sexes> -->
+					            <my-combo_select liste="{{liste_soustable.sexe}}" dropdown_selobj="{{dropdown_selobj}}" class="input1col" table="sexe" id="sexe" label="Genre" value_sel="{{objet.sexe}}"></my-combo_select>
+							</div>
+							<div class="ligne">
+							    <paper-input class="input1col" id="prenom1" label="Prenom1" type="text" value="{{objet.prenom1}}"></paper-input>
+					            <paper-input class="input1col" id="prenom2" label="Prenom2" type="text" value="{{objet.prenom2}}"></paper-input>
+					            <paper-input class="input1col" id="prenom3" label="Prenom3" type="text" value="{{objet.prenom3}}"></paper-input>
+							</div>
+							<div class="ligne">
+					            <paper-input class="input3cols" id="adresse" label="Adresse" type="text" value="{{objet.adresse}}"></paper-input>
+					        </div>
+					        <div class="ligne">
+					        	<paper-input class="input1col" id="pays" label="Pays" type="text" value="{{objet.pays}}"><iron-icon icon="social:public" prefix></paper-input>
+					            <paper-input class="input1col" id="codepostal" label="Code Postal" type="number" value="{{objet.codepostal}}"></paper-input>
+					            <paper-input class="input1col" id="ville" label="Ville" type="text" value="{{objet.ville}}"></paper-input>
+					        </div>
+					        <div class="ligne">
+					            <paper-input class="input2cols" id="phone" label="Telephone" type="text" value="{{objet.phone}}"><iron-icon icon="communication:phone" prefix></iron-icon></paper-input>
+					            <paper-input class="input2cols" id="email" label="Courriel" type="text" value="{{objet.email}}"><iron-icon icon="communication:email" prefix></iron-icon></paper-input>
+					            
+					        </div>
+					        <div class="ligne">
+					            <paper-input class="input2cols" id="livretcirc_num" label="N° Livret circulation" type="text" value="{{objet.livretcirc_num}}"></paper-input>
+					            <paper-input class="input2cols" id="profession" label="Profession" type="text" value="{{objet.profession}}"></paper-input>
+					        </div>
+					        <div class="ligne">
+					            <paper-input class="input1col" id="datenaissance" label="Date de naissance" type="date" value="{{objet.datenaissance}}"><iron-icon icon="event-available" prefix></iron-icon></paper-input>
+					            <paper-input class="input2cols" id="lieunaissance" label="Lieu de naissance" type="text" value="{{objet.lieunaissance}}"></paper-input>
+					        </div>
+					        <div class="ligne">
+					            <paper-input class="input2cols" id="cartegrise" label="N° Carte grise" type="text" value="{{objet.cartegrise}}"><iron-icon icon="airport-shuttle" prefix></iron-icon></paper-input>
+					            <paper-input class="input1col" id="immatriculation" label="Immatriculation" type="text" value="{{objet.immatriculation}}"></paper-input>
+					        </div>
+					        <div class="ligne">
+					            <paper-input class="input3cols" id="commentaire" label="Commentaires" type="textarea" value="{{objet.commentaire}}"></paper-input>
+					        </div> 
+							<paper-fab  class="reply-button" mini icon="reply" title="Annuler" on-tap="reply"></paper-fab>
+							<paper-fab  class="reload-button" hidden$="[[refreshbuttonint_hide]]" mini icon="cached" title="Réactualiser" on-tap="refreshthis"></paper-fab>
+							<paper-fab  class="valid-button" hidden$="[[modificationbuttonint_hide]]" mini icon="check" title="Valider" on-tap="savethis"></paper-fab>
+							
+						</div>
+			
+					</my-groupprofil_behavior>
+					<my-liste_famillemembres  liste_soustable="{{liste_soustable}}" charge_table$="{{is_edited}}" class="card cardprinc listemembre" addable="{{sous_table_addable}}" titulaire="{{objet}}"></my-liste_famillemembres>
+				</li>
+				<li style="display:block;width:1000px;margin-left:auto;margin-right:auto;margin-top:-40px;margin-bottom:0">
+					<my-liste_compte_ecritures hidesearchbox class="liste_compte_ecritures" id="{{_listeecr_id(objet.id)}}" liste_soustable2="[[liste_factures]]" liste_objets="{{liste_compte_ecriture}}" liste_soustable="{{liste_soustable}}" charge_table class="card cardprinc listecompteur" addable="{{sous_table_addable}}" solde="{{soldecompta}}" titulaire="{{objet}}"></my-liste_compte_ecritures>
+					<my-liste_factures hidesearchbox liste_soustable2="{{liste_compte_ecriture}}" liste_objets="{{liste_factures}}" liste_soustable="{{liste_soustable}}" charge_table$="{{is_edited}}" class="card cardprinc listefacture" addable="{{sous_table_addable}}" titulaire="{{objet}}" ></my-liste_factures>
+					<my-liste_famillesejours  liste_soustable="{{liste_soustable}}" charge_table$="{{is_edited}}" class="card cardprinc listesejour" addable="{{sous_table_addable}}" titulaire="{{objet}}"></my-liste_famillesejours>
+				</li>
+				</div>			
+  		</my-profil_behavior>
+
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-profilfamille',
+	  
+	  properties: {  
+
+	  	 params_get:{type: Object,
+		   	 	  notify : true,
+		   	 	  computed:'_getparams_get(objet.id,objet)'
+		     },
+	     params_save:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'personne'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_delete:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'delete',type:'maj',element:'personne'/*v:'voyage.1.1.1'*/}}
+	        },
+	     edited_item_id:{notify : true},
+	     modificationbuttonint_hide:{type:Boolean,notify:true},
+	     refreshbuttonint_hide:{type:Boolean,notify:true},
+	     doc_print_link:{type:String,
+	    	 notify:true,
+	    	 computed:'_getprintlink(objet)'},
+	     is_edited:{type:Boolean,
+	    	 notify:true,
+	    	 computed:'_is_edited(objet,edited_item_id)'
+	    	 }
+	  },
+	  savethis:function(){
+		  this.$.profilfamille.savethis();
+	  },
+	  refreshthis:function(){
+		  this.$.profilfamille.refreshthis();
+	  },
+	  reply:function(){
+		  this.$.profilfamille.reply();
+	  },
+	  _getprintlink:function(objet){
+		  if (objet && objet.id) {
+			  return "doc_famille&id="+objet.id;
+		  } else {
+			  return null;
+		  }
+		  
+	  },
+	  _getparams_get:function(obj_id,objet){
+		  return {type:'get',action:'detailpersonne',id:obj_id}
+	  },
+	  _listeecr_id:function(obj_id){
+		  return 'fam_liste_compte_ecritures'+obj_id;
+	  },
+	  _is_edited:function(objet,edited_item_id){
+		  if(objet && objet.id && objet.id==edited_item_id){
+			  return true;
+		  } else{
+			  return false;
+		  }
+	  }
+  });
+  
+  </script>
+
+</dom-module>
+		

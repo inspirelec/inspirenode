@@ -1,0 +1,56 @@
+<link rel="import" href="/library/bower_components/polymer/polymer.html">
+<dom-module id="doc-test">
+		  <template>
+			  <style>
+			  	.person{
+			  		color:green;
+			  	}
+				.animal{
+					color:red;
+					margin-left:10px
+				}
+				.repas{
+					color:blue;
+					margin-left:20px;
+				}
+			  </style>
+			  
+			  
+			  
+			  <div class="person"> M. [[object_charge.nom]] a des animaux</div>
+			  <template is="dom-repeat" items="[[object_charge.animaux]]" as="animal">
+			  	<div class="animal">un [[animal.type]] qui s'appel [[animal.nom]]</div>
+			  	<template is="dom-repeat" items="[[animal.nourritures]]" as="repas">
+			  		<div class="repas">[[repas]]</div>
+			  	</template>
+			  </template>
+			  
+			  
+		  </template>
+		
+		  <script>
+		    Polymer({
+		
+		      is: 'doc-test',
+		
+		      properties: {
+		    	  object_charge:{type : Object,
+		    		  			value :{nom:"Tintin",
+			    		  				animaux:[    {type:"chien",
+			    		  								nom:"milou",
+			    		  								nourritures:["croquettes","pat�","restes de cuisine"]
+			    		  							 },
+			    		  							 {type:"chat",
+			    		  								nom:"matou",
+			    		  								nourritures:["croquettes"]
+			    		  							 }
+		    		  							 ]
+		    							}
+		    				}
+		      },
+			  chargement : function(){
+				  
+			  }
+		    });
+		  </script>
+		</dom-module>

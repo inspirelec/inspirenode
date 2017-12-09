@@ -1,0 +1,46 @@
+	
+
+
+
+	#calendar {
+		right:2%
+		width: 95%;
+		margin: 10px;
+		/*padding: 0 15px;
+		float: right;*/
+	}
+	
+	.fc-content {
+		color: white;
+		font-weight:normal;
+	}
+	
+	.ui_btniconseul {
+		border-width:0px;
+		color:inherit;
+		background-color: transparent;
+	}
+	#wrap {
+		width: 100%;
+		margin: 0 auto;
+	}
+	.boxs_left {
+		/*float: left top;*/
+		top:5%;
+		width: 90%;
+		/*min-height: 30%;*/
+		padding: 0px 5px 5px 5px;
+		border: 1px solid #ccc;
+		background: #eee;
+		text-align: left;
+		
+		/*min-height: 300px;*/
+		margin:10px;
+		/*margin-top: 10px;*/
+	}
+	#top {
+		margin:10px;
+	}
+	.fc-ltr .fc-time-grid .fc-event-container{
+		margin-left:16px;
+	}

@@ -1,0 +1,120 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<dom-module id="my-plan_tag_icon">
+
+  <template>
+  		<style>
+  		  	  :host {		        
+  		  	    --position-top: 100px;
+		  		--position-left: 100px;
+		      }     
+		      .tag_icon{
+		      	position : absolute;
+		      	top: var(--position-top);
+		      	left: var(--position-left);
+				background-color: rgba(255, 255, 255, 0.5);
+		      	font-size:14px;
+				font-weight: bold;
+		      	padding:0px;
+		      	margin:0px;
+		      	min-width:1em;
+		      }
+  		</style>
+  		<paper-button id="tag_icon" class="tag_icon" on-tap="get_tag_periph" tag_uuid="{{tag.tag_uuid}}" uuid="{{tag.uuid}}">
+	  		<iron-icon icon="{{tag.icon_plan}}" src="{{app.url_http}}:{{app.port_http}}/[[etat_icon]]"></iron-icon>
+	  		{{etat.expr1}}<br/>
+			{{etat.expr2}}<br/>
+			{{etat.expr3}}
+	  		<paper-tooltip>{{tag.nom}}</paper-tooltip>
+  		</paper-button>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-plan_tag_icon',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	     tag:{type:Object,
+	    	 notify:true
+	     },
+	     etat_icon:{type:String,
+	    	 notify:true,
+	    	 computed: 'compute_etat_icon(lastupdatetime)'},
+	     etat:{type:String,
+	    	 notify :true,
+	    	 computed: 'compute_etat(lastupdatetime)'},
+	     taguuid:{type:String,
+	    	 notify :true,
+	    	 value:null},
+	     plan_dim:{type:Object,
+	    	 notify:true
+	    }
+	  },
+      observers: [
+                  '_update_positions(plan_dim,plan_dim.rect)'
+                ],
+
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+	      },
+	  _update_positions: function(plan_dim){
+		  this.app = document.querySelector('#app');
+		  if (this.tag.position_x && this.tag.position_y) {
+			  var ratio = plan_dim.rect.width/plan_dim.imagesize.width;
+			  
+			  this.customStyle['--position-left']=(this.tag.position_x*ratio+plan_dim.rect.left)+"px";
+			  this.customStyle['--position-top']=( this.tag.position_y*ratio+plan_dim.rect.top)+"px";
+			  this.updateStyles();	
+	 
+		  }
+
+	  },
+	  compute_etat: function(lastupdatetime){
+	    	 this.app = document.querySelector('#app');
+    		 if (this.app.lastetat &&this.app.lastetat['tag_'+this.tag.id] && this.app.lastetat['tag_'+this.tag.id].expression){
+    			 return this.app.lastetat['tag_'+this.tag.id].expression;			 
+    		 } else if (this.app.lastetat &&this.app.lastetat[this.tag.uuid] && this.app.lastetat[this.tag.uuid].expression){
+    			 return this.app.lastetat[this.tag.uuid].expression;			 
+    		 }
+    		 return null;
+	      },
+	  compute_etat_icon: function(lastupdatetime){
+	    	 this.app = document.querySelector('#app');
+			if (this.tag.categorie && this.app.lastetat &&this.app.lastetat[this.tag.uuid] && this.app.lastetat[this.tag.uuid].expression){
+    			if (this.app.lastetat[this.tag.uuid].expression.etat==this.tag.ecriture_max_value) { 
+					return this.tag.categorie.iconmax;		 
+    		 	} else if (this.app.lastetat[this.tag.uuid].expression.etat==this.tag.ecriture_min_value) { 
+					return this.tag.categorie.iconmin;		 
+    		 	} else { 
+					return this.tag.categorie.iconmidle;		 
+    		 	}
+			}
+    		 return null;
+	      },
+	  get_tag_periph: function(e,a){
+	    	  this.taguuid=e.currentTarget.tag_uuid;
+	    	  this.app.$.location.path="/appliindus/periphListPage/"+this.taguuid;
+	    	  
+	      },
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      }
+  })
+  </script>
+
+</dom-module>

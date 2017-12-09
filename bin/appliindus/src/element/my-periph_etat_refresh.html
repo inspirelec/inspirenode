@@ -1,0 +1,112 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<dom-module id="my-periph_etat_refresh">
+
+  <template>
+  		<style>
+  		</style>
+		<iron-ajax
+			id="get_etat"
+		    method="GET"
+		    url="{{get_etat_url}}"
+		    headers="{{app.header_auth}}"
+		    params="{{params_get_etat}}"
+		    handle-as="json"
+	    	on-error="_disconnect"
+		    last-response="{{get_etat_Response}}"
+		    debounce-duration="10000">
+		</iron-ajax>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-periph_etat_refresh',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	     lastupdatetime:{type: String,
+	   	 	  notify : true,
+	   	 	  value:null},	  
+    	 header_auth: {type: Object, 
+   		  	value:null, notify : true },
+	     params_get_etat:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'getetat',v:'indus.1.1.1'}},
+	   	 get_etat_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+	     get_etat_Response: {type:String, 
+			    notify : true,
+			  	value:null }
+	  },
+      observers: [
+                  '_get_etat_Responsechange(get_etat_Response,header_auth)',
+                  '_start_etat_Response(header_auth,params_get_etat)'
+                ],
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+
+	      },
+	  _start_etat_Response: function(header_auth,params_get_etat){
+	    	  if (header_auth){
+	    		  this.app = document.querySelector('#app');
+		         this.params_get_etat.updateTime=this.lastupdatetime;
+		         this.set('get_etat_url',this.app.url_api+':'+this.app.port_api+'/index');
+	    		 this.$.get_etat.generateRequest();
+	    	  }else {
+	    		  this.set('lastupdatetime',0);
+	    		  this.set('get_etat_url',null);
+	    		  if(this.$.get_etat.lastRequest){
+	    	            this.$.get_etat.lastRequest.xhr.abort();
+	    	      }
+	    	  }
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _get_etat_Responsechange: function(get_etat_Response,header_auth){
+	    	  if (this.get_etat_Response){
+	  	    	//this.lastupdatetime=this.get_etat_Response.updateTime;
+	  	    	
+
+		    	console.log(get_etat_Response)  ;
+		    	if (!this.app.lastetat) this.app.lastetat={};
+		    	var nbetat=0;
+		    	for (var e in get_etat_Response){
+		    		
+		    		this.app.lastetat[e]=this.get_etat_Response[e];
+		    		
+		    		//this.app.fire('Etatchange', {uuid:e,data: get_etat_Response[e]});
+		    		nbetat++;
+		    	}
+	  	    	this.set('lastupdatetime',this.get_etat_Response.updateTime);
+	  	    	this.params_get_etat.updateTime=this.get_etat_Response.updateTime;
+		    	//this.app.$.alertnotif.label=nbetat;
+		        //this.set('app.lastupdatetime',this.lastupdatetime);
+	    	  }
+	    	  if (this.$.get_etat.url && header_auth){
+	    		  this.$.get_etat.generateRequest();  
+	    	  }
+	      }
+	  
+  })
+  
+
+  </script>
+
+</dom-module>

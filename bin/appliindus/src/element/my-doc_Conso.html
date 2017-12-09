@@ -1,0 +1,362 @@
+<link rel="import" href="/library/bower_components/polymer/polymer.html">
+
+<dom-module id="my-doc_Conso">
+		  		  <template>
+			  <style>
+			  
+			  	div {font-size: 10px;
+					text-align: center;}
+				td {font-size: 10px;
+					text-align: center;}
+			    .databrutes { color:grey;white-space: pre;width:500px; font-family: monospace; font-size: 10px;}
+			  	
+			  	.cadre {
+		        	display :block;
+		            margin: 5px;
+		            padding:5px;
+		          	position: relative;
+		            background-color: white;
+			        box-shadow: 1px 1px 1px 1px;
+			        border-radius: 3px;
+			     }
+			  	.facture{
+			  		color:green;
+			  	}
+			  	.titre{
+			  		color:black;
+					font-size: 14px;
+					text-align: center;
+					margin:3px
+				}
+				.sejour{
+					color:red;
+					margin-left:10px
+				}
+				.famille{
+					color:blue;
+					margin-left:20px;
+				}
+			  </style>
+			  
+			
+			 <iron-ajax
+				id="charge_ecriture"			    method="GET"
+			    url="{{charge_ecriture_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_ecriture}}"    handle-as="json"   	on-error="_disconnect"
+			    last-response="{{ecritures}}"   		debounce-duration="300">
+			</iron-ajax>	
+			<iron-ajax
+				id="charge_sejour"	    		method="GET"
+			    url="{{charge_sejour_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_sejours}}"		    handle-as="json"    on-error="_disconnect"
+			    last-response="{{sejours}}"			    debounce-duration="300">
+			</iron-ajax>	
+			<iron-ajax
+				id="charge_tag"	    		method="GET"
+			    url="{{charge_tag_url}}"	    headers="{{app.header_auth}}"
+			    params="{{params_get_tag}}"		    handle-as="json"    on-error="_disconnect"
+			    last-response="{{tag}}"			    debounce-duration="300">
+			</iron-ajax>			
+			
+			<div class="cadre">
+				  <p class="titre">
+					<b>Bilan des consommations par emplacement</b>
+					</br>	
+					<b>Extraction du {{selection_query.date1}} au {{selection_query.date2}}</b>
+				  </p>			 
+		  	</div>
+			<div class="cadre">
+				  				 
+				 <table style=" border-radius:4px; border:1px solid #636363;width: 100%">
+				    <thead>
+						<tr>
+							<th> Emplacement </th>
+							<th> Séjour </th>
+							<th> Eau </th>
+							<th> Electricité </th>
+							<th> Total </th>
+						</tr>
+					</thead>
+					<tbody>						
+						<tr>
+							   <td style="width: 20%">
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.id}}<br/>
+									</template>
+								</td>		
+								
+							   
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.empl_qt}} jrs {{lig.empl_mt}} €<br/>
+									</template>
+								
+							   </td>
+							   
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.eau_qt}} m3 {{lig.eau_mt}} €<br/>
+									</template>
+								
+							   </td>
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.elec_qt}} kWh {{lig.elec_mt}} €<br/>
+									</template>
+								
+							   </td>	
+							   <td style=" width: 20%">	
+								   <template is="dom-repeat" items="[[ecriture_sel]]" as="lig">
+										{{lig.total}} €<br/>
+									</template>
+								
+							   </td>			
+						</tr>	
+						
+					</tbody>
+					<tfoot>
+						<tr>
+							<th> Total </th>
+							<th> {{total_empl_qt}} jrs {{total_empl_mt}} € </th>
+							<th> {{total_eau_qt}} m3 {{total_eau_mt}} € </th>
+							<th> {{total_elec_qt}} kWh {{total_elec_mt}} € </th>
+							<th> {{total_mt}} € </th>
+						</tr>
+					</tfoot>
+				</table>	
+		  	 </div>
+		  <highcharts-chart
+				  id="graphique"
+				  data="{{graph.grap_histo_data}}"
+				  title='{{graph.titre_graphique}}'
+				  type="{{graph.type_graphique}}"
+				  x-zoom
+				  legend
+				  loading="{{loading}}"
+				  loading-message="{{graph.loadingmessage}}"
+				  vs-time="{{graph.X_axis_is_time}}"
+				  x-label="{{graph.titreX_graphique}}"
+				  y-label="{{graph.titreY_graphique}}"
+		  >
+		  </highcharts-chart>
+			<table style=" border-radius:4px; border:1px solid #636363;width: 100%">
+					<tr>
+				   <th style="width: 40%">
+					signature du gestionnaire<br/><br/><br/><br/><br/><br/>
+				   </th>	
+				   <th style=" width: 20%">
+					
+				   </th>	
+				   <th style="width: 40%">
+					signature de l'usager<br/><br/><br/><br/><br/><br/>
+				   </th>	
+				</tr>		
+			</table>
+		  
+		  </template>
+		
+		  <script>
+		    Polymer({
+		
+		      is: 'my-doc_Conso',
+
+		      properties: {
+		 	     app: {
+			          type: Object
+		        	},    
+		    	 selection_query:{type : Object,
+	  				  notify:true/*,
+	  				  value:{}*/},
+				 /*action: detail.... pour un enregistrement
+				           list...    pour plusieurs enregistrements*/
+		  		
+		  		 params_get_ecriture:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listcompte_ecriture'}},
+		  		 params_get_sejours:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listsejour'}},
+		  		 params_get_tag:{type: Object,
+			   	 	  notify : true,
+			   	 	  value: {type:'get',action:'listtag'}},
+
+			      ecriture_sel:{type:Object,
+			    	  notify:true,
+			    	  computed: 'computeecriture_sel(ecritures, sejours,tag)'},
+			     /*tables de la base de donnée*/
+				 ecritures:{type:Array,notify:true},
+			     sejours:{type:Array,notify:true},
+			     tag:{type:Array,notify:true},
+			      
+				 /*nombres calculés*/
+				 total_elec_mt:{type:Number,notify:true,value:0},
+				 total_eau_mt:{type:Number,notify:true,value:0},
+				 total_empl_mt:{type:Number,notify:true,value:0},
+				 total_elec_qt:{type:Number,notify:true,value:0},
+				 total_eau_qt:{type:Number,notify:true,value:0},
+				 total_empl_qt:{type:Number,notify:true,value:0},
+				 total_mt:{type:Number,notify:true,value:0},
+				  graph:{type:Object,notify:true}
+		      },
+	    	  observers: [
+		                  '_selection_query_change(selection_query, params_get_sejours, params_get_ecriture,params_get_tag)'	                  
+		                ],
+		      
+		      _selection_query_change: function(selection_query, params_get_sejours, params_get_ecriture, params_get_tag) {
+			        this.app = document.querySelector('#app');
+					 if (params_get_sejours && selection_query && selection_query.date1 && selection_query.date2) {
+			        	params_get_sejours.date_debut=" between '"+selection_query.date1+"' and '"+selection_query.date2+"'";
+			        } else if (params_get_sejours && selection_query && selection_query.date1) {
+			        	params_get_sejours.date_debut=">='"+selection_query.date1+"'";
+			        } else if (params_get_sejours && selection_query && selection_query.date2) {
+			        	params_get_sejours.date_debut="<='"+selection_query.date2+"'";
+			        } else if (params_get_sejours) {
+			        	params_get_sejours.date_debut='';
+			        }	
+					
+					if (params_get_sejours && selection_query && selection_query.emplacement_id) {
+			        	params_get_sejours.emplacement_id=" = '"+selection_query.emplacement_id+"'";
+					}
+					
+					if (params_get_tag && selection_query && selection_query.emplacement_id) {
+			        	params_get_tag.id=" = '"+selection_query.emplacement_id+"'";
+					}
+
+					if (params_get_ecriture && selection_query && selection_query.date1 && selection_query.date2) {
+			        	params_get_ecriture.date=" between '"+selection_query.date1+"' and '"+selection_query.date2+"'";
+			        } else if (params_get_ecriture && selection_query && selection_query.date1) {
+			        	params_get_ecriture.date=">='"+selection_query.date1+"'";
+			        } else if (params_get_ecriture && selection_query && selection_query.date2) {
+			        	params_get_ecriture.date="<='"+selection_query.date2+"'";
+			        } else if (params_get_ecriture) {
+			        	params_get_ecriture.date='';
+			        }					
+					
+			    	//params_get_ecriture.type_operation = '9';
+					
+					// info des ecritures
+			        this.charge_ecriture_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_ecriture.generateRequest();	
+					// info des sejour
+			        this.charge_sejour_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_sejour.generateRequest();			
+					// info des tags
+			        this.charge_tag_url=this.app.url_api+':'+this.app.port_api+'/index'
+			    	this.$.charge_tag.generateRequest();					
+					
+			  },
+				calculinfosgraphique:function(){
+
+		           var infosgraphique={
+                       titre_graphique:"Consommations",
+                       titreX_graphique:"Temps",
+                       X_axis_is_time:false,
+                       titreY_graphique:"Kw",
+                       loadingmessage:"Chargement des consos",
+                       type_graphique:"line",
+                       grap_histo_data:[{name: 'legende serie 1',type:'line' ,data: [['A',10],['B',12],['C',5]]},
+                           {name: 'legende serie 2',type:'line' ,data: [['A',21],['B',5],['C',15]]}
+                       ]
+                   };
+					/*exemple de point si axe X is time  (X_axis_is_time:true)*/
+					/*var point=[(new Date(historiques[h].timestamp)).getTime(),1500];
+					 res_serie1.push(point);*/
+
+		           this.set('graph',infosgraphique);
+				},
+
+			  /*calcul des lignes*/
+			  computeecriture_sel:function(ecritures, sejour, emplacement){ 				 
+				 var total_elec_mt=0;
+				 var total_eau_mt=0;
+				 var total_empl_mt=0;
+				 var total_elec_qt=0;
+				 var total_eau_qt=0;
+				 var total_empl_qt=0;
+				 var total_mt=0;
+				 for (var i in emplacement){
+					emplacement[i].elec_mt=0;
+					emplacement[i].elec_qt=0;
+					emplacement[i].total=0;
+					emplacement[i].eau_mt=0;
+					emplacement[i].eau_qt=0;
+					emplacement[i].empl_mt=0;
+					emplacement[i].empl_qt=0;
+				 }
+				 
+				 for (var s in ecritures){
+					for (var d in sejour){
+						if (ecritures[s].sejour_id == sejour[d].id){
+						    //emplacement[sejour[d].emplacement_id].id = sejour[d].emplacement_id;
+							if (ecritures[s].libelle == 'Electricité'){
+								emplacement[sejour[d].emplacement_id].elec_mt += Number((ecritures[s].montant));
+								total_elec_mt += Number((ecritures[s].montant));
+								emplacement[sejour[d].emplacement_id].elec_qt += Number((ecritures[s].qte));
+								total_elec_qt += Number((ecritures[s].qte));
+								emplacement[sejour[d].emplacement_id].total += Number((ecritures[s].montant));
+								total_mt += Number((ecritures[s].montant));
+							}
+							else if (ecritures[s].libelle == 'Eau'){
+								emplacement[sejour[d].emplacement_id].eau_mt += Number(ecritures[s].montant);
+								total_eau_mt += Number(ecritures[s].montant);
+								emplacement[sejour[d].emplacement_id].eau_qt += Number(ecritures[s].qte);
+								total_eau_qt += Number(ecritures[s].qte);
+								emplacement[sejour[d].emplacement_id].total += Number(ecritures[s].montant);
+								total_mt += Number(ecritures[s].montant);
+							}
+							else if (ecritures[s].libelle == 'Emplacement'){
+								emplacement[sejour[d].emplacement_id].empl_mt += Number(ecritures[s].montant);
+								total_empl_mt += Number(ecritures[s].montant);
+								emplacement[sejour[d].emplacement_id].empl_qt += Number(ecritures[s].qte);
+								total_empl_qt += Number(ecritures[s].qte);
+								emplacement[sejour[d].emplacement_id].total += Number(ecritures[s].montant);
+								total_mt += Number(ecritures[s].montant);
+							}
+						}
+					}
+				  }
+				  for (var i in emplacement){
+					emplacement[i].elec_mt=(emplacement[i].elec_mt).toFixed(2);
+					emplacement[i].elec_qt=(emplacement[i].elec_qt).toFixed(0);
+					emplacement[i].total=(emplacement[i].total).toFixed(2);
+					emplacement[i].eau_mt=(emplacement[i].eau_mt).toFixed(2);
+					emplacement[i].eau_qt=(emplacement[i].eau_qt).toFixed(3);
+					emplacement[i].empl_mt=(emplacement[i].empl_mt).toFixed(2);
+					emplacement[i].empl_qt=(emplacement[i].empl_qt).toFixed(0);
+				 }
+			  
+				  this.set('total_elec_mt',(total_elec_mt).toFixed(2));
+				  this.set('total_eau_mt',(total_eau_mt).toFixed(2));
+				  this.set('total_empl_mt',(total_empl_mt).toFixed(2));
+				  this.set('total_elec_qt',(total_elec_qt).toFixed(0));
+				  this.set('total_eau_qt',(total_eau_qt).toFixed(3));
+				  this.set('total_empl_qt',(total_empl_qt).toFixed(0));
+				  this.set('total_mt',(total_mt).toFixed(2));
+				  return emplacement;
+			  },
+
+
+
+			  _getobjinliste:function(liste,searchval,searchcolumn){
+				  if(!liste){
+					  return {};
+				  }
+				  if (!searchcolumn){
+					  searchcolumn='id';
+				  }
+				  for (var o in liste){
+					  if(liste[o][searchcolumn]==searchval){
+						  return liste[o];
+					  }
+				  }
+				  return {};
+				  
+			  },
+			  
+			  _disconnect: function(obj){
+		    	  this.app = document.querySelector('#app');
+		    	  return this.app.disconnect();
+		      }
+		    });
+		  </script>
+		</dom-module>

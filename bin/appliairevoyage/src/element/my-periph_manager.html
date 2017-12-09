@@ -1,0 +1,128 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<link rel="import" href="../element/my-periph_view_DEFAULT.html">
+<link rel="import" href="../element/my-periph_view_BINAIRE.html">
+<link rel="import" href="../element/my-periph_view_BINVAR.html">
+<link rel="import" href="../element/my-periph_view_VOLETR.html">
+<link rel="import" href="../element/my-periph_view_VARIABLE.html">
+<link rel="import" href="../element/my-periph_view_TEMPERATURECONSIGNE.html">
+<link rel="import" href="../element/my-periph_view_CONSIGNE.html">
+<link rel="import" href="../element/my-periph_view_VOLETRVARIABLE.html">
+<!--
+<link rel="import" href="../element/my-periph_view_PLAYER.html">
+-->
+
+
+
+<dom-module id="my-periph_manager">
+
+  <template>
+  		<style>
+  		  	  :host {
+		        --background-color: #fff;
+		  		--color: #757575;
+
+		  		--paper-fab-background:white;
+                --paper-fab-keyboard-focus-background:white;
+                --text-primary-color:black;
+		      }
+	           .card {
+		        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+		        border-radius: 5px;
+		      }
+
+  		</style>
+  		
+			  <div class="card" style="width:100%;height:100%" >
+			  	  <template is="dom-if" if="{{show(ecriture_type,'SANS')}}">
+		          <my-periph_view_DEFAULT  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="SANS" lastupdatetime="{{lastupdatetime}}"></my-periph_view_DEFAULT>
+				  </template>
+		          <template is="dom-if" if="{{show(ecriture_type,'BINAIRE')}}">
+		          <my-periph_view_BINAIRE  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="BINAIRE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_BINAIRE>
+		          </template>
+		          <template is="dom-if" if="{{show(ecriture_type,'BINVAR')}}">
+				  <my-periph_view_BINVAR  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="BINVAR" lastupdatetime="{{lastupdatetime}}"></my-periph_view_BINVAR>
+				  </template>
+				  <template is="dom-if" if="{{show(ecriture_type,'VARIABLE')}}">
+				  <my-periph_view_BINVAR  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="VARIABLE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_BINVAR>
+				  </template>
+				  <template is="dom-if" if="{{show(ecriture_type,'CONSIGNE')}}">
+		          <my-periph_view_CONSIGNE  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="CONSIGNE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_CONSIGNE>
+		          </template>
+				  <template is="dom-if" if="{{show(ecriture_type,'PLAYER')}}">
+				  <my-periph_view_PLAYER  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="PLAYER" lastupdatetime="{{lastupdatetime}}"></my-periph_view_PLAYER>
+				  </template>
+				  <template is="dom-if" if="{{show(ecriture_type,'VOLETR')}}">
+				  <my-periph_view_VOLETR  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="VOLETR" lastupdatetime="{{lastupdatetime}}"></my-periph_view_VOLETR>
+				  </template>
+				  <template is="dom-if" if="{{show(ecriture_type,'VOLETRVARIABLE')}}">
+				  <my-periph_view_VOLETRVARIABLE  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="VOLETRVARIABLE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_VOLETRVARIABLE>
+				  </template>
+				  <template is="dom-if" if="{{show(ecriture_type,'CHAUDIERE')}}">
+				  <my-periph_view_DEFAULT  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="CHAUDIERE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_DEFAULT>
+				  </template>
+				  <template is="dom-if" if="{{show(ecriture_type,'ALARME')}}">
+				  <my-periph_view_DEFAULT  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="ALARME" lastupdatetime="{{lastupdatetime}}"></my-periph_view_DEFAULT>
+		          </template>
+		          <template is="dom-if" if="{{show(ecriture_type,'INFOS')}}">
+		          <my-periph_view_DEFAULT  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="INFOS" lastupdatetime="{{lastupdatetime}}"></my-periph_view_DEFAULT>
+		          </template>
+		          <template is="dom-if" if="{{show(ecriture_type,'BATTERIE')}}">
+		          <my-periph_view_DEFAULT  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="BATTERIE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_DEFAULT>
+				  </template>
+				  <template is="dom-if" if="{{show(ecriture_type,'TEMPERATURECONSIGNE')}}">		          
+		          <my-periph_view_TEMPERATURECONSIGNE  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="TEMPERATURECONSIGNE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_TEMPERATURECONSIGNE>
+		          </template>
+		          <template is="dom-if" if="{{show(ecriture_type,'TEMPERATURE')}}">
+		          <my-periph_view_TEMPERATURECONSIGNE  id="[[periph.uuid]]" periph="[[periph]]" ecriture_type="TEMPERATURE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_TEMPERATURECONSIGNE>
+	          	  </template>
+	          </div>
+	 		
+		
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-periph_manager',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	     periph:{type:Object,
+	    	 notify:true
+	     },
+	     ecriture_type:{type:String,
+	    	 notify:true
+	     }
+	  },
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+        	//this.importHref(this.resolveUrl('../element/my-periph_view_' + this.periph.ecriture_type + '.html'), null, null, true);	
+	        
+	      },
+	  _toArray(obj){
+	    	  return this.app._toArray(obj);
+	      },
+	  _disconnect(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+      show: function (periph_ecriture_type,ecriture_type) {
+    	    //console.log('OK',periph.nom,periph.uuid,ecriture_type,periph.ecriture_type,periph.ecriture_type==ecriture_type);	
+
+    	    return periph_ecriture_type==ecriture_type;
+    	}
+  })
+  </script>
+
+</dom-module>

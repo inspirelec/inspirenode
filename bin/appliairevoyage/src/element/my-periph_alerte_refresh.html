@@ -1,0 +1,115 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<dom-module id="my-periph_alerte_refresh">
+
+  <template>
+  		<style>
+  		</style>
+		<iron-ajax
+			id="get_alerte"
+		    method="GET"
+		    
+		    headers="{{app.header_auth}}"
+		    params="{{params_get_alerte}}"
+		    handle-as="json"
+	    	on-error="_disconnect"
+		    last-response="{{get_alerte_Response}}"
+		    debounce-duration="10000">
+		</iron-ajax>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-periph_alerte_refresh',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	     lastupdatetime:{type: String,
+	   	 	  notify : true,
+	   	 	  value: '0'},
+   	  	header_auth: {type: Object, 
+    		  	value:null, notify : true },
+	     params_get_alerte:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'getalerte',v:'voyage.1.1.1'}},
+	   	 get_alerte_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+	     get_alerte_Response: {type:String, 
+			    notify : true,
+			  	value:null }
+	  },
+      observers: [
+                  '_get_alerte_Responsechange(get_alerte_Response)',
+                  '_start_alerte_Response(header_auth,params_get_alerte)'
+                ],
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+
+	      },
+	   _start_alerte_Response: function(header_auth,params_get_alerte){
+	    	  if (header_auth){
+	    		 this.app = document.querySelector('#app');
+		         this.params_get_alerte.updateTime=this.lastupdatetime;
+		         this.$.get_alerte.url=this.app.url_api+':'+this.app.port_api+'/index'
+	    		 this.$.get_alerte.generateRequest();
+	    	  } else {
+	    		  this.set('lastupdatetime',0);
+	    		  this.$.get_alerte.url=null;
+	    		  if(this.$.get_alerte.lastRequest){
+	    	            this.$.get_alerte.lastRequest.xhr.abort();
+	    	      }
+	    	  }
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _get_alerte_Responsechange: function(get_alerte_Response){
+	    	  if (this.get_alerte_Response){
+	  	    	this.lastupdatetime=this.get_alerte_Response.updateTime;
+	  	    	this.params_get_alerte.updateTime=this.lastupdatetime;
+		    	//console.log(get_etat_Response)  ;
+		    	var nbetat=0;
+		    	this.app.alertes=this.get_alerte_Response.data;
+		    	
+		    	if (!this.app.alertes) this.app.alertes=[];
+		    	this.app.fire('Alertechange', {data: get_alerte_Response});
+		    	var nb_alertes=0;
+		    	for (var a in this.app.alertes){
+		    		this.app.alertes[a].checked=false;
+		    		if (this.app.alertes[a].etat=="0" || this.app.alertes[a].etat=="1" ) { 
+		    			nb_alertes++;
+		    		}
+		    	}			    	
+		    	//this.app.$.alertnotif.label=nb_alertes;
+		    	this.set('app.alertes_nb',nb_alertes);
+		    	this.set('app.alerte_loader_show',false);
+		    	
+	    	  }
+	    	  if (this.$.get_alerte.url && this.app && this.app.header_auth){
+	    		  this.$.get_alerte.generateRequest();  
+	    	  }
+	    	  
+	      }
+	  
+  })
+  
+
+  </script>
+
+</dom-module>

@@ -1,0 +1,579 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../element/my-liste_famillemembres.html">
+<link rel="import" href="../element/my-liste_famillesejours.html">
+<!-- <link rel="import" href="../element/my-liste_compteurs.html"> -->
+<link rel="import" href="../element/my-liste_compte_ecritures.html">
+<link rel="import" href="../element/my-liste_factures.html">
+<link rel="import" href="../element/my-liste_sexes.html">
+<dom-module id="my-profilfamille">
+
+  <template>
+		<style include="app-grid-style">
+  		 :host {
+			/*display:flex;*/
+			display: block;
+          --app-grid-columns: 2;
+          --app-grid-gutter: 10px;
+          --app-grid-expandible-item-columns: 6;
+          --paper-icon-button-ink-color: white;
+          margin-top :2px;
+          margin-bottom:2px;
+        }
+		ul {
+		 padding:0;
+		 margin-bottom:-15px;
+		 line-height:1.2;
+		}
+        .item {
+			
+        }
+        .card {
+        	display :block;
+            
+            padding:5px;
+            padding-bottom: 20px;
+          	max-width: 500px;
+          	margin-right: auto;
+          	margin-left: auto;
+          	position: relative;
+            background-color: white;
+        	color: var(--paper-blue-800);
+	        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	        border-radius: 5px;
+	        
+	     }
+	     .cardtext {
+	     	margin-right:auto;
+	     	margin-top:0;
+	     }
+	     .profil {
+	     	min-width: 350px;
+	     	max-width:500px;
+	     }
+	     .listemembre {
+	     	/*margin : 5px auto;*/
+	     	min-width: 350px;
+	     }
+	     .listesejour {
+	     	margin-top : 25px;
+	     	
+	     	min-width: 350px;
+	     }
+	     .listefacture {
+	     	margin-top : 25px;
+	     	
+	     	min-width: 350px;
+	     }
+	     .listecompteur {
+	     	margin-top : 25px;
+	     	
+	     	min-width: 350px;
+	     }
+	     .ligne{
+	     	display:flex;
+	     	width:100%;
+	     }
+		 .input2cols {
+		 	margin:0 10px;
+		 	width:66%;
+		 }
+		 .input1col {
+		 	margin:0 10px;
+		 	width:33%;
+		 }
+		 .input3cols {
+		 	margin:0 10px;
+		 	width:100%;
+		 }
+		 .valid-button{
+		 	position:absolute;
+		 	top:-20px;
+		 	right:5px;
+		 	--paper-fab-background: var(--paper-green-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-green-900);
+		 }
+		 .reply-button{
+		 	position:absolute;
+		 	top:-20px;
+		 	right:50px;
+		 	--paper-fab-background: var(--paper-red-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-red-900);
+		 }
+		 .edit-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:5px;
+    		color: var(--paper-blue-500);
+		 }
+		 .delete-button{
+		 	position:absolute;
+		 	top:5px;
+		 	right:55px;
+		 	color: var(--paper-blue-500);
+		 }
+		 .cardprinc{
+		 	padding-top:60px;
+		 	margin-top: 40px;
+		 	position: relative;
+		 }
+		 .item-title {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color: rgba(170, 0, 30, 0.5);
+          color: white;
+          font-weight: 400;
+          padding: 16px;
+          
+        }
+        @media(max-width: 999px) {
+          :host {
+            --app-grid-columns: 2;
+            --app-grid-gutter: 10px;
+          }
+        }
+  		</style>
+	<ul class="app-grid">
+		<li class="card profil" hidden$="[[cardtexte_hidden]]">
+			<!-- <div style="display:block;width:100%"> -->
+				<div hidden$="[[cardtexte_hidden]]">		
+					<paper-icon-button hidden$="[[editbuttonhide]]" class="edit-button" mini icon="create" title="Edit" on-tap="edit"></paper-icon-button>
+					<paper-icon-button hidden$="[[editbuttonhide]]" class="delete-button" mini icon="delete" title="Edit" on-tap="deletethis"></paper-icon-button>
+					Famille {{objet.nom}} {{objet.prenom1}}<div style="float:right;margin-right:110px">Solde : {{soldecompta}}</div>
+					</br>
+					Adresse {{objet.adresse}} {{objet.codepostal}} {{objet.ville}} {{objet.pays}}</br>
+					
+					{{objet.commentaire}}
+					
+				</div>
+		</li>
+		<li class="card cardprinc profil" hidden$="[[!editmode]]">
+				<div hidden$="[[!editmode]]">		
+					<div class="item-title" >Profil titulaire</div>
+				    <paper-fab  class="reply-button" mini icon="reply" title="Annuler" on-tap="reply"></paper-fab>
+					<paper-fab  class="valid-button" mini icon="check" title="Valider" on-tap="submit"></paper-fab>
+				    <paper-input id="id" label="id" hidden type="text" value="{{objet_temp.id}}"> </paper-input>
+				    <paper-input id="uuid" label="uuid" hidden type="text" value="{{objet_temp.uuid}}">     </paper-input>              
+					<div class="ligne">
+					   	<paper-input class="input2cols" id="nom" label="Nom" type="text" value="{{objet_temp.nom}}"> 
+			              <!-- <iron-icon prefix height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon> -->
+			            </paper-input>
+			            <my-liste_sexes class="input1col" id="sexe" label="Genre" value_sel="{{objet_temp.sexe}}"></my-liste_sexes>
+			            
+			            
+					</div>
+					<div class="ligne">
+					    <paper-input class="input1col" id="prenom1" label="Prenom1" type="text" value="{{objet_temp.prenom1}}"></paper-input>
+			            <paper-input class="input1col" id="prenom2" label="Prenom2" type="text" value="{{objet_temp.prenom2}}"></paper-input>
+			            <paper-input class="input1col" id="prenom3" label="Prenom3" type="text" value="{{objet_temp.prenom3}}"></paper-input>
+					</div>
+					<div class="ligne">
+			            <paper-input class="input3cols" id="adresse" label="Adresse" type="text" value="{{objet_temp.adresse}}"></paper-input>
+			        </div>
+			        <div class="ligne">
+			        	<paper-input class="input1col" id="pays" label="Pays" type="text" value="{{objet_temp.pays}}"><iron-icon icon="social:public" prefix></paper-input>
+			            <paper-input class="input1col" id="codepostal" label="Code Postal" type="number" value="{{objet_temp.codepostal}}"></paper-input>
+			            <paper-input class="input1col" id="ville" label="Ville" type="text" value="{{objet_temp.ville}}"></paper-input>
+			        </div>
+			        <div class="ligne">
+			            <paper-input class="input1col" id="phone" label="Telephone" type="text" value="{{objet_temp.phone}}"><iron-icon icon="communication:phone" prefix></iron-icon></paper-input>
+			            <paper-input class="input1col" id="email" label="Courriel" type="text" value="{{objet_temp.email}}"><iron-icon icon="communication:email" prefix></iron-icon></paper-input>
+			            <paper-input class="input1col" id="profession" label="Profession" type="text" value="{{objet_temp.profession}}"></paper-input>
+			        </div>
+			        <div class="ligne">
+			            <paper-input class="input1col" id="datenaissance" label="Date de naissance" type="date" value="{{objet_temp.datenaissance}}"><iron-icon icon="event-available" prefix></iron-icon></paper-input>
+			            <paper-input class="input2cols" id="lieunaissance" label="Lieu de naissance" type="text" value="{{objet_temp.lieunaissance}}"></paper-input>
+			        </div>
+			        <div class="ligne">
+			            <paper-input class="input2cols" id="cartegrise" label="N° Carte grise" type="text" value="{{objet_temp.cartegrise}}"><iron-icon icon="airport-shuttle" prefix></iron-icon></paper-input>
+			            <paper-input class="input1col" id="immatriculation" label="Immatriculation" type="text" value="{{objet_temp.immatriculation}}"></paper-input>
+			        </div>
+			        <div class="ligne">
+			            <paper-input class="input3cols" id="commentaire" label="Commentaires" type="textarea" value="{{objet_temp.commentaire}}"></paper-input>
+			        </div>
+			        
+			        
+			   </div>
+			<!-- </div> -->
+		</li>
+		<li  hidden$="[[!editmode]]" style="display:block">
+	   		<my-liste_compte_ecritures compte_ecritures_Response="{{compte_ecritures_Response}}" class="card cardprinc listecompteur" addable="{{sous_table_addable}}" solde="{{soldecompta}}" titulaire="{{objet}}" seltitulaire="{{objet.id}}" hidden$="[[!editmode]]" contextePrint="{{contextePrint}}"></my-liste_compte_ecritures>
+	   		<my-liste_factures compte_ecritures_Response="{{compte_ecritures_Response}}" class="card cardprinc listefacture" addable="{{sous_table_addable}}" titulaire="{{objet}}" seltitulaire="[[selitem]]" hidden$="[[!editmode]]" contextePrint="{{contextePrint}}"></my-liste_factures>
+	   		<my-liste_famillesejours class="card cardprinc listesejour" addable="{{sous_table_addable}}" titulaire="{{objet}}" seltitulaire="[[selitem]]" hidden$="[[!editmode]]" contextePrint="{{contextePrint}}"></my-liste_famillesejours>
+	   		<my-liste_famillemembres class="card cardprinc listemembre" addable="{{sous_table_addable}}" titulaire="{{objet}}" seltitulaire="[[selitem]]" hidden$="[[!editmode]]" contextePrint="{{contextePrint}}"></my-liste_famillemembres>
+	   		<!-- <my-liste_compteurs class="card cardprinc listecompteur" titulaire="{{objet}}" seltitulaire="[[selitem]]" hidden$="[[!editmode]]"></my-liste_compteurs> -->
+		
+		</li>
+	</ul>
+	<iron-ajax
+		id="save"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_save.body}}"
+	    params="{{params_save.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    on-response="save_validate"
+	    last-response="{{save_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+	<iron-ajax
+		id="delete"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_delete.body}}"
+	    params="{{params_delete.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    on-response="delete_validate"
+	    last-response="{{delete_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+    
+    
+    <iron-ajax
+		id="save_membres"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_savemembres.body}}"
+	    params="{{params_savemembres.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    debounce-duration="300">
+	</iron-ajax>
+    <iron-ajax
+		id="save_sejours"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_savesejours.body}}"
+	    params="{{params_savesejours.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    debounce-duration="300">
+	</iron-ajax>
+	<iron-ajax
+		id="save_compteurs"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_savecompteurs.body}}"
+	    params="{{params_savecompteurs.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    debounce-duration="300">
+	</iron-ajax>
+	<iron-ajax
+		id="save_compte_ecritures"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_savecompte_ecritures.body}}"
+	    params="{{params_savecompte_ecritures.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    debounce-duration="300">
+	</iron-ajax>
+	<iron-ajax
+		id="save_factures"
+	    method="POST"
+	    headers="{{app.header_auth}}"
+	    body="{{params_savefactures.body}}"
+	    params="{{params_savefactures.params}}"
+	    content-type="application/json"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    debounce-duration="300">
+	</iron-ajax>
+	<paper-dialog id="delete_dialog" >
+	  <h2>Suppression</h2>
+	  <p>Voulez vous supprimer cette ligne</p>
+	  <div class="buttons">
+	    <paper-button dialog-dismiss>Annuler</paper-button>
+	    <paper-button dialog-confirm autofocus on-tap="_send_delete">Supprimer</paper-button>
+	  </div>
+	</paper-dialog>
+	<paper-dialog id="load_dialog" modal>
+		<paper-spinner active style="z-index:100"></paper-spinner>	
+	</paper-dialog>
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-profilfamille',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+	     params_save:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'personne'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_savemembres:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'personne'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_savesejours:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'sejour'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_savecompteurs:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'relevecompteur'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_savecompte_ecritures:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'compte_ecriture'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_savefactures:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'facture'/*v:'voyage.1.1.1'*/}}
+	        },
+	     params_delete:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {body:{},params:{action:'delete',type:'maj',element:'personne'/*v:'voyage.1.1.1'*/}}
+	        },
+	     objet:{type: Object,
+	    	 notify : true,
+	    	 value:{}
+	     },
+	     show_loading:{type:Number,
+	    	 notify : true,
+	    	 value:0
+	     },
+	     objet_temp:{type: Object,
+	    	 notify : true,
+	    	 value:{}
+	     },
+	     selitem:{type:Number,
+	    	 	notify : true},
+	    editmode:{type:Boolean,
+	    	notify : true,
+	    	value:false
+	    },
+	    soldecompta:{type:Number,notify:true},
+	    editbuttonhide:{type:Boolean,
+	    	notify : true
+	    },
+	    hideme:{type:Boolean,
+	    		notify:true,
+	    		value:false},
+   	    cardtexte_hidden:{type:Boolean,
+      		notify:true,
+      		computed: '_computecardtexte_hidden(hideme, editmode)'
+      		},
+      	sous_table_addable:{type:Boolean,
+      		notify:true,
+      		computed: '_computesous_table_addable(objet,objet.id)'
+      		},
+   	     compte_ecritures_Response:{type: Object,
+	    	 notify : true
+	     }
+	  },
+	     observers: [
+	                  '_objetchange(selitem,objet)',
+	                  '_editmodechange(editmode)',
+	                  '_show_loading(show_loading)'
+	                ],
+
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+	      },
+	  submit:function (event) {
+		  this.set('show_loading',5);
+		  var datainputs=this.querySelectorAll('paper-input');
+		  var datas=this.objet_temp;
+		  datas.membres=this.objet.membres;
+		  datas.compte_ecritures=this.objet.compte_ecritures;
+		  datas.sejours=this.objet.sejours;
+		  this.set('params_save.body',{data:datas});
+		  this.$.save.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save.generateRequest();
+		  
+      },
+      _editmodechange:function(editmode){
+    	  if (editmode){
+    		  this.$.sexe.refreshdata();
+    		  this.customStyle['--app-grid-columns'] = '2';
+              this.updateStyles();
+    	  } else {
+    		  this.customStyle['--app-grid-columns'] = '1';
+              this.updateStyles();
+    	  }
+    	  
+    	  
+      },
+      _edit : function (etat){
+    	  this.set('editmode',etat);
+		  this.set('editbuttonhide',etat);
+		  if (etat){
+			  this.set('selitem',this.objet.id);
+		  } else {
+			  this.set('selitem',-1);
+		  }
+		  
+      },
+      _computesous_table_addable:function(objet,id){
+    	  if (objet && id && id>=0){
+    		  return true;
+    	  } else {
+    		  return false;
+    	  }
+    	  
+      },
+      _computecardtexte_hidden:function(hideme, editmode){
+      	if(hideme || editmode){
+      		return true;
+      	}  else {
+      		return false;
+
+      	}
+        },
+      _objetchange:function(selitem,objet){
+    	  if (this.objet.newobjet){
+    		  delete (objet.newobjet);
+    		  this._edit(true);
+    		  this.set('objet.id',-2);
+    	  } else if (selitem>-1 || selitem==-2){
+    		  if(selitem==objet.id){
+    			  //this.set('editbuttonhide',true);
+    			  this.set('hideme',false);
+    			  this.set('editmode',true);
+    		  } else {
+    			  //this.set('editbuttonhide',false);
+    			  this.set('hideme',true);
+    			  this.set('editmode',false);
+    		  }
+    	  } else {
+    		  
+    		  this.set('editbuttonhide',false);
+    		  this.set('editmode',false);
+    		  this.set('hideme',false);
+    	  }
+      },
+	  reply:function (event) {
+		  this.fire('reply_famille', this.objet);
+		  this._edit(false);
+      },
+	  edit:function (event) {
+		  this._edit(true);
+		  this.set('objet_temp',{});
+		  for (var p in this.objet){
+			  this.set('objet_temp.'+p,this.objet[p]);
+			  //this.notifyPath('objet_temp.'+p);
+		  }		  
+      },
+
+      deletethis:function (event) {
+		  this.$.delete_dialog.open();
+      },
+      _show_loading:function(show_loading){
+    	  if (show_loading>0) {
+    		  this.$.load_dialog.open();
+    	  } else {
+    		  this.$.load_dialog.close();
+    	  }
+      },
+      _send_delete:function (event) {
+		  this.set('params_delete.body',{data:this.objet});
+		  this.$.delete.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.delete.generateRequest();
+
+      },
+      delete_validate:function(e,r,t){
+    	  this.objet.id=-1;
+		  this.fire('reply_famille', this.objet);
+		  this._edit(false);
+		  this.reply();
+	  },
+      
+      
+      save_validate:function(e,r,t){
+    	  if (this.save_Response.element){
+    		  for (var p in this.save_Response.element){
+    			  this.set('objet.'+p,this.save_Response.element[p]);
+    			  //this.notifyPath('objet.'+p);
+    		  }	
+    	  }
+    	  this.save_membres();
+    	  this.save_sejours();
+    	  /*this.save_compteurs();*/
+    	  this.save_compte_ecritures();
+    	  this.save_factures();
+    	  this.set('show_loading',0);
+    	  //this.reply();
+      },
+	  save_membres:function(ert){
+		  for (var m in this.objet.membres){
+			  this.objet.membres[m].titulaire_id=this.objet.id;
+		  }
+		  this.set('params_savemembres.body',{data:this.objet.membres});
+		  this.$.save_membres.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save_membres.generateRequest();
+	  },
+	  save_sejours:function(ert){
+		  for (var m in this.objet.sejours){
+			  this.objet.sejours[m].titulaire_id=this.objet.id;
+		  }
+		  this.set('params_savesejours.body',{data:this.objet.sejours});
+		  this.$.save_sejours.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save_sejours.generateRequest();
+	  },
+	  /*save_compteurs:function(ert){
+		  for (var m in this.objet.compteurs){
+			  this.objet.compteurs[m].titulaire_id=this.objet.id;
+		  }
+		  this.set('params_savecompteurs.body',{data:this.objet.compteurs});
+		  this.$.save_compteurs.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save_compteurs.generateRequest();
+	  },*/
+	  save_compte_ecritures:function(ert){
+		  for (var m in this.objet.compte_ecritures){
+			  this.objet.compte_ecritures[m].titulaire_id=this.objet.id;
+		  }
+		  this.set('params_savecompte_ecritures.body',{data:this.objet.compte_ecritures});
+		  this.$.save_compte_ecritures.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save_compte_ecritures.generateRequest();
+	  },
+	  save_factures:function(ert){
+		  for (var m in this.objet.factures){
+			  this.objet.factures[m].titulaire_id=this.objet.id;
+		  }
+		  this.set('params_savefactures.body',{data:this.objet.factures});
+		  this.$.save_factures.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save_factures.generateRequest();
+	  },
+      save_releves:function(ert){
+		  
+	  },
+            
+	  disconnect:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app._toArray(obj);
+	      }
+  });
+  
+  </script>
+
+</dom-module>

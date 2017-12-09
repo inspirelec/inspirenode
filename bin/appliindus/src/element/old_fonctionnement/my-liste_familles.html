@@ -1,0 +1,97 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../element/my-profilfamille.html">
+
+<dom-module id="my-liste_familles">
+
+  <template>
+		<style >
+		 .add-button{
+		 	position:fixed;
+		 	bottom:50px;
+		 	left:50px;
+		 	--paper-fab-background: var(--paper-red-400);
+		    --paper-fab-keyboard-focus-background: var(--paper-red-900);
+		 }
+  		</style>
+
+  	<iron-ajax
+		id="charge_allfamilles"
+	    method="GET"
+	    url="{{charge_allfamilles_url}}"
+	    headers="{{app.header_auth}}"
+	    params="{{params_allfamilles}}"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    last-response="{{famille_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+	<paper-fab class="add-button" hidden$="[[editbuttonhide]]" mini icon="add" title="Cr�er" on-tap="add"></paper-fab>
+		
+    <template is="dom-repeat" items="[[famille_Response]]">
+			<my-profilfamille objet="{{item}}" selitem="{{selitem}}" editbuttonhide="{{editbuttonhide}}" contextePrint="{{contextePrint}}"></my-profilfamille>
+	</template>
+
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-liste_familles',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },    
+  		 params_allfamilles:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {type:'get',action:'listpersonne',titulaire_id:"isnull"}},
+	   	 charge_allfamilles_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+	     editbuttonhide:{type:Boolean,
+	    	 	notify : true,
+	    	 	value:false },	     
+	     selitem:{type:Number,
+		    	 	notify : true,
+		    	 	value :-1},
+	  },
+	  listeners: {
+          'reply_famille': 'handleReply',
+        },
+	  add : function(){
+		 this.push('famille_Response', {newobjet:true});
+		 this.set('selitem',-2);
+		 this.set('editmode',true);
+		  this.set('editbuttonhide',true);
+	  },
+	  handleReply:function(e,detail){
+		  if (detail.id==-2 && this.famille_Response.indexOf(detail)>-1) {
+			  this.splice('famille_Response', this.famille_Response.indexOf(detail), 1);
+		  }
+	  },
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+	    	  this.charge_allfamilles_url=this.app.url_api+':'+this.app.port_api+'/index'
+	    	  this.$.charge_allfamilles.generateRequest();
+	      },
+	      
+	  _disconnect: function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+	  _toArray: function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+
+  })
+  </script>
+
+</dom-module>
