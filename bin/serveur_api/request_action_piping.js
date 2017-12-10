@@ -5,7 +5,8 @@ var debugging = 0;
  
 
 module.exports =function(variables,userResponse,user,userRequest){
-    	
+	logger('DEBUG',{variables:variables,userResponse:userResponse,user:user,userRequest:userRequest},'request_action_piping');
+
 	var options={};
 	for (var p_id in global.obj.peripheriques) {
 		//if (global.obj.peripheriques[cam_id].categorie && global.obj.peripheriques[cam_id].categorie.type=='camera'){

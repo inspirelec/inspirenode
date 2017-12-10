@@ -389,6 +389,7 @@ var core=function(){
                                                           //res.writeHead(200, {'Content-Type': 'text/plain',
                                                           //	 'Access-Control-Allow-Origin': '*'});
                                                           //reponse.page='back'
+														  logger('DEBUG',{msg:'Save',sql:sql,valeurs_array:valeurs_array},'core');
                                                           var sql1=sql;
                                                           id=rowid;
                                                           //console.log('==id='+id);

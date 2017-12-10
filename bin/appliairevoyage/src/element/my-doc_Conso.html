@@ -443,6 +443,9 @@
 						var conso_elec_mt=conso_elec*this._getobjinliste(tarif,sejour[d].type_tarif).prix_elec_kwh;
 						var conso_jr=index_jr_fin-index_jr_deb;
 						conso_jr = Math.floor((conso_jr/1000/60/60/24)+1);
+						var diff_date = date_selection_deb-date_sejour_deb;
+						if(diff_date<=0){conso_jr=conso_jr-1;}
+
 						var conso_jr_mt=conso_jr*this._getobjinliste(tarif,sejour[d].type_tarif).prix_empl_jour;
 						var empl_id = (sejour[d].emplacement_id*1)-1;
 

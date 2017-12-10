@@ -60,6 +60,10 @@ var class_box = function box(){
 							if (isNaN(self.port) || self.port=="") self.port=80;
 							
 							break;
+						case 'fibaro':
+							var comm = new global.req.comm_with_fibaro;
+							if (isNaN(self.port) || self.port=="") self.port=80;							
+							break;
 						case 'virtuel':
 							var comm = new global.req.comm_with_virtuel;
 							break;

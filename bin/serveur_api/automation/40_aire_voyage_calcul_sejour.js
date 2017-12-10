@@ -36,6 +36,7 @@ aire_voyage_calcul_sejour.stop=function(){
 
 
 function calcul_sejours(in_titulaire_id,in_sejour_id,sejourdata,callback){
+	logger('INFO',{msg:'appel automation calcul sejours', data:sejourdata, sejour:in_sejour_id, titulaire:in_titulaire_id ,nom:this.nom},'40_calcul_sejour');
 
 	//console.log('appel automation calcul sejours',in_titulaire_id);
     var sqlsel="select r.*,round(nb_jour*prix_empl_jour,2) total_empl"+

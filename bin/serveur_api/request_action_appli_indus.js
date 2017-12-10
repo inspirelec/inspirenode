@@ -9,6 +9,7 @@ module.exports =function(variables,res,user,req){
     	
 	    
 		
+		logger('DEBUG',{variables:variables,res:res,user:user,req:req},'request_action_appli_indus');
 		switch (variables.action) {
 		
 		case 'configappli':

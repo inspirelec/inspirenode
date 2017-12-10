@@ -28,7 +28,7 @@ var Request_action = function(req,res,app,user) {
 		var user=this.user;
 		var path=url_parts.pathname;
 
-		//logger('INFO',{msg:'requete api',requete:url_parts},'api_serveur');
+		logger('DEBUG',{msg:'requete api',requete:url_parts},'api_serveur');
 		switch (variables.type) {
 		case 'piping':
 			this.traiteaction=global.req.request_action_piping;

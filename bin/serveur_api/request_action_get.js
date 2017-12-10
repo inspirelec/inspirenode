@@ -6,7 +6,8 @@
 var parserxml2json = new global.req.xml2js.Parser();
 
 module.exports =function(variables,res,user){
-    	
+		logger('DEBUG',{variables:variables,res:res,user:user},'request_action_appli_get');
+
 		switch (variables.action) {
 		case 'testconnection':
 			if (user.type =='ADMINISTRATEUR' || user.type=='ADMIN' || !user.type) {

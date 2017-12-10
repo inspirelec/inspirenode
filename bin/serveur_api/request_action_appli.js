@@ -8,7 +8,9 @@ var parserxml2json = new global.req.xml2js.Parser();
 module.exports =function(variables,res,user,req){
     	
 	    
-		
+
+		logger('DEBUG',{variables:variables,res:res,user:user,req:req},'request_action_appli');
+
 		switch (variables.action) {
 		
 		case 'configappli':
@@ -1139,7 +1141,7 @@ module.exports =function(variables,res,user,req){
 											}
 											
 										}
-										console.log("  tag " +tag.id+" "+tag.nom);
+										//console.log("  tag " +tag.id+" "+tag.nom);
 										global.req.async.map(Object.keys(modesprogs[m][c][t]),function(p,callbackp){
 											var prog=modesprogs[m][c][t][p];
 											objprog={};
@@ -1150,7 +1152,7 @@ module.exports =function(variables,res,user,req){
 											objprog.valeur=prog.valeur;
 											objprog.jours=[];
 											objprog.categorie=categ.id;
-											console.log("    prog " +prog.heure+" = "+prog.valeur + " categ "+categ.id);
+											//console.log("    prog " +prog.heure+" = "+prog.valeur + " categ "+categ.id);
 											for (j in prog.jours){
 												if (prog.jours[j]==1) {
 													var jour={"id":j,"value":true};
@@ -1177,7 +1179,7 @@ module.exports =function(variables,res,user,req){
 								
 							}
 					  		,function(err){
-					  			console.log('fin des enregistrement consigne_temp');
+					  			//console.log('fin des enregistrement consigne_temp');
 					  			callbackd();
 					  		});
 					    }
@@ -1346,12 +1348,12 @@ module.exports =function(variables,res,user,req){
 			break;
 		case 'deletemode':
 			var mode_uuid=variables.mode_uuid;
-			console.log('delete mode ', mode_uuid);
+			//console.log('delete mode ', mode_uuid);
 			var objs={action:'delete',element:'mode'};
 			var deleted=false;
 			for (m in global.obj.modes){
 				if (global.obj.modes[m].uuid==mode_uuid){
-					console.log('delete mode '+ global.obj.modes[m].nom +" " +global.obj.modes[m].uuid)
+					//console.log('delete mode '+ global.obj.modes[m].nom +" " +global.obj.modes[m].uuid)
 					objs.data=global.obj.modes[m];
 					deleted=true;
 					global.obj.app.core.majdb(objs,function(){
@@ -1373,7 +1375,7 @@ module.exports =function(variables,res,user,req){
 			break;
 		case 'addmode':
 			var mode_name=variables.mode_nom;
-			console.log('add mode ', mode_name);
+			//console.log('add mode ', mode_name);
 			var added=false;
 			objs={action:'save',element:'mode'};
 				objs.data={nom:mode_name,icon:'images/confort_n.png'};
@@ -1414,7 +1416,7 @@ module.exports =function(variables,res,user,req){
 			var objs={action:'delete',element:'mode'};
 			for (m in global.obj.modes){
 				if (!variables.data.modes[global.obj.modes[m].uuid]){
-					console.log('delete mode '+ global.obj.modes[m].nom +" " +global.obj.modes[m].uuid)
+					//console.log('delete mode '+ global.obj.modes[m].nom +" " +global.obj.modes[m].uuid)
 					objs.data=global.obj.modes[m];
 					global.obj.app.core.majdb(objs,function(){	});
 				}
@@ -1560,10 +1562,10 @@ module.exports =function(variables,res,user,req){
 
 
 			case 'differemode' :
-				console.log(JSON.stringify(variables));
+				//console.log(JSON.stringify(variables));
 				//{"action":"differemode","data":"id=p731&date=2016-01-08&heure=6h00"}
 				var jsondata='{"'+variables.data.split("\n").join().split('&').join('","').split('=').join('":"')+'"}';
-				console.log(jsondata);
+				//console.log(jsondata);
 				var objdata=JSON.parse(jsondata);
 				var modediff= global.obj.app.core.findobj(objdata.id,'modes');
 				if (modediff) {
@@ -1744,7 +1746,7 @@ module.exports =function(variables,res,user,req){
 			case 'getrecu_num':
 
 					global.req.numerotation.create_numero(function(num){
-							console.log('recu num',lpad(num,4));
+							//console.log('recu num',lpad(num,4));
 							var cde_no= 'R'+global.req.moment().format('YYMM')+lpad(num,4);
 							var rep=JSON.stringify({num:cde_no});
 							res.writeHead(200, 
@@ -1759,7 +1761,7 @@ module.exports =function(variables,res,user,req){
 			case 'getfacture_num':
 
 				global.req.numerotation.create_numero(function(num){
-						console.log('facture num',lpad(num,4));
+						//console.log('facture num',lpad(num,4));
 						var cde_no= 'F'+global.req.moment().format('YYMM')+lpad(num,4);
 						var rep=JSON.stringify({num:cde_no});
 						res.writeHead(200, 

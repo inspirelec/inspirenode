@@ -231,7 +231,7 @@ module.exports = function() {
 								if (err){
 									//console.log(err);
 									selfdb.nbsqlerror++;
-									logger('ERROR',{msg:"erreur sql",message:err.message,order:order,err:err},'database_sql');
+									logger('ERROR',{msg:"erreur sql",message:err.message,order:order,sql:sql,dataarray:dataarray,err:err},'database_sql');
 								}
 								lastID=this.lastID;
 								callbacke();
@@ -278,7 +278,7 @@ module.exports = function() {
 					if (err){
 						//console.log(err);
 						selfdb.nbsqlerror++;
-						logger('ERROR',{msg:"erreur sql",message:err.message,order:order,err:err},'database_sql');
+						logger('ERROR',{msg:"erreur sql",message:err.message,order:order,dataarray:dataarray,err:err},'database_sql');
 					}
 					lastID=this.lastID;
 				    selfdb.database[dbsuffixe].run("COMMIT;", function(e) {
@@ -318,7 +318,7 @@ module.exports = function() {
 							logger('INFO',"sql en cours:"+selfdb.nbsqlencours+" total:"+selfdb.nbsqltotal+" error:"+selfdb.nbsqlerror,'database_sql');
 							if (err){
 								selfdb.nbsqlerror++;
-								logger('ERROR',{msg:"erreur sql",order:order,err:err},'database_sql');
+								logger('ERROR',{msg:"erreur sql",order:order,sql:sql,err:err},'database_sql');
 							}
 							callback(rows);
 						});
@@ -339,7 +339,7 @@ module.exports = function() {
 						//logger('INFO',"sql en cours:"+selfdb.nbsqlencours+" total:"+selfdb.nbsqltotal+" error:"+selfdb.nbsqlerror,'database_sql');
 						if (err){
 							selfdb.nbsqlerror++;
-							logger('ERROR',{msg:"erreur sql",order:order,err:err},'database_sql');
+							logger('ERROR',{msg:"erreur sql",order:order,dataarray:dataarray,err:err},'database_sql');
 						}
 						if (rows && !rows[0]) {
 							callback([rows]);

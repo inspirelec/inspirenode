@@ -271,21 +271,35 @@
 				  var datefin=new Date();
 				  if (selection_query && selection_query.date2){
 					  datefin=new Date(selection_query.date2);
+					  var userTimezoneOffset = datefin.getTimezoneOffset() * 60000;
+					  datefin=new Date(datefin.getTime() + userTimezoneOffset);
 				  }
 				  var datedebut=new Date();
 				  datedebut.setDate(datedebut.getDate()-365);
 				  if (selection_query && selection_query.date1){
 					  datedebut=new Date(selection_query.date1);
+					  var userTimezoneOffset = datedebut.getTimezoneOffset() * 60000;
+					  datedebut=new Date(datedebut.getTime() + userTimezoneOffset);
 				  }
 
 				  for  (var s in sejours){
 					  var db = new Date(sejours[s].date_debut);
-	    					  db.setDate(db.getDate()+1);
+	    					db.setDate(db.getDate()+1);
+							var userTimezoneOffset = db.getTimezoneOffset() * 60000;
+							db=new Date(db.getTime() + userTimezoneOffset);
+
 					  var df = new Date(sejours[s].date_fin);
+							var userTimezoneOffset = df.getTimezoneOffset() * 60000;
+							df=new Date(df.getTime() + userTimezoneOffset);
+
 					  var dc = new Date(sejours[s].date_debut);
-	    					  dc.setDate(dc.getDate()+1);
-					  if (lignes_emplacement['empl_'+sejours[s].emplacement_id]) {
-	                      while (dc<=df || (!df && dc<=datefin)) {
+	    					dc.setDate(dc.getDate()+1);
+							var userTimezoneOffset = dc.getTimezoneOffset() * 60000;
+							dc=new Date(dc.getTime() + userTimezoneOffset);
+
+					  if (lignes_emplacement['empl_'+sejours[s].emplacement_id]  && df >= datedebut && db <= datefin) {
+	                      //while (dc<=df || (!df && dc<=datefin)) {
+	                      while (dc<=df ) {
 	                    	  var mois=dc.getMonth()+1;
 	    					  lignes_emplacement['empl_'+sejours[s].emplacement_id].months[mois].nb++;
 	    					  lignes_emplacement['empl_'+sejours[s].emplacement_id].months[13].nb++;
@@ -304,7 +318,8 @@
 					  }
 				  }
 				  var datecalc=datedebut;
-				  while (datecalc<=datefin ) {
+
+				  while (datecalc<=datefin) {
                 	  var mois=datecalc.getMonth()+1;
 					  lignes_emplacement['tot'].months[mois].maxnb++;
 					  lignes_emplacement['tot'].months[13].maxnb++;

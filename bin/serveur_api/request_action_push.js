@@ -3,6 +3,7 @@
  */
 
 module.exports =function(variables,res){
+	logger('DEBUG',{variables:variables,res:res},'request_action_push');
 	switch (variables.action) {
 	case 'sendmessage':
 		if (variables.data.type_envoi=='smshttp'){

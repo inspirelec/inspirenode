@@ -14,7 +14,6 @@ var reqarray=[	{name:'request',require:'request'},
 	            {name:'async',require:'async'},
 	            {name:'os',require:'os'},
 	            {name:'moment',require:'moment'},
-
 	            /*{name:'emailjs',require:'emailjs'},*/
 	            {name:'i2c',require:'i2c'},
 	            {name:'jsmodbus',require:'jsmodbus'},
@@ -37,7 +36,8 @@ var reqarray=[	{name:'request',require:'request'},
 	            {name:'comm_with_sonos',require:'./serveur_api/comm_with_sonos'},
 	            {name:'comm_with_infoOS',require:'./serveur_api/comm_with_infoOS'},
 	            {name:'comm_with_onduleur',require:'./serveur_api/comm_with_onduleur'},
-	            
+	            {name:'comm_with_fibaro',require:'./serveur_api/comm_with_fibaro'},
+
 	            {name:'comm_with_zway',require:'./serveur_api/comm_with_zway'},
 	            {name:'comm_with_i2c',require:'./serveur_api/comm_with_i2c'},
 	            {name:'comm_with_modbus',require:'./serveur_api/comm_with_modbus'},

@@ -929,6 +929,7 @@ var database = {
 										   {"name" : "transaction", "type" : "button", "action" : "index?type=set&action=transaction"}
 						                   ]
 
+
 					},
 					{"name": "historise_cron","in_database":true,
 					"colonnes": [

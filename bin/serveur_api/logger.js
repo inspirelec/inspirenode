@@ -63,7 +63,8 @@ logger=function (typel,messagel,fichierl) {
 						}*/
 						if (type=='ERROR' ){
 							//console.trace(Datetime+" -- " + type + " "+fichier+" -- " + message+ " -- " + info);
-						} else 	if ( (tracagelevel==tracelevels.DEBUG 
+							global.req.fs.appendFileSync(dir+"/"+applicationtype+"_"+Datefile+"__ERROR.log",Datetime+" -- " + type + " -- " + message+ " -- " + info + "\n");
+						} else 	if ( (tracagelevel==tracelevels.DEBUG
 								&& (fichier=="box_inspirenode" 
 									||fichier=="startstop1"  )
 								)) {

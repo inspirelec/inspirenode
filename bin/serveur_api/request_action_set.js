@@ -3,6 +3,8 @@
  */
 
 module.exports =function(variables,res){
+
+	logger('DEBUG',{variables:variables,res:res},'request_action_set');
 	switch (variables.action) {
 	case 'BOX':
 		var periphremote=variables.data.periphremote;

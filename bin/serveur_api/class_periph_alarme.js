@@ -145,6 +145,8 @@ class_periph_alarme.generationGlobale=function(callback){
 
             tags_alarme[tc].ecriture_max_value=tags_alarme[tc].alarme[s].ecriture_max_value;
             tags_alarme[tc].ecriture_min_value=tags_alarme[tc].alarme[s].ecriture_min_value;
+
+			tags_alarme[tc].box_protocole=tags_alarme[tc].alarme[s].box_protocole;
 			tags_alarme[tc].box=tags_alarme[tc].alarme[s].box;
 			tags_alarme[tc].box_id=tags_alarme[tc].alarme[s].box_id;
 			tags_alarme[tc].categorie=tags_alarme[tc].alarme[s].categorie;

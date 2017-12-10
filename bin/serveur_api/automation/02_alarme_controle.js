@@ -2,6 +2,8 @@
  * New node file
  */
 var alarme_controle={id:2,nom:"alarme_controle",etat:"ON",lastrun:null};
+var frequenceAlarmAlert=300000;
+var demarrageAlarmAlert=30000;
 
 
 alarme_controle.start=function(){
@@ -22,7 +24,6 @@ obj.app.serveur.on('peripherique_alarme.last_etat.changed',changementetatalarme)
 
 
 function controledetection(periph,previous_etat,new_etat_expressions){
-	var frequenceAlarmAlert=300000;
 	try {
 		if (global.obj.app.core.findobj('alarme_time_entre_alerte_ms','constantes')) {
 			frequenceAlarmAlert=global.obj.app.core.findobj('alarme_time_entre_alerte_ms','constantes').valeur
@@ -37,7 +38,7 @@ function controledetection(periph,previous_etat,new_etat_expressions){
 		for ( var iddecl in global.obj.peripheriques_alarme[idalarm].declencheur) {
 			if (periph.uuid==global.obj.peripheriques_alarme[idalarm].declencheur[iddecl].uuid){
 				//console.log('un mouvement est detecté');
-				logger('INFO',{msg:'un detecteur a changer d état',periph_nom:periph.nom,periph_id:periph.id,new_etat:new_etat_expressions},'automation_alarme');
+				logger('DEBUG',{msg:'un detecteur a changer d état',periph_nom:periph.nom,periph_id:periph.id,new_etat:new_etat_expressions},'automation_alarme');
 				var alarme_active=false;
 				var alerte_waiting_finish=false;
 				var timeactuel=new Date().getTime();
@@ -52,9 +53,11 @@ function controledetection(periph,previous_etat,new_etat_expressions){
 								global.obj.peripheriques_alarme[idalarm].alarme[idalarme].last_etat.dernierealerte+frequenceAlarmAlert<timeactuel) ||
 								!global.obj.peripheriques_alarme[idalarm].alarme[idalarme].last_etat.dernierealerte){
 							if (global.obj.peripheriques_alarme[idalarm].alarme[idalarme].last_etat.dernierealerte) {
+								logger('DEBUG',{msg:'temps d attente entre 2 alertes fini **',alarm_id:periph.id,alarm_nom:periph.nom},'automation_alarme');						
 								alerte_waiting_finish=true;
-							}							
-							logger('INFO',{msg:'** compare dernier envoi alerte **',lastalerte:global.obj.peripheriques_alarme[idalarm].alarme[idalarme].last_etat.dernierealerte,timeactuel:timeactuel,frequenceAlarmAlert:frequenceAlarmAlert,alarm_id:global.obj.peripheriques_alarme[idalarm].id,alarm_nom:global.obj.peripheriques_alarme[idalarm].nom},'automation_alarme');
+							}
+							
+							logger('INFO',{msg:'** compare dernier envoi alerte **',lastalerte:global.obj.peripheriques_alarme[idalarm].alarme[idalarme].last_etat.dernierealerte,timeactuel:timeactuel,frequenceAlarmAlert:frequenceAlarmAlert,alarm_id:global.obj.peripheriques_alarme[idalarm].id,alarm_nom:global.obj.peripheriques_alarme[idalarm].nom},'automation_alarme');						
 							if (new_etat_expressions.etat!=periph.ecriture_min_value) {
 								global.obj.peripheriques_alarme[idalarm].alarme[idalarme].last_etat.dernierealerte=timeactuel;
 								logger('INFO',{msg:'** affecte le timer attente alerte **',frequenceAlarmAlert:frequenceAlarmAlert,alarm_id:global.obj.peripheriques_alarme[idalarm].id,alarm_nom:global.obj.peripheriques_alarme[idalarm].nom},'automation_alarme');
@@ -81,19 +84,23 @@ function controledetection(periph,previous_etat,new_etat_expressions){
 	}
 }
 
-function changementetatalarme(periph,previous_etat,new_etat_expressions){
+function changementetatalarme(periph,previous_etat,new_etat_expressions){	
+	logger('INFO',{msg:'Etat Alarme',alarm_nom:periph.nom,alarm_id:periph.id,etat:new_etat_expressions.etat},'automation_alarme');
 	if (new_etat_expressions.etat<=0) {
 		stop_sirene(periph);
 		logger('INFO',{msg:'L alarme vient d etre desactivée',alarm_nom:periph.nom,alarm_id:periph.id},'automation_alarme');
 	} else {
 		logger('INFO',{msg:'L alarme vient d etre activée',alarm_nom:periph.nom,alarm_id:periph.id},'automation_alarme');
 		var timeactuel=new Date().getTime();
-		logger('INFO',{msg:'suite activation affecte le timer attente alerte **',alarm_id:periph.id,alarm_nom:periph.nom},'automation_alarme');						
+		//fm pour la gestion du demarrage
+		var timedem = timeactuel-demarrageAlarmAlert-1;
 		
 		for (var idalarme in periph.alarme){
 			if (periph.alarme[idalarme].last_etat &&
 					periph.alarme[idalarme].last_etat.expression ) {
-					periph.alarme[idalarme].last_etat.dernierealerte=timeactuel;
+						///modif fm : timeactuel -> timedem		
+					logger('INFO',{msg:'suite activation affecte le timer attente alerte **',dernierealarm:timedem,alarm_id:periph.id,alarm_nom:periph.nom},'automation_alarme');						
+					periph.alarme[idalarme].last_etat.dernierealerte=timedem;
 			}
 		}
 	}
@@ -133,9 +140,9 @@ function on_instrusion(periph_alarm,periph_detect,previous_etat,new_etat_express
 	logger('INFO',{msg:'** Alarme detection **',alarme_nom:periph_alarm.nom,alarme_id:periph_alarm.id},'automation_alarme');
 	
 	texte += periph_detect.nom +' ';
-	if (previous_etat && previous_etat.expression) {
+	/*if (previous_etat && previous_etat.expression) {
 		texte += previous_etat.expression.etat+' => '+ new_etat_expressions.etat+'\n';
-	}
+	}*/
 	texte += periph_alarm.nom + ' ' ;
 	if (periph_alarm.tag && periph_alarm.tag[0]){
 		texte += periph_alarm.tag[0].nom ;
@@ -168,6 +175,23 @@ function on_instrusion(periph_alarm,periph_detect,previous_etat,new_etat_express
 		}
 	});
 	active_sirene(periph_alarm);
+	Fermeture_VR();
+	
+}
+function Fermeture_VR(){
+	var id_vr_1=272; //chambre
+	var id_vr_2=276; //zone sam
+	var id_vr_3=279; //zone bureau
+	
+	var periph_vr_1=obj.app.core.findobj(id_vr_1,'peripheriques');
+	var periph_vr_2=obj.app.core.findobj(id_vr_2,'peripheriques');
+	var periph_vr_3=obj.app.core.findobj(id_vr_3,'peripheriques');
+	
+	
+	periph_vr_1.set_etat('DOWN',null,function(){});
+	periph_vr_2.set_etat('DOWN',null,function(){});
+	periph_vr_3.set_etat('DOWN',null,function(){});
+	logger('INFO',{msg:'fermeture volets roulants'},'automation_alarme');	
 }
 
 
