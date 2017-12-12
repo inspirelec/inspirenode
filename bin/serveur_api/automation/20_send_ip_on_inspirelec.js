@@ -12,10 +12,11 @@ send_ip_on_inspirelec.start=function(){
 		logger('INFO',{msg:'demarrage automation',nom:this.nom},'startstop');
 		/*Execution toutes les  30 secondes*/
 		timer=setInterval(function(){
-				send_ip();
+
+                version_git(send_ip);
 				/*http://www.inspirelec.com/adr/dnsdynamic.php?id='  obj.app.core.findobj('id_installation','constantes');*/
 			}, 300000);
-		send_ip();
+        version_git(send_ip);
 	}
 }
 
@@ -47,14 +48,43 @@ var get_ip=function(){
 
 function send_ip(){
 	var adresseip=get_ip()[0];
+
 	global.req.comm.perso_get('www.inspirelec.com','/adr/dnsdynamic.php?'+
 			'id=' +	obj.app.core.findobj('idapplication','constantes').valeur+
 			'&iplocal=local'+adresseip +
 			'&apiport='+global.obj.app.config.apiport +
-			'&httpport='+global.obj.app.config.httpport
+			'&httpport='+global.obj.app.config.httpport+
+		    '&ap='+applienweb+
+		    '&ver='+appversion
 			,80,function(err,httpResponse,body){
 		//console.log(body);
 	});
+}
+
+function version_git(callback){
+    var exec = spawn=global.req.child_process.exec;
+
+    try {
+        if (process.platform=='linux'){
+            exec('git describe --tag', function(error, stdout, stderr) {
+                appversion=stdout;
+                callback();
+            });
+
+        } else if (process.platform=='win32' || process.platform=='win64'){
+            exec('git describe --tag', function(error, stdout, stderr) {
+                appversion=stdout;
+                callback();
+            });
+        }else {
+        	callback();
+		};
+	} catch (e) {
+        callback();
+	}
+
+
+
 }
 
 module.exports = send_ip_on_inspirelec;

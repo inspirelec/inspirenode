@@ -1,7 +1,7 @@
 {
   "httpport": "1389",
   "apiport": "1388",
-  "path_database_files":"../../../databases/mydb_indus_moussie_20171111/",
+  "path_database_files":"../../data/",
   "database_file":"mydb_indus",
   "menus_appli":{"menubutton": { "accueilbutton": {"name":"Plan","visible":true,"href":"planpage"},
 							"tagbutton": {"name":"Pieces","visible":true,"href":"tagListPage"},

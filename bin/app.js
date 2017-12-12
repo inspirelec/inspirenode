@@ -147,6 +147,8 @@ var InhibeConsole=function(){
 
 applicationtype='';
 appconfig=null;
+applienweb=null;
+appversion=null;
 
 process.argv.forEach(function (val, index, array) {
     console.log('arguments de lancement',index + ': ' + val);
@@ -156,6 +158,7 @@ process.argv.forEach(function (val, index, array) {
     if (apps[val]){
         appconfig=apps[val];
         applicationtype=appconfig.applicationtype;
+        applienweb=appconfig.lienweb;
         for (var reqappi in appconfig.reqarrayspe) {
             reqarray.push(appconfig.reqarrayspe[reqappi]);
 		}
