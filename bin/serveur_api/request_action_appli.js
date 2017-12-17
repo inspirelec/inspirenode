@@ -716,7 +716,7 @@ module.exports =function(variables,res,user,req){
 				for (var p in global.obj.peripheriques){
 					var pe={};
 					var etat={};
-					if (global.obj.peripheriques[p].last_etat) {
+					if (global.obj.peripheriques[p].last_etat && global.obj.peripheriques[p].last_etat.expression) {
 						if (global.obj.peripheriques[p].last_etat.TimeOfetat>variables.updateTime) {
 							pe=JSON.parse(JSON.stringify(global.obj.peripheriques[p].last_etat));
 							etat=pe;
@@ -739,7 +739,7 @@ module.exports =function(variables,res,user,req){
 				for (p in global.obj.peripheriquesdeportes){
 					var pe={};
 					var etat={};
-					if (global.obj.peripheriquesdeportes[p].last_etat) {
+					if (global.obj.peripheriquesdeportes[p].last_etat && global.obj.peripheriquesdeportes[p].last_etat.expression) {
 						if (global.obj.peripheriquesdeportes[p].last_etat.TimeOfetat>variables.updateTime) {
 							pe=JSON.parse(JSON.stringify(global.obj.peripheriquesdeportes[p].last_etat));
 							etat=pe;
@@ -763,7 +763,7 @@ module.exports =function(variables,res,user,req){
 				for (p in global.obj.peripheriques_chauffage){
 					var pe={};
 					var etat={};
-					if (global.obj.peripheriques_chauffage[p] && global.obj.peripheriques_chauffage[p].last_etat) {
+					if (global.obj.peripheriques_chauffage[p] && global.obj.peripheriques_chauffage[p].last_etat && global.obj.peripheriques_chauffage[p].last_etat.expression) {
 						if (global.obj.peripheriques_chauffage[p].last_etat.TimeOfetat>variables.updateTime) {
 							pe=JSON.parse(JSON.stringify(global.obj.peripheriques_chauffage[p].last_etat));
 							etat=pe;
@@ -787,7 +787,7 @@ module.exports =function(variables,res,user,req){
 				for (p in global.obj.peripheriques_batterie){
 					var pe={};
 					var etat={};
-					if (global.obj.peripheriques_batterie[p] && global.obj.peripheriques_batterie[p].last_etat) {
+					if (global.obj.peripheriques_batterie[p] && global.obj.peripheriques_batterie[p].last_etat && global.obj.peripheriques_batterie[p].last_etat.expression) {
 						if (global.obj.peripheriques_batterie[p].last_etat.TimeOfetat>variables.updateTime) {
 							pe=JSON.parse(JSON.stringify(global.obj.peripheriques_batterie[p].last_etat));
 							etat=pe;
@@ -943,18 +943,10 @@ module.exports =function(variables,res,user,req){
 			
 		case 'getid' :
 			var cid=global.obj.app.core.findobj('idapplication','constantes');
-			if (this.user && this.user.user=='demo') {
-				cid={valeur:'demonstration'};
-			}
 			var rep={};
-			if(cid){
-				rep['id']=cid.valeur;
-			} else {
-				rep['id']='sans';
-			}
+			rep['id']=cid.valeur;
 			rep['user']=user.user;
 			rep['droit_tarif']=user.droit_tarif;
-			
 			res.writeHead(200, 
 					{'Content-Type': 'text/plain',
 					 'Access-Control-Allow-Origin': '*'});
@@ -1006,12 +998,12 @@ module.exports =function(variables,res,user,req){
 			
 			
 		case 'getprogrammation' :
-				var categ_consigne_temperature=null;
+				/*var categ_consigne_temperature=null;
 				for (var c in global.obj.categories){
 					if (global.obj.categories[c].type=='consigne_temperature'){
 						categ_consigne_temperature=global.obj.categories[c];
 					}
-				}
+				}*/
 				/*/index.php{"action":"getprogrammation"}*/
 				/*{"mode_m0":{"tag_24":[{"heure":"0h00","valeur":"20","jours":{"Lu":"1","Ma":"1","Me":"1","Je":"1","Ve":"1","Sa":"1","Di":"1"}}],"tag_10":[{"heure":"5h00","valeur":"20.5","jours":{"Lu":"0","Ma":"1","Me":"1","Je":"0","Ve":"1","Sa":"0","Di":"1"}},{"heure":"10h00","valeur":"19","jours":{"Lu":"0","Ma":"1","Me":"1","Je":"0","Ve":"1","Sa":"0","Di":"1"}}]},"mode_m2":{"tag_24":[{"heure":"0h00","valeur":"20","jours":{"Lu":"1","Ma":"1","Me":"1","Je":"1","Ve":"1","Sa":"1","Di":"1"}}]}}*/
 				var result={};
@@ -1743,37 +1735,119 @@ module.exports =function(variables,res,user,req){
 
 					});
 				break;
+            case 'refresh_infos_cloture':
+                console.log('demande de refresh pour cloture',variables.sejour_id,variables.titulaire_id);
+                var automation=global.automation['40_aire_voyage_calcul_sejour'];
+                automation.calculsejour(variables.titulaire_id,null,null,function(lignes_consos){
+
+                    var rep = JSON.stringify(lignes_consos);
+                    res.writeHead(200,
+                        {'Content-Type': 'text/plain',
+                            'Access-Control-Allow-Origin': '*'});
+                    res.end(rep);
+                });
+                break;
+            case 'maj_sejour_refresh_infos_cloture':
+                console.log('demande de refresh pour cloture',variables.sejour_id,variables.titulaire_id);
+                var automation=global.automation['40_aire_voyage_calcul_sejour'];
+                //var vars={element:'sejour', data:variables.data,action:'save'};
+                //obj.app.core.majdb(vars,function(variabls,reponse){
+                automation.calculsejour(variables.titulaire_id,variables.sejour_id,variables.data,function(lignes_consos){
+                    var rep = JSON.stringify(lignes_consos);
+                    res.writeHead(200,
+                        {'Content-Type': 'text/plain',
+                            'Access-Control-Allow-Origin': '*'});
+                    res.end(rep);
+                });
+                //});
+
+                break;
+
+            case 'maj_sejour_cloture':
+                console.log('demande de refresh pour cloture',variables.sejour_id,variables.titulaire_id);
+                var automation=global.automation['40_aire_voyage_calcul_sejour'];
+                logger('INFO',{msg:'maj_sejour_cloture',variablesrecues:variables},'maj_sejour_cloture');
+
+                var ecritures=[];
+                for (var e in variables.data.facture.ecritures){
+                    if (variables.data.facture.ecritures[e].titulaire_id!=variables.titulaire_id
+                        || variables.data.facture.titulaire_id!=variables.titulaire_id
+                        || variables.data.sejour.titulaire_id!=variables.titulaire_id){
+                        logger('ERROR',{msg:'probleme de sauvegarde de facture avec une ecriture.titulaire_id différent de la facture',variablesrecues:variables},'maj_sejour_cloture');
+
+                    } else {
+                        ecritures.push(variables.data.facture.ecritures[e]);
+                    }
+                }
+                var vars={element:'sejour', data:variables.data.sejour,action:'save'};
+                obj.app.core.majdb(vars,function(variabls,reponse){
+                    var rep = JSON.stringify(reponse);
+
+                    if (variables.data.facture.facture_num=='Fxxxxxxxx'){
+                        global.req.numerotation.create_numero(function(num){
+                            console.log('facture num',lpad(num,4));
+                            var num= 'F'+global.req.moment().format('YYMM')+lpad(num,4);
+
+                            savefacture(variables.data.facture,ecritures,res,num);
+
+                        },'facture',global.req.moment().format('YYYYMM'));
+                    } else {
+                        savefacture(variables.data.facture,ecritures,res);
+                    }
+                });
+
+                break;
 			case 'getrecu_num':
 
-					global.req.numerotation.create_numero(function(num){
-							//console.log('recu num',lpad(num,4));
-							var cde_no= 'R'+global.req.moment().format('YYMM')+lpad(num,4);
-							var rep=JSON.stringify({num:cde_no});
-							res.writeHead(200, 
+							var rep=JSON.stringify({num:'Rxxxxxxxx'});
+							res.writeHead(200,
 									{'Content-Type': 'text/plain',
 									 'Access-Control-Allow-Origin': '*'});
-							res.end(rep);							
-
-					},'recu',global.req.moment().format('YYYYMM'));
-						
+							res.end(rep);
 
 				break;
-			case 'getfacture_num':
+			/*case 'getfacture_num':
 
 				global.req.numerotation.create_numero(function(num){
-						//console.log('facture num',lpad(num,4));
+						console.log('facture num',lpad(num,4));
 						var cde_no= 'F'+global.req.moment().format('YYMM')+lpad(num,4);
 						var rep=JSON.stringify({num:cde_no});
-						res.writeHead(200, 
+						res.writeHead(200,
 								{'Content-Type': 'text/plain',
 								 'Access-Control-Allow-Origin': '*'});
-						res.end(rep);							
+						res.end(rep);
 
 				},'facture',global.req.moment().format('YYYYMM'));
-					
+				break;*/
+			case 'saverecu' :
+				if (variables.data.recu_num=='Rxxxxxxxx'){
+                    global.req.numerotation.create_numero(function(num){
+                        console.log('recu num',lpad(num,4));
+                        var num= 'R'+global.req.moment().format('YYMM')+lpad(num,4);
+                        saveecriture(variables.data,res,num);
+                    },'recu',global.req.moment().format('YYYYMM'));
+				} else {
+                    savefacture(variables.data,variables.data.ecritures,res);
+				}
+
+			  break;
+			case 'savefacture':
+
+				if (variables.data.facture_num=='Fxxxxxxxx'){
+                    global.req.numerotation.create_numero(function(num){
+                        console.log('facture num',lpad(num,4));
+                        var num= 'F'+global.req.moment().format('YYMM')+lpad(num,4);
+
+                        savefacture(variables.data,variables.data.ecritures,res,num);
+
+                    },'facture',global.req.moment().format('YYYYMM'));
+				} else {
+                    savefacture(variables.data,variables.data.ecritures,res);
+				}
+
 
 			break;
-			
+
 			
 			/*********************/
 			/*	case 'allconfig2':
@@ -1793,4 +1867,66 @@ module.exports =function(variables,res,user,req){
 			res.end("");
 			break;
 	}
+};
+var saveecriture=function(dataecriture,res,newrecunum){
+
+        var vars={element:'compte_ecriture',
+            data:dataecriture,action:'save'};
+            if(newrecunum) {
+		             vars.data.recu_num=newrecunum;
+            }
+        obj.app.core.majdb(vars,function(variabls,reponse){
+            console.log(JSON.stringify(reponse));
+            res.writeHead(200, {'Content-Type': 'text/plain',
+                'Access-Control-Allow-Origin': '*'});
+            res.write(JSON.stringify(reponse));
+            res.end();
+        }
+
+        );
+
+}
+
+
+var savefacture=function(datafacture,dataecritures,res,newfacturenum){
+    global.req.async.mapSeries(dataecritures,function(element,callbackbe){
+        var vars={element:'compte_ecriture',
+            data:element,action:'save'};
+        if(newfacturenum) {
+            if (Array.isArray(vars.data)){
+                for (var i in vars.data){
+                    vars.data[i].facture_num=newfacturenum;
+				}
+			} else {
+                vars.data.facture_num=newfacturenum;
+			}
+
+
+        }
+        if (vars.data.recu_num=='Rxxxxxxxx') {
+          global.req.numerotation.create_numero(function(num){
+              console.log('recu num',lpad(num,4));
+              var num= 'R'+global.req.moment().format('YYMM')+lpad(num,4);
+              vars.data.recu_num=num;
+              obj.app.core.majdb(vars,function(){callbackbe()});
+
+          },'recu',global.req.moment().format('YYYYMM'));
+        } else {
+           obj.app.core.majdb(vars,function(){callbackbe()});
+        }
+
+    },function(err){
+        var vars={element:'facture',
+            data:datafacture,action:'save'};
+        if(newfacturenum) {
+            vars.data.facture_num=newfacturenum;
+        }
+        obj.app.core.majdb(vars,function(variabls,reponse){
+            console.log(JSON.stringify(reponse));
+            res.writeHead(200, {'Content-Type': 'text/plain',
+                'Access-Control-Allow-Origin': '*'});
+            res.write(JSON.stringify(reponse));
+            res.end();
+        });
+    });
 };
