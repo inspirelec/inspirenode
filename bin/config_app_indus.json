@@ -1,16 +1,30 @@
 {
-  "httpport": "1389",
-  "apiport": "1388",
-  "path_database_files":"../../data/",
-  "database_file":"mydb_indus",
-  "menus_appli":{"menubutton": { "accueilbutton": {"name":"Plan","visible":true,"href":"planpage"},
+  	"appli_folder":"appliindus",
+  	"appli_link_adr_web":"appli",
+	"automationfolderspe":"/../data/automation_indus/",
+	"reqarrayspe":[
+		{"name":"request_action_appliphp',","require":"./serveur_api/request_action_appliphp"},
+		{"name":"request_action_appli_indus","require":"./serveur_api/request_action_appli"},
+		{"name":"dbmodel","require":"./dbmodel.js"}
+	],
+	"menus_appli":{"menubutton": { "accueilbutton": {"name":"Plan","visible":true,"href":"planpage"},
+							"calendarbutton": {"name":"Calendrier","visible":true,"href":"calendarpage"},
 							"tagbutton": {"name":"Pieces","visible":true,"href":"tagListPage"},
 							"progbutton": {"name":"Programmation","visible":true,"href":"prog_modes"},
-							"paramsbutton": {"name":"Paramètres","visible":true,"href":"parametrepage"},
-	  						"testbutton": {"name":"Test","visible":true,"href":"testPage"}
+							"paramsbutton": {"name":"Paramètres","visible":true,"href":"parametrepage"}
 						  },
-			"menubuttoncountshow":4 ,
-			"with_graphique_on_tag_page":false ,
+	             "parametres_liste":{
+							"constantes":true,
+							"jourconsignes":true,
+							"emplacements":true,
+							"aires":false,
+							"societes":false,
+							"sexes":false,
+							"typecafs":false,
+							"type_paiement":false,
+							"type_operation":false,
+							"tarifs":false
+				 },
 			"titre_application":{"name":"InspirIndus","size":"15"} ,
 			"icon_application":{"path":"/images/inspirathome.gif","width":15, "height":15}
 						
@@ -35,7 +49,10 @@
 	               {"id" : "contantes", "titre" : "Contantes", "action" : "constantes", "image" : "../images/constantes.jpg"},
 	               {"id" : "box_virtuel_etat", "titre" : "Etat boxs virtuelles", "action" : "box_virtuel_etat", "image" : "../images/constantes.jpg"},
 	               {"id" : "servicemsg", "titre" : "Service Message", "action" : "servicemsg", "image" : "../images/log.jpg"},
-	               {"id" : "graph", "titre" : "Graphique", "action" : "graph", "image" : "../images/log.jpg"}
-	               ]
+	               {"id" : "graph", "titre" : "Graphique", "action" : "graph", "image" : "../images/log.jpg"},
+				  {"id" : "plan", "titre" : "Plan", "action" : "plan", "image" : "../images/log.jpg"},
+				  {"id" : "plan_tag", "titre" : "Plan tag position", "action" : "plan_tag", "image" : "../images/log.jpg"},
+				  {"id" : "plan_peripherique", "titre" : "Plan periph position", "action" : "plan_peripherique", "image" : "../images/log.jpg"}
+	     ]
 		
 }

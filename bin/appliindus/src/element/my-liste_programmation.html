@@ -556,7 +556,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	   		 value: {action:'addmode',v:'indus.1.1.1'}},
  	   	 params_allcategmode:{type: Object,
 	   	 	  notify : true,
-	   	 	  value: {action:'getcategories',v:'indus.1.1.1'}}, 
+	   	 	  value: {action:'getcategories',v:'indus.1.1.1'}},
 	   	 params_alltagmode:{type: Object,
 	   	 	  notify : true,
 	   	 	  value: {action:'alltagmode',v:'indus.1.1.1'}},    	  
@@ -574,7 +574,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	      },
 	  get_tag_periph:function(e,a){
 	    	  this.taguuid=e.currentTarget.uuid;
-	    	  this.app.$.location.path="/appliindus/periphListPage/"+this.taguuid;
+	    	  this.app.$.location.path="/"+this.app.url_folder+"/periphListPage/"+this.taguuid;
 	    	  
 	      },
 

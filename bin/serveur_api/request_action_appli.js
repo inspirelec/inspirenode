@@ -345,7 +345,7 @@ module.exports =function(variables,res,user,req){
 			/*{"action":"allmodes","v":"1.1.1"}*/
 			
 			var result={};
-			
+
 			for (p in global.obj.categories){
 				var pe=JSON.parse(JSON.stringify(global.obj.categories[p]));
 				/*if (pe.type=='sonde_de_temperature'
@@ -357,65 +357,102 @@ module.exports =function(variables,res,user,req){
 				}
 			}
 			var rep = JSON.stringify(result);
-			res.writeHead(200, 
+			res.writeHead(200,
 					{'Content-Type': 'text/plain',
 					 'Access-Control-Allow-Origin': '*'});
 			res.end(rep);
 		
 			break;
-			
-			
+		case 'getallcategories' :
+                /*{"action":"allmodes","v":"1.1.1"}*/
+
+                var result={};
+
+                for (p in global.obj.peripheriques){
+                    var per=global.obj.peripheriques[p];
+                    if (per.visibilite =='visible'){
+                        result[per.categorie.id]=per.categorie;
+					}
+                }
+				for (p in global.obj.peripheriques_chauffage){
+					var per=global.obj.peripheriques_chauffage[p];
+					if (per.visibilite =='visible'){
+						result[per.categorie.id]=per.categorie;
+					}
+				}
+                var rep = JSON.stringify(result);
+                res.writeHead(200,
+                    {'Content-Type': 'text/plain',
+                        'Access-Control-Allow-Origin': '*'});
+                res.end(rep);
+
+                break;
 		case 'alltagplan' :
 			/*{"action":"alltag","v":"1.1.1"}*/
 			var result={};
 			result.tags=[];
-			for (p in global.obj.tags){
-				if(global.obj.tags[p].visible=='O' && global.obj.tags[p].position_x && global.obj.tags[p].position_y) {
-					var pe=JSON.parse(JSON.stringify(global.obj.tags[p]));
-					var pemin={};
-					pemin.id=pe.id;
-					pemin.nom=pe.nom;
-					pemin.parent_tag=[];
-					pemin.icon=pe.icon;
-					pemin.tag_uuid=pe.id;
-					pemin.uuid=pe.uuid;
-					pemin.visible=pe.visible;
-					pemin.position_x=pe.position_x;
-					pemin.position_y=pe.position_y;
-					pemin.icon_plan=pe.icon_plan;
-					pemin.type=pe.type;
-					pemin.typeprog=pe.typeprog;
-					
-					result.tags.push(pemin);	
-				}
-				
-			}
-			for (p in global.obj.peripheriques){
-				if(global.obj.peripheriques[p].position_x && global.obj.peripheriques[p].position_y) {
-					var pe=JSON.parse(JSON.stringify(global.obj.peripheriques[p]));
-					var pemin={};
-					pemin.id=pe.id;
-					pemin.nom=pe.nom;
-					pemin.parent_tag=[];
-					pemin.categorie=pe.categorie;
-					pemin.uuid=pe.uuid;
-					pemin.ecriture_max_value=pe.ecriture_max_value;
-					pemin.ecriture_min_value=pe.ecriture_min_value;
-					
-					pemin.tag_uuid=pe.tag[0].id;
-					pemin.visible=pe.visible;
-					pemin.position_x=pe.position_x;
-					pemin.position_y=pe.position_y;
-					
-					result.tags.push(pemin);	
-				}
-				
-			}
-			var rep = JSON.stringify(result);
-			res.writeHead(200, 
-					{'Content-Type': 'text/plain',
-					 'Access-Control-Allow-Origin': '*'});
-			res.end(rep);
+
+            var sql="Select 'plan_tag' type,pt.* from plan_tag pt where plan='"+variables.idplan+"' "+
+				"union Select 'plan_peripherique' type,pp.* from plan_peripherique pp where plan='"+variables.idplan+"'; ";
+            //var dataarray=[variables.idplan,variables.idplan];
+            global.obj.app.db.sqlorder(sql,
+                function(rows){
+                    if(rows && rows[0]){
+                    	for (var t in rows){
+                    		if(rows[t].type=='plan_tag'){
+                                var pe=global.obj.app.core.findobj(rows[t].tag,'tags');
+                                var pemin={};
+                                pemin.id=rows[t].id;
+                                pemin.table=rows[t].type;
+                                pemin.nom=pe.nom;
+                                pemin.parent_tag=[];
+                                pemin.icon=pe.icon;
+                                pemin.periph_id=pe.id;
+                                pemin.tag_uuid=pe.id;
+                                pemin.uuid=pe.uuid;
+                                pemin.visible=pe.visible;
+                                pemin.position_x=rows[t].position_x;
+                                pemin.position_y=rows[t].position_y;
+                                pemin.icon_plan=rows[t].icon_plan;
+                                pemin.type=pe.type;
+                                pemin.typeprog=pe.typeprog;
+                                result.tags.push(pemin);
+							}
+							if(rows[t].type=='plan_peripherique'){
+                                var pe=global.obj.app.core.findobj(rows[t].tag,'peripheriques');
+                                if (!pe) {
+                                	pe=global.obj.app.core.findobj(rows[t].tag,'peripheriques_chauffage');
+								}
+                                var pemin={};
+                                pemin.id=rows[t].id;
+                                pemin.table=rows[t].type;
+                                pemin.nom=pe.nom;
+                                pemin.periph_id=pe.id;
+                                pemin.parent_tag=[];
+                                pemin.categorie=pe.categorie;
+                                pemin.uuid=pe.uuid;
+                                pemin.ecriture_max_value=pe.ecriture_max_value;
+                                pemin.ecriture_min_value=pe.ecriture_min_value;
+
+                                pemin.tag_uuid=pe.tag[0].id;
+                                pemin.visible=pe.visible;
+                                pemin.position_x=rows[t].position_x;
+                                pemin.position_y=rows[t].position_y;
+
+                                result.tags.push(pemin);
+							}
+						}
+
+                    }
+                    var rep = JSON.stringify(result);
+                    res.writeHead(200,
+                        {'Content-Type': 'text/plain',
+                            'Access-Control-Allow-Origin': '*'});
+                    res.end(rep);
+                }/*, dataarray*/);
+
+
+
 		
 			break;	
 		case 'alltag' :
@@ -447,8 +484,13 @@ module.exports =function(variables,res,user,req){
 					 'Access-Control-Allow-Origin': '*'});
 			res.end(rep);
 		
-			break;	
-		case 'alltagmode' :
+			break;
+        case 'alltagmode' :
+        	var restrictecrituretype="TEMPERATURE";
+            var restrictecrituretype2="SANS";
+		case 'alltagperiphsel' :
+
+
 			/*{"action":"alltagmode","v":"1.1.1"}*/
 			var categorie_id=variables.categorie;
 			
@@ -500,7 +542,7 @@ module.exports =function(variables,res,user,req){
 					/*for (pct in global.obj.peripheriques_chauffage[pc].tag) {*/
 						if (global.obj.peripheriques_chauffage[pc].tag && global.obj.peripheriques_chauffage[pc].tag[0]
 							&& global.obj.peripheriques_chauffage[pc].tag[0].id==tag_id
-							&& global.obj.peripheriques_chauffage[pc].ecriture_type	!="TEMPERATURE"
+							&& global.obj.peripheriques_chauffage[pc].ecriture_type	!=restrictecrituretype
 							&& global.obj.peripheriques_chauffage[pc].categorie_id==categorie_id
 								
 						) {
@@ -520,7 +562,7 @@ module.exports =function(variables,res,user,req){
 					/*for (pct in global.obj.peripheriques_chauffage[pc].tag) {*/
 						if (global.obj.peripheriquesdeportes[pc].tag && global.obj.peripheriquesdeportes[pc].tag[0]
 							&& global.obj.peripheriquesdeportes[pc].tag[0].id==tag_id
-							&& global.obj.peripheriquesdeportes[pc].ecriture_type !="TEMPERATURE"
+							&& global.obj.peripheriquesdeportes[pc].ecriture_type !=restrictecrituretype
 							&& global.obj.peripheriquesdeportes[pc].categorie_id==categorie_id
 						) {
 							var pchauff={};
@@ -539,7 +581,7 @@ module.exports =function(variables,res,user,req){
 					/*for (pct in global.obj.peripheriques_chauffage[pc].tag) {*/
 						if (global.obj.peripheriques[pc].tag && global.obj.peripheriques[pc].tag[0]
 							&& global.obj.peripheriques[pc].tag[0].id==tag_id
-							&& global.obj.peripheriques[pc].ecriture_type !="SANS"
+							&& global.obj.peripheriques[pc].ecriture_type !=restrictecrituretype2
 							&& global.obj.peripheriques[pc].categorie_id==categorie_id
 						) {
 							var pchauff={};
@@ -1847,7 +1889,20 @@ module.exports =function(variables,res,user,req){
 
 
 			break;
+            case 'getplans' :
+                var sql='Select * from plan u;';
+                var self=this
+                global.obj.app.db.sqlorder(sql,
+                    function(rows){
+                        var rep = {};
 
+                        rep=JSON.stringify(rows);
+                        res.writeHead(200,
+                            {'Content-Type': 'text/plain',
+                                'Access-Control-Allow-Origin': '*'});
+                        res.end(rep);
+                    });
+                break;
 			
 			/*********************/
 			/*	case 'allconfig2':

@@ -2,7 +2,7 @@
 
 <dom-module id="my-globaldata">
 
-
+	<script src="../../library/bower_components/polymer-global-variables/dist/polymer-global-variables.js" charset="utf-8"></script>
 	<script>
   Polymer({
 	  is: 'my-globaldata',
@@ -14,11 +14,9 @@
       },
 
 	  set:function(variableName,data){
-	      console.log('set data',variableName);
           Polymer.globalsManager.set(variableName, data);
 	  },
 	  get:function(variableName){
-          console.log('_____get data',variableName);
           return Polymer.globalsManager.get(variableName);
 	  },
 	  getAll:function(){

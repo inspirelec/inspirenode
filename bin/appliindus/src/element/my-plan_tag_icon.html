@@ -28,15 +28,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		      	min-width:1em;
 		      }
   		</style>
-  		<paper-button id="tag_icon" class="tag_icon" on-tap="get_tag_periph" tag_uuid="{{tag.tag_uuid}}" uuid="{{tag.uuid}}">
+  		<paper-button  id="tag_icon" class="tag_icon" on-tap="get_tag_periph" tag_uuid="{{tag.tag_uuid}}" uuid="{{tag.uuid}}">
 	  		<iron-icon icon="{{tag.icon_plan}}" src="{{app.url_http}}:{{app.port_http}}/[[etat_icon]]"></iron-icon>
 	  		{{etat.expr1}}<br/>
 			{{etat.expr2}}<br/>
 			{{etat.expr3}}
 	  		<paper-tooltip>{{tag.nom}}</paper-tooltip>
   		</paper-button>
+
+
+	  <iron-ajax
+			  id="save"
+			  method="POST"
+			  headers="{{app.header_auth}}"
+			  body="{{params_save.body}}"
+			  params="{{params_save.params}}"
+			  content-type="application/json"
+			  handle-as="json"
+			  on-error="_disconnect"
+			  on-response="save_validate"
+			  last-response="{{save_Response}}"
+			  debounce-duration="300">
+	  </iron-ajax>
   </template>
   <script>
+
   Polymer({
 
 	  is: 'my-plan_tag_icon',
@@ -59,15 +75,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	    	 value:null},
 	     plan_dim:{type:Object,
 	    	 notify:true
-	    }
+	    },
+          params_save:{type: Object,
+              notify : true,
+              value: {body:{},params:{action:'save',type:'maj',element:''/*v:'voyage.1.1.1'*/}}
+          },
 	  },
       observers: [
-                  '_update_positions(plan_dim,plan_dim.rect)'
+                  '_update_positions(plan_dim,plan_dim.rect,plan_dim.imagesize,tag.position_x,tag.position_y)'
                 ],
 
 	  ready: function() {
 	        this.app = document.querySelector('#app');
 	      },
+
 	  _update_positions: function(plan_dim){
 		  this.app = document.querySelector('#app');
 		  if (this.tag.position_x && this.tag.position_y) {
@@ -75,15 +96,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			  
 			  this.customStyle['--position-left']=(this.tag.position_x*ratio+plan_dim.rect.left)+"px";
 			  this.customStyle['--position-top']=( this.tag.position_y*ratio+plan_dim.rect.top)+"px";
-			  this.updateStyles();	
+			  this.updateStyles();
 	 
 		  }
 
 	  },
+	  setpositiontag:function(X,Y){
+	    this.set('tag.position_x',X);
+	    this.set('tag.position_y',Y);
+	    this.set('params_save.params.element',this.tag.table);
+          this.set('params_save.body',{data:this.tag});
+          this.$.save.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save.generateRequest();
+	  },
+      movepositiontag:function(X,Y){
+          this.set('tag.position_x',this.tag.position_x*1+X);
+          this.set('tag.position_y',this.tag.position_y*1+Y);
+      },
 	  compute_etat: function(lastupdatetime){
 	    	 this.app = document.querySelector('#app');
-    		 if (this.app.lastetat &&this.app.lastetat['tag_'+this.tag.id] && this.app.lastetat['tag_'+this.tag.id].expression){
-    			 return this.app.lastetat['tag_'+this.tag.id].expression;			 
+    		 if (this.app.lastetat &&this.app.lastetat['tag_'+this.tag.periph_id] && this.app.lastetat['tag_'+this.tag.periph_id].expression){
+    			 return this.app.lastetat['tag_'+this.tag.periph_id].expression;
     		 } else if (this.app.lastetat &&this.app.lastetat[this.tag.uuid] && this.app.lastetat[this.tag.uuid].expression){
     			 return this.app.lastetat[this.tag.uuid].expression;			 
     		 }
@@ -92,9 +125,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  compute_etat_icon: function(lastupdatetime){
 	    	 this.app = document.querySelector('#app');
 			if (this.tag.categorie && this.app.lastetat &&this.app.lastetat[this.tag.uuid] && this.app.lastetat[this.tag.uuid].expression){
-    			if (this.app.lastetat[this.tag.uuid].expression.etat==this.tag.ecriture_max_value) { 
+    			if (this.app.lastetat[this.tag.uuid].expression.etat==this.tag.ecriture_max_value) {
 					return this.tag.categorie.iconmax;		 
-    		 	} else if (this.app.lastetat[this.tag.uuid].expression.etat==this.tag.ecriture_min_value) { 
+    		 	} else if (this.app.lastetat[this.tag.uuid].expression.etat==this.tag.ecriture_min_value) {
 					return this.tag.categorie.iconmin;		 
     		 	} else { 
 					return this.tag.categorie.iconmidle;		 
@@ -104,7 +137,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	      },
 	  get_tag_periph: function(e,a){
 	    	  this.taguuid=e.currentTarget.tag_uuid;
-	    	  this.app.$.location.path="/appliindus/periphListPage/"+this.taguuid;
+	    	  this.app.$.location.path="/"+this.app.url_folder+"/periphListPage/"+this.taguuid;
 	    	  
 	      },
 	  _disconnect: function(obj){

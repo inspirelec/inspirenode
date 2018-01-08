@@ -20,20 +20,14 @@
 <link rel="import" href="/library/bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="/library/bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../element/my-login.html">
+<link rel="import" href="../element/my-alertedrawer.html">
+<link rel="import" href="../element/my-menudrawer.html">
+<link rel="import" href="../element/my-maindrawer.html">
+<link rel="import" href="../element/my-headerdrawer.html">
 
 
 
 
-
-<!-- 
-
-	          
-
-<link rel="import" href="../pages/my-acceuilPage.html">
-<link rel="import" href="../pages/my-periphListPage.html">
-<link rel="import" href="../pages/my-planpage.html">
-<link rel="import" href="../pages/my-progmodepage.html">
-<link rel="import" href="../pages/my-tagListPage.html"> -->
 
 
 <dom-module id="appli-app">
@@ -71,26 +65,7 @@
 	        top: 10px;
 	        
 	    }
-	    .acquiter{
-	       background: #fff;
-	       color: var(--app-primary-color);
-	       padding:10px;
-	    }
-	    .acquiter iron-icon{
-	       padding-left:10px;
-	    }
-	    .touscocher{
-	    	align-self: center;
-		    padding: 8px 16px;
-		    --paper-checkbox-label-spacing: 0;
-		    --paper-checkbox-margin: 8px 16px 8px 0;
-		    --paper-checkbox-vertical-align: top;
-		    width:100%;
-		    text-align:left;
-		    padding:0px 16px;
-	      color: var(--app-primary-color);
-	      line-height:2em;
-	    }
+
       app-header {
         background-color: var(--app-primary-color);
         color: #fff;
@@ -98,95 +73,12 @@
       app-header paper-icon-button {
         --paper-icon-button-ink-color: white;
       }
-      .drawer-list {
-        margin: 0 20px;
-      }
-      
-      .drawer-list a {
-        display: block;
-        padding: 0 16px;
-        line-height: 40px;
-        text-decoration: none;
-        color: var(--app-secondary-color);
-      }
-      .drawer-list a.iron-selected {
-        color: black;
-        font-weight: bold;
-      }
-      .drawer-list a.subroute {
-        padding-left: 32px;
-      }
 
 	  .centered {
       	margin:0 auto;
       }
-      #alerte_etat_0 {
-	    border: 1px solid var(--paper-green-200);
-	    --paper-checkbox-checked-color: var(--paper-green-500);
-	    --paper-checkbox-checked-ink-color: var(--paper-green-500);
-	    --paper-checkbox-unchecked-color: var(--paper-green-900);
-	    --paper-checkbox-unchecked-ink-color: var(--paper-green-900);
-	    --paper-checkbox-label-color: var(--paper-green-500);
-	    }
-	  #alerte_etat_1 {
-	    border: 1px solid var(--paper-red-200);
-	    --paper-checkbox-checked-color: var(--paper-red-500);
-	    --paper-checkbox-checked-ink-color: var(--paper-red-500);
-	    --paper-checkbox-unchecked-color: var(--paper-red-900);
-	    --paper-checkbox-unchecked-ink-color: var(--paper-red-900);
-	    --paper-checkbox-label-color: var(--paper-red-500);
-	    }
-	  .item_alerte {
-	    align-self: center;
-	    padding: 8px 16px;
-	    --paper-checkbox-label-spacing: 0;
-	    --paper-checkbox-margin: 8px 16px 8px 0;
-	    --paper-checkbox-vertical-align: top;
-	    width:100%;
-	    text-align:left;
-	    }
-	  .item_alerte .subtitle {
-	    display: block;
-	    font-size: 0.8em;
-	    margin-top: 2px;
-	    max-width: 150px;
-	  }
-	  
-	  /*
-	 #loginbox {
-      display: block;
-      box-sizing: border-box;
-      text-align: center;
-      margin: 5px;
-      max-width: 250px;
-      min-width: 200px;
-      background:white;
-    }
 
-    #loginbox > h3 {
-      margin-top: 5px;
-    }
 
-    #loginbox ::content img {
-      border-radius: 50%;
-    }
-
-    #loginbox paper-input{
-      margin-left: auto;
-      margin-right: auto;
-      width: 90%;
-    }
-
-    #loginbox paper-material{
-      padding: 15px;
-    }
-
-    #loginbox #submitbutton {
-      margin-top: 10px;
-      width: 90%;
-      background: #4285f4;
-      color: white;
-    }*/
 	  </style>
     
     <app-location id="location" route="{{route}}"></app-location>
@@ -199,152 +91,56 @@
     <!-- login, main, ... -->
 
 
-<!--<app-drawer-layout id="drawerlayalerte" responsiveWidth="150px">-->
+	<template is="dom-if" if="{{_showframedisposition(mainframedisposition,0)}}">
+		<app-drawer-layout id="drawerlayalerte" responsive-width="150px">
+			<app-drawer-layout id="drawerlaymenu" force-narrow responsive-width="500px">
+					<!-- menu gauche -->
+					<app-drawer id="d" class="menu">
+						<my-menudrawer url_folder="{{url_folder}}" subrouteData="{{subrouteData}}" menuresponse="{{menuresponse}}" header_auth="{{header_auth}}"></my-menudrawer>
+					</app-drawer>
+					<app-header-layout>
+						<!-- entete -->
+						<app-header fixed condenses effects="waterfall">
+							<my-headerdrawer alertes_nb="{{alertes_nb}}" alertetoggle="{{alerteopenonly}}" user_auth="[[user_auth]]" menuresponse="{{menuresponse}}" header_auth="{{header_auth}}"></my-headerdrawer>
+						</app-header>
+						<!-- corps -->
+						<my-maindrawer  subroute-data="{{subrouteData}}" lastupdatetime="{{lastupdatetime}}" menuresponse="{{menuresponse}}" header_auth="{{header_auth}}"></my-maindrawer>
+					</app-header-layout>
+			</app-drawer-layout>
+			<!-- menu alerte -->
+			<app-drawer id="AlertesDrawer" class="alertedrawer" align="end" switch-open width="350px">
+				<my-alertedrawer id="AlertesDrawerliste" alertes_nb="{{alertes_nb}}" header_auth="{{header_auth}}" ></my-alertedrawer>
+			</app-drawer>
+		</app-drawer-layout>
+	</template>
 
+	  <template is="dom-if" if="{{_showframedisposition(mainframedisposition,1)}}">
+		  <!--<app-drawer-layout id="drawerlayalerte" responsive-width="150px">-->
+			  <app-drawer-layout id="drawerlaymenu" force-narrow responsive-width="500px">
+				  <!-- menu gauche -->
+				  <app-drawer id="d" class="menu">
+					  <my-menudrawer url_folder="{{url_folder}}" subrouteData="{{subrouteData}}" menuresponse="{{menuresponse}}" header_auth="{{header_auth}}"></my-menudrawer>
+				  </app-drawer>
+				  <app-header-layout>
+					  <!-- entete -->
+					  <app-header fixed condenses effects="waterfall">
+						  <my-headerdrawer alertes_nb="{{alertes_nb}}" alertetoggle="{{alertetoggle}}" user_auth="[[user_auth]]" menuresponse="{{menuresponse}}" header_auth="{{header_auth}}"></my-headerdrawer>
+					  </app-header>
+					  <!-- corps -->
+					  <my-maindrawer  subroute-data="{{subrouteData}}" lastupdatetime="{{lastupdatetime}}" menuresponse="{{menuresponse}}" header_auth="{{header_auth}}"></my-maindrawer>
+				  </app-header-layout>
+			  <!--</app-drawer-layout>-->
+			  <!-- menu alerte -->
+			  <app-drawer id="AlertesDrawer"  class="alertedrawer" align="end" switch-open width="350px">
+				  <my-alertedrawer id="AlertesDrawerliste" alertes_nb="{{alertes_nb}}" header_auth="{{header_auth}}" ></my-alertedrawer>
+			  </app-drawer>
+		  </app-drawer-layout>
+	  </template>
 
-<app-drawer-layout id="drawerlaymenu" responsiveWidth="500px">
-
-    	<!-- menu gauche -->
-    	<app-drawer id="d"> 
-	    	<app-toolbar>Menu</app-toolbar>
-	    		<iron-ajax
-					id="charge_menu"
-				    method="GET"
-				    url="{{charge_menu_url}}"
-				    headers="{{header_auth}}"
-				    params="{{params_configappli}}"
-				    handle-as="json"
-				    on-error="disconnect"
-				    last-response="{{menuResponse}}"
-				    debounce-duration="300">
-				</iron-ajax>
-	        <iron-selector selected="[[subrouteData.page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-                <template is="dom-repeat" items="[[_toArray(menuResponse.menubutton)]]">
-					<a name="[[item.name]]" href="/appliindus/[[item.href]]">[[item.name]]</a>
-		        </template>
-	        </iron-selector>
-    	</app-drawer>
-
-		
-    	<app-header-layout>
-
-		  <app-header fixed condenses effects="waterfall">
-		    <app-toolbar>
-		      <paper-icon-button icon="menu" onclick="document.getElementById('d').toggle();"></paper-icon-button>
-		      <div main-title>[[menuResponse.titre_application.name]]</div>
-			  <div style="font-size:12px">[[user_auth]]</div>
-		      <paper-icon-button id="disconnect" on-tap="disconnect" icon="icons:cancel" alt="disconnect" ></paper-icon-button>
-		      <div>
-		      <paper-icon-button id="number" onclick="document.getElementById('AlertesDrawer').open();" icon="social:notifications" alt="inbox" ></paper-icon-button>
-		      <paper-badge id="alertnotif"  for="number" label="[[alertes_nb]]"></paper-badge>
-			  </div>
-			<!-- <paper-icon-button icon="more-horiz" class="dropdown-trigger" alt="menu"> </paper-icon-button> -->				
-		  
-          <!-- <paper-menu-button> -->
-            
-            <!-- <paper-menu class="dropdown-content">
-                <paper-item>Utilisateurs</paper-item>
-                <paper-item>Reglages</paper-item>
-            </paper-menu>
-          </paper-menu-button> -->
-		    </app-toolbar>
-		  </app-header>
-		 
-		  <iron-pages role="main" selected="[[subrouteData.page]]" attr-for-selected="name">
-	          <my-acceuilPage name="acceuilPage" lastupdatetime="{{lastupdatetime}}"></my-acceuilPage>
-	          <my-tagListPage name="tagListPage"></my-tagListPage>
-	          <my-progmodepage name="progmodepage" ></my-progmodepage>
-	          <my-famillepage name="famillepage" ></my-famillepage>
-	          <my-facturepage name="facturepage" ></my-facturepage>
-	          <my-recupage name="recupage" ></my-recupage>
-	          <my-parametrepage name="parametrepage" ></my-parametrepage>
-			  <my-prog_modes name="prog_modes" ></my-prog_modes>
-			  <my-prog_graphiques name="prog_graphiques" ></my-prog_graphiques>
-	          <my-docPrint name="docPrint" ></my-docPrint>
-	          <my-planpage name="planpage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-planpage>
-	          <my-periphListPage name="periphListPage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-periphListPage>
-			 <!-- <my-testPage name="testPage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-testPage>-->
-          </iron-pages>
-          
-		</app-header-layout>
-
-
- <!-- </app-drawer-layout>-->
-  		<app-drawer id="AlertesDrawer" align="end" swipe-open width="350px">
-				<paper-spinner id="loader_alerte" active$="[[alerte_loader_show]]" style="float:left;margin:6px;z-index:100"></paper-spinner>
-				<paper-button  class="acquiter" on-tap="_send_acquitement">Acquiter<iron-icon  icon="send"></iron-icon> </paper-button>
-				<paper-checkbox on-change="alerte_tous_cocher" id="alerte_checkall" class="touscocher" >
-					  Tous cocher ([[alertes_nb]])
-				</paper-checkbox>
-                <div style="height:100%;overflow: auto;">
-		        <template is="dom-repeat" items="[[alertes]]">
-                <template is="dom-if" if="{{_acquitement_color(item.etat,'1')}}">
-	                <paper-checkbox id="alerte_etat_1" uuid="[[item.uuid]]" class="item_alerte" checked$="{{item.checked}}">
-					  [[item.libelle]]
-					  <br>
-					  <span class="subtitle">
-					    [[item.commentaire]] [[item.date_alerte]]
-					    </br>
-					    Num : [[item.id]] 
-					  </span>
-					</paper-checkbox>
-				</template>
-				<template is="dom-if" if="{{_acquitement_color(item.etat,'0')}}">
-	                <paper-checkbox id="alerte_etat_0" uuid="[[item.uuid]]" class="item_alerte" checked$="{{item.checked}}">
-					  [[item.libelle]]
-					  <br>
-					  <span class="subtitle">
-					    [[item.commentaire]] [[item.date_alerte]]
-					    </br>
-					    Num : [[item.id]] 
-					  </span>
-					</paper-checkbox>
-				</template>
-		        </template>
-		        <div style="height:80px;width:100%"></div>
-		        </div>
-
-		</app-drawer>
-</app-drawer-layout>	
-	<my-login id="loginbox" header_auth="{{header_auth}}"></my-login>
-	<!-- <div  id="loginbox">
-    <paper-material elevation="3">
-      <h3>[[heading]]</h3>
-
-      <content select="[avatar]"></content>
-
-      <form is="iron-form" id="form">
-        <paper-input id="username" 
-          type="text"
-          label="[[usernameInputLabel]]"
-          value="{{username}}" 
-          auto-validate pattern="[[usernameValidationPattern]]"
-          error-message="[[usernameErrorMessage]]"
-          autofocus>
-        </paper-input>
-
-        <paper-input id="password" 
-          type="password" 
-          label="[[passwordInputLabel]]" 
-          value="{{password}}"
-          auto-validate pattern="[[passwordValidationPattern]]"
-          error-message="[[passwordErrorMessage]]">
-        </paper-input>
-
-        <paper-button 
-          id="submitbutton" 
-          raised 
-          on-click="validate">[[submit]]</paper-button>
-         
-      </form>
-      
-    </paper-material>
-    <iron-a11y-keys keys="enter" on-keys-pressed="validate"></iron-a11y-keys>
-	</div>-->
-	
-	
+    <my-login id="loginbox" header_auth="{{header_auth}}"></my-login>
 	<paper-toast id="error_auth_toast" class="error_toast fit-bottom" text="Identification invalide"></paper-toast>
-	
+
+
 	<iron-ajax
 		id="get_config"
 	    auto
@@ -365,17 +161,18 @@
 	    on-error="_error_auth"
 	    debounce-duration="300">
 	</iron-ajax>
-	
-	<iron-ajax
-		id="send_acquitement"
-	    method="GET"
-	    headers="{{header_auth}}"
-	    params={{params_acquitement}}
-	    handle-as="json"
-	    on-response="_acquitement_Reponse"
-	    on-error="disconnect"
-	    debounce-duration="300">
-	</iron-ajax>
+
+	  <iron-ajax
+			  id="charge_menu"
+			  method="GET"
+			  url="{{charge_menu_url}}"
+			  headers="{{header_auth}}"
+			  params="{{params_configappli}}"
+			  handle-as="json"
+			  on-error="disconnect"
+			  last-response="{{menuresponse}}"
+			  debounce-duration="300">
+	  </iron-ajax>
 	
 
 
@@ -392,11 +189,12 @@
       properties: {
     	  config_file:{type:String,
 	          	notify: true,
-		  		value:"/data/config_app_indus.json"},
+		  		value:"config_app.json"},
     	  header_auth: {type: Object, 
     		  	value:null, notify : true },
     	  user_auth: {type: Object, 
     		  	value:null },
+          alertes_nb:{type: Number,notify:true},
     	  charge_menu_url: {type:String, 
     		    notify : true,
     		  	value:null },
@@ -406,14 +204,7 @@
     	  params_configappli:{type: Object,
     	 		notify : true,
     	 		value: {action:'configappli',v:'indus.1.1.1'}},
-    	  params_acquitement:{type: Object,
-    	 		notify : true,
-    	 		value: {action:'setacquitementalerte',v:'indus.1.1.1'}},
-		  alertes:{type: Object,
-			   		value:[]},
-		  alertes_nb:{type: Number,value:0},
-		  alerte_loader_show:{type: Boolean,
-		   		value:true},
+
 		  lastetat:{type: Object,
 			  	notify :true},
 		  lastupdatetime:{type: String,
@@ -433,10 +224,16 @@
 		  url_http:{type:String,
 	          	notify: true,
     		  	value:window.location.protocol+"//"+window.location.hostname},
+		  url_folder:{type:String,
+		        notify:true},
+          alertetoggle:{type:Boolean,notify:true,value:true},
+          alerteopenonly:{type:Boolean,notify:true,value:false},
+          mainframedisposition:{type:Number,notify:true},
+
 		  port_http:{type:String,
 	          	notify: true,
     		  	value:window.location.port||1389},
-
+		  config:{type:Object,notify:true},
     	  queryparams:{type:Object,
     		  notify:true}
     	  
@@ -455,12 +252,17 @@
         },
       _showhidePlan : function(){
     	  var largeur_fenetre=window.innerWidth;
-    	  if (this.$.location.path=="/appliindus/planpage" && largeur_fenetre<1100){
-    		  this.$.location.path="/appliindus/tagListPage";
+    	  if (this.$.location.path=="/"+this.url_folder+"/planpage" && largeur_fenetre<1100){
+    		  this.$.location.path="/"+this.url_folder+"/tagListPage";
     	  } /*else if (this.$.location.path=="/appliindus/tagListPage" && largeur_fenetre>=1100) {
     		  this.$.location.path="/appliindus/planpage";
     	  }*/
       },
+      _showframedisposition: function (code,code2) {
+            //console.log('OK',periph.nom,periph.uuid,ecriture_type,periph.ecriture_type,periph.ecriture_type==ecriture_type);
+
+            return code==code2;
+        },
       _httpadressechange: function(newtypeappli,newpage) {
          //console.log('vous venez de passer sur l appli '+newtypeappli +' page:'+newpage);
          if (!this.header_auth) {
@@ -488,23 +290,27 @@
               this.$.valid_auth.url=this.url_api+':'+this.port_api+'/index'
               this.$.valid_auth.generateRequest();
           }
-          this.$.drawerlaymenu.forceNarrow=true;
+
         },
+
       disconnect : function(){
     	  this.set('header_auth',null);
     	  this.set('compte_id',null);
   	      this.set('user_auth',null);
-  	      this.set('alertes',[]);
+
   	      this.set('lastupdatetime',null);
-  	      this.$.alertnotif.label=0;
-    	  this.$.location.path="/appliindus/";
+
+    	  this.$.location.path="/"+this.url_folder+"/";
      	 this.$.loginbox.openlogin();
       },
       _seturls_ports : function(event){
         	var data=event.detail.response
         	if (data) {
             	this.port_api=data.apiport || 1338;
-            	this.port_http=data.httpport || 1339;	
+            	this.port_http=data.httpport || 1339;
+            	this.url_folder=data.appli_link_adr_web;
+				this.set('mainframedisposition',data.mainframedisposition);
+            	this.set('config',data);
         	}
 
        },
@@ -513,6 +319,7 @@
     	    //console.log('authentification valide',data.id);
     	    this.set('compte_id',data.id);
     	    this.set('user_auth',data.user);
+    	    this.set('droit_tarif',data.droit_tarif);
     	    this.$.loginbox.closelogin();
     	    this._charge_appli();
           },
@@ -524,43 +331,9 @@
       _charge_appli: function(){
     	  this.charge_menu_url=this.url_api+':'+this.port_api+'/index'
           this.$.charge_menu.generateRequest();
-    	  this.$.location.path="/appliindus/planpage";
+    	  this.$.location.path="/"+this.url_folder+"/planpage";
       },
-      _acquitement_Reponse: function(){
-    	  //console.log('update style acquitements');
-    	  this.updateStyles();	
-    	  this.set('alerte_loader_show',false);
-      },
-      _acquitement_color: function(etat,test){
-    	  return etat==test;
-      },
-      alerte_tous_cocher:function(a,b,c){
-    	  var list= document.querySelectorAll('.item_alerte');
-    	  for (var c in list){
-    		  list[c].checked=a.currentTarget.checked;
-    	  }
-      },
-      _send_acquitement: function(){
-    	  this.set('alerte_loader_show',true);
-    	  var list= document.querySelectorAll('.item_alerte');
-    	  var rep=[];
-    	  for (var c in list){
-    		  
-    		  if (list[c].checked){
-    			  //console.log('acquitement '+list[c].uuid);
-    			  rep.push(list[c].uuid);
-    		  } else {
-    			 // console.log('non acquit� '+list[c].uuid);
-    		  }
-    	  }
-    	  if (rep.length>0){
-        	  this.params_acquitement.data=rep;
-              this.$.send_acquitement.url=this.url_api+':'+this.port_api+'/index'
-              this.$.send_acquitement.generateRequest(); 
-    	  }
 
-    	  //console.log('fin');
-      },
    	  _toArray: function(obj) {
    		  var arrayobj= Object.keys(obj).map(function(key) {
    			  var objnew=obj[key];

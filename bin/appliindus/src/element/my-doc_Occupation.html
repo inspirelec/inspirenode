@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="/library/bower_components/polymer/polymer.html">
 
 <dom-module id="my-doc_Occupation">
 		  <template>
@@ -147,10 +147,46 @@
 				</tbody></table>
 			</div>	
 			<div >
+				<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%">
+						<td style="width: 100%">
+							<p class="titre">ETAT CIVIL ARRIVEE</p>
+						</td>
+					</tr>
+					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%"><td style="width: 100%">
+						<table style=" border-radius:4px; border:1px solid #636363;width: 100%"><tbody>
+							<tr>
+							   <td style="width: 50%">
+								   <template is="dom-repeat" items="[[stat_etatcivil]]" as="lig">
+										{{lig.nom}} <br/>
+									</template>
+								<br/>
+								Total
+							   </td>
+
+							   <td style=" width: 20%">
+								   <template is="dom-repeat" items="[[stat_etatcivil]]" as="lig">
+										{{lig.nb_arrive}} <br/>
+									</template>
+								_____<br/>
+								{{stat_etatcivil_nbpersonne_arrive}}
+							   </td>
+
+							   <td style=" width: 30%">
+								<br/>
+								<br/>
+							   </td>
+							</tr>
+							</td>
+						</tbody></table>
+					</tr>
+				</tbody></table>
+			</div>
+			<div >
 				<table style=" border-radius:4px; border:1px solid #636363;width: 100%" ><tbody>
 					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%">
 						<td style="width: 100%">
-							<p class="titre">COMPOSITION DES MENAGES ACCUEILLIS</p>	
+							<p class="titre">COMPOSITION DES MENAGES ACCUEILLIS</p>
 						</td>							
 					</tr>	
 					<tr style=" border-radius:4px; border:1px solid #636363;width: 100%"><td style="width: 100%">
@@ -287,6 +323,7 @@
 			     
 				 /*nombres calculés*/
 				 stat_etatcivil_nbpersonne:{type:Number,notify:true,value:0},
+				 stat_etatcivil_nbpersonne_arrive:{type:Number,notify:true,value:0},
 			     stat_caf_nbtpcaf:{type:Number,notify:true,value:0},
 				 stat_duree_nbduree:{type:Number,notify:true,value:0},
 				 stat_age_nbage:{type:Number,notify:true,value:0},
@@ -306,9 +343,10 @@
 			        this.app = document.querySelector('#app');
 			        /*prise en compte des dates dans la requete envoyée au serveur pour la liste des séjours*/
 			        if (this.params_get_sejours && selection_query && selection_query.date1 && selection_query.date2) {
-			        	this.params_get_sejours.date_debut=" between '"+selection_query.date1+"' and '"+selection_query.date2+"'";
+			        	this.params_get_sejours.date_debut="<='"+selection_query.date2+"'";
+			        	this.params_get_sejours.date_fin=">='"+selection_query.date1+"'";
 			        } else if (this.params_get_sejours && selection_query && selection_query.date1) {
-			        	this.params_get_sejours.date_debut=">='"+selection_query.date1+"'";
+			        	this.params_get_sejours.date_fin=">='"+selection_query.date1+"'";
 			        } else if (this.params_get_sejours && selection_query && selection_query.date2) {
 			        	this.params_get_sejours.date_debut="<='"+selection_query.date2+"'";
 			        } else if (this.params_get_sejours) {
@@ -360,9 +398,15 @@
 								
 								
 				  for (var s in sejours){ /*boucle sejour*/
-				    if (!sejours[s].clos){
-						var dateD = new Date(sejours[s].date_debut); 
-						var dateF = new Date(sejours[s].date_fin); 
+				    if (1==1){
+						var dateD = new Date(sejours[s].date_debut);
+							/*dateD.setDate(dateD.getDate()+1);		*/
+						if (sejours[s].clos==1){
+							var dateF = new Date(sejours[s].date_fin);
+						}else{
+							var dateF = new Date();
+						}
+
 						var tmp = dateF-dateD;
 						var diff_day = Math.floor(tmp/1000/60/60/24);
 						
@@ -375,6 +419,7 @@
 						
 						nb_duree+= 1;
 					}
+
 				  }
 				  /*poucentage*/
 				  for (var s in durees){
@@ -421,7 +466,7 @@
 						 
 							 nb_age+= 1;
 							for (var m in personnes){ /*boucle membre*/
-								if (personnes[m].titulaire_id=personnes[t.id]){ /*si membre du titulaire*/
+								if (personnes[m].titulaire_id==personnes[t].id){ /*si membre du titulaire*/
 									var dateNaissance = new Date(personnes[m].datenaissance); 
 									if (!dateNaissance){							
 										ages[5].nb += 1;
@@ -459,17 +504,31 @@
 			  compute_etatcivil:function(sexes,personnes,sejours,selection_query){				  
 				  for (var s in sexes){
 					  sexes[s].nb=0;
+					  sexes[s].nb_arrive=0;
 				  }
 				  var nb_personnes=0;
+				  var nb_personnes_arrive=0;
 				  for (var s in sejours){ /*boucle sejour*/
 					  for (var t in personnes){ /*boucle titulaire*/
 						 if (!personnes[t].titulaire_id && sejours[s].titulaire_id==personnes[t].id){ /*si titulaire du sejour*/
-							 this._getobjinliste(sexes,personnes[t].sexe).nb += 1
+							 this._getobjinliste(sexes,personnes[t].sexe).nb += 1;
 							 nb_personnes+= 1;
+							 var dateSejour = new Date(sejours[s].date_debut);
+							 var datedeb = new Date(selection_query.date1);
+							 if (dateSejour >= datedeb){
+								this._getobjinliste(sexes,personnes[t].sexe).nb_arrive += 1;
+								nb_personnes_arrive+= 1;
+							 }
 							for (var m in personnes){ /*boucle membre*/
-								if (personnes[m].titulaire_id=personnes[t.id]){ /*si membre du titulaire*/
-									this._getobjinliste(sexes,personnes[t].sexe).nb += 1;
+								if (personnes[m].titulaire_id==personnes[t].id){ /*si membre du titulaire*/
+									this._getobjinliste(sexes,personnes[m].sexe).nb += 1;
 									nb_personnes+= 1;
+									 var dateSejour = new Date(sejours[s].date_debut);
+									 var datedeb = new Date(selection_query.date1);
+									 if (dateSejour >= datedeb){
+										this._getobjinliste(sexes,personnes[m].sexe).nb_arrive += 1;
+										nb_personnes_arrive+= 1;
+									 }
 								}
 							} 
 						 } 
@@ -480,7 +539,8 @@
 					  sexes[s].pourc=Math.round(sexes[s].nb/nb_personnes*1000)/10;
 				  }
 				  this.set('stat_etatcivil_nbpersonne',nb_personnes);
-				  
+				  this.set('stat_etatcivil_nbpersonne_arrive',nb_personnes_arrive);
+
 				  return sexes;
 			  },
 			  

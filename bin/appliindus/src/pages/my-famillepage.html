@@ -8,7 +8,7 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="/library/bower_components/app-layout/app-grid/app-grid-style.html">
 
 
 <link rel="import" href="../majcore/my-liste_behavior.html">
@@ -28,15 +28,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			--liste_overflow:auto;
 		}
     </style>
-    
-    <app-location  route="{{route}}"></app-location>
-    <!-- ip.../appli/main -->
-    <app-route  route="{{route}}" pattern="/:typeappli" data="{{routeData}}" tail="{{subroute}}"></app-route>
-    <!-- reglages, appli, applicamp ... -->
-    <app-route  route="{{subroute}}"  pattern="/:page"   data="{{subrouteData}}" tail="{{uuidroute}}"></app-route>
-    <!-- uuid ... -->
-    <app-route  route="{{uuidroute}}"  pattern="/:page"   data="{{uuidrouteData}}"></app-route>
-  
+
+
+    <my-urlmanager pattern="/:typeappli/:page/:uuid" constraint="/:appliairevoyage/:famillepage" data="{{subrouteData}}"></my-urlmanager>
+
 	<my-liste_familles charge_table selitem="[[selitem]]" ></my-liste_familles>
 	
 
@@ -50,17 +45,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  properties: {  
 		     selitem:{type:Number,
 		    	 	notify : true,
-		    	 	computed:'_selitem(subrouteData.page,uuidrouteData.page)'  
-		    	 },   
+		    	 	computed:'_selitem(subrouteData.page,subrouteData.uuid)'
+		    	 },
 	  },
 	  _selitem:function(subroutepage,uuidroutepage){
-		  //console.log(subroutepage,uuidroutepage);
+		  console.log(subroutepage,uuidroutepage);
 		  if (subroutepage=='famillepage') {
 			  return uuidroutepage;
 		  } else {
 			  return null;
 		  }
-		  
+
 	  }
     });
   </script>

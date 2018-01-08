@@ -79,6 +79,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	     dropdown_selobj:{type:Object,notify:true},
 	     value_sel:{type:Number,notify:true,value:6},
 	     charge_table:{type:Boolean,notify:true},
+		 searchmode:{type:Boolean,notify:true},
 	     searchquery:{type:String,
 	    	 notify:true,
 	    	 value:""
@@ -86,10 +87,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  },
 	 
 	  observers:[
-		  '_selection_titulaire(titulairesel,searchmode)',
+		  '_selection_titulaire(titulairesel,searchmode,famille_id)',
 	  ],
-	  _selection_titulaire(titulairesel,searchmode){
-		  if (searchmode) {
+	  _selection_titulaire:function(titulairesel,searchmode,famille_id){
+		  if (searchmode && famille_id && titulairesel) {
+			  this.set('titulaire',titulairesel);
+		  } else if (searchmode && !famille_id && !titulairesel){
 			  this.set('titulaire',titulairesel);  
 		  }
 	  },
@@ -114,8 +117,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					 modification:true,
 					 suppression:false,
 					 impression:true};
-		  } if (titulaire && titulaire.spe && titulaire.spe=='listfactures'){
+		  } else if (titulaire && titulaire.spe && titulaire.spe=='listfactures'){
 			  return {creation:false,
+					 modification:true,
+					 suppression:false,
+					 impression:true};
+		  } else if (this.searchmode) {
+		  	  return {creation:false,
 					 modification:true,
 					 suppression:false,
 					 impression:true};

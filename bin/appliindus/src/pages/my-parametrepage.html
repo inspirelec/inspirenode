@@ -23,6 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../element/my-liste_aires.html">
 <link rel="import" href="../element/my-liste_emplacements.html">
 <link rel="import" href="../element/my-liste_joursconsignes.html">
+<link rel="import" href="../element/my-liste_constantes.html">
 
 <dom-module id="my-parametrepage">
 
@@ -37,16 +38,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
 	<div>
-		<!--<my-liste_tarifs charge_table class="parametres_zone" ></my-liste_tarifs>
-		 <my-liste_type_operation charge_table class="parametres_zone"></my-liste_type_operation>
-		 <my-liste_type_paiement charge_table class="parametres_zone"></my-liste_type_paiement>
-		<my-liste_typecafs charge_table class="parametres_zone"></my-liste_typecafs>
-		<my-liste_sexes charge_table class="parametres_zone"></my-liste_sexes>
-		<my-liste_societes charge_table class="parametres_zone"></my-liste_societes>
-		<my-liste_aires charge_table class="parametres_zone"></my-liste_aires>
-		-->
-		<my-liste_emplacements charge_table class="parametres_zone"></my-liste_emplacements>
-		<my-liste_joursconsignes charge_table class="parametres_zone"></my-liste_joursconsignes>
+
+
+        <template is="dom-if" if="{{params.tarifs}}">
+            <my-liste_tarifs charge_table class="parametres_zone" ></my-liste_tarifs>
+        </template>
+        <template is="dom-if" if="{{params.type_operation}}">
+            <my-liste_type_operation charge_table class="parametres_zone"></my-liste_type_operation>
+        </template>
+        <template is="dom-if" if="{{params.type_paiement}}">
+            <my-liste_type_paiement charge_table class="parametres_zone"></my-liste_type_paiement>
+        </template>
+        <template is="dom-if" if="{{params.typecafs}}">
+            <my-liste_typecafs charge_table class="parametres_zone"></my-liste_typecafs>
+        </template>
+        <template is="dom-if" if="{{params.sexes}}">
+            <my-liste_sexes charge_table class="parametres_zone"></my-liste_sexes>
+        </template>
+        <template is="dom-if" if="{{params.societes}}">
+            <my-liste_societes charge_table class="parametres_zone"></my-liste_societes>
+        </template>
+        <template is="dom-if" if="{{params.aires}}">
+            <my-liste_aires charge_table class="parametres_zone"></my-liste_aires>
+        </template>
+        <template is="dom-if" if="{{params.emplacements}}">
+		    <my-liste_emplacements charge_table class="parametres_zone"></my-liste_emplacements>
+        </template>
+        <template is="dom-if" if="{{params.jourconsignes}}">
+		    <my-liste_joursconsignes charge_table class="parametres_zone"></my-liste_joursconsignes>
+        </template>
+        <template is="dom-if" if="{{params.constantes}}">
+            <my-liste_constantes charge_table class="parametres_zone"></my-liste_constantes>
+        </template>
 	</div>
   </template>
 
@@ -55,8 +78,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     Polymer({
 
       is: 'my-parametrepage',
-    	  properties: {  
+    	  properties: {
+              params:{type:Object,notify:true}
     	  }
+
     });
   </script>
 

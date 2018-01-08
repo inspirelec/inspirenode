@@ -13,6 +13,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 		<style>
+			.regionscroll {
+				max-height: var(--liste_maxheight);
+				overflow: var(--liste_overflow);
+			}
   		</style>
   		
   	 	<my-profil_behavior 
@@ -28,15 +32,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   	 	 	parentfield_id="titulaire_id"
   	 	 	doc_print_link="{{doc_print_link}}"
   	 	 	grants_acces="{{grants_acces}}"
+			hidealwaysbottombutton="{{hidealwaysbottombutton}}"
   	 	 	hideother_onedit="{{hideother_onedit}}"
   	 	 	hideothereditbutton_onedit="{{hideothereditbutton_onedit}}"
   	 	 	return_onsave=false
+			savfireeventonly=true
   		> 
   		
 
 	  		
 	  		<div class="reduit">
-				{{objet.facture_num}}, {{objet.date}}, {{objet.libelle}}
+				{{objet.facture_num}}, {{objet.date}}, {{objet.libelle}} <i>[[familleinfo.nom]] [[familleinfo.prenom1]]</i>
 	  		</div>
 	  		
 	  		
@@ -49,15 +55,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				</div>
 			    <div class="ligne">
 				 	 <paper-input class="input3cols" id="libelle" label="Libelle" required  type="text" value="{{objet.libelle}}"></paper-input>
-				</div>          
-				<template is="dom-repeat" items="{{liste_soustable2}}">
-					<template is="dom-if" if="{{show_ecriture_lgn_choice(objet.id,item.id,objet.facture_num,item.facture_num)}}">
-						<div><paper-checkbox class="lgn_ecr" obj="{{item}}" checked>{{item.checked}}[[item.recu_num]] du [[item.date]], [[item.type_operation]] de [[item.signe]][[item.montant]]€</paper-checkbox></div>
+				</div>
+				<div id="regionscroll" class="regionscroll">
+					<template is="dom-repeat" items="{{liste_soustable2}}">
+						<template is="dom-if" if="{{show_ecriture_lgn_choice(objet.id,item.id,objet.facture_num,item.facture_num)}}">
+							<div><paper-checkbox class="lgn_ecr" obj="{{item}}" checked>{{item.checked}}[[item.recu_num]] du [[item.date]], [[item.type_operation]] de [[item.signe]][[item.montant]]€</paper-checkbox></div>
+						</template>
+						<template is="dom-if" if="{{show_ecriture_lgn(objet.id,item.id,objet.facture_num,item.facture_num)}}">
+							<div><paper-checkbox class="lgn_ecr" obj="{{item}}" checked disabled>{{item.checked}}[[item.recu_num]] du [[item.date]], [[item.type_operation]] de [[item.signe]][[item.montant]]€</paper-checkbox></div>
+						</template>
 					</template>
-					<template is="dom-if" if="{{show_ecriture_lgn(objet.id,item.id,objet.facture_num,item.facture_num)}}">
-						<div><paper-checkbox class="lgn_ecr" obj="{{item}}" checked disabled>{{item.checked}}[[item.recu_num]] du [[item.date]], [[item.type_operation]] de [[item.signe]][[item.montant]]€</paper-checkbox></div>
-					</template>
-				</template>
+				</div>
 	  		</div>
 	 <iron-ajax
 		id="charge_compte_ecr"
@@ -86,13 +94,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		</iron-ajax>
   		
   		</my-profil_behavior>
-	  <iron-ajax
-		id="get_new_facture_num"			    method="GET"
-	    url="{{new_facture_url}}"	    		headers="{{app.header_auth}}"
-	    params="{{params_new_facture.params}}"	handle-as="json"   	on-error="_disconnect"
-	    last-response="{{new_facture}}"   		debounce-duration="300"
-	    on-response="set_facture">
-	</iron-ajax>
+		 <iron-ajax
+			id="get_new_facture_num"			    method="GET"
+			url="{{new_facture_url}}"	    		headers="{{app.header_auth}}"
+			params="{{params_new_facture.params}}"	handle-as="json"   	on-error="_disconnect"
+			last-response="{{new_facture}}"   		debounce-duration="300"
+			on-response="set_facture">
+		</iron-ajax>
+		<iron-ajax
+			id="charge_familleinfo"
+			method="GET"
+			url="{{familleinfo_url}}"
+			headers="{{app.header_auth}}"
+			params="{{params_get_familleinfo}}"
+			handle-as="json"
+			on-error="_disconnect"
+			last-response="{{famillesinfo}}"
+			debounce-duration="300">
+		</iron-ajax>
   </template>
   <script>
   Polymer({
@@ -111,9 +130,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	   	 	  notify : true,
 	   	 	  value:{type:'get',action:'listcompte_ecriture',facture_num:''}
 	     },
+		 params_get_familleinfo:{type: Object,
+	   	 	  notify : true,
+	   	 	  value:{type:'get',action:'detailpersonne',id:-1}
+	     },
 	     params_save:{type: Object,
 	   	 	  notify : true,
-	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'facture'/*v:'voyage.1.1.1'*/}}
+	   	 	  value: {body:{},params:{action:'savefacture',element:'facture',v:'voyage.1.1.1'}}
 	        },
 	     params_ecr_save:{type: Object,
 	   	 	  notify : true,
@@ -128,23 +151,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	   	 	  value: {body:{},params:{action:'getfacture_num',v:'voyage.1.1.1'}}
 	        },
 	     edited_item_id:{notify : true},
-	     
+
+	     famillesinfo:{type: Array,
+	   	 	  notify : true,
+	     },
+		 familleinfo:{type: Object,
+	   	 	  notify : true,
+			  computed:'_getfamille_info(famillesinfo)'
+	     },
+
 	     doc_print_link:{type:String,
 	    	 notify:true,
 	    	 computed:'_getprintlink(objet)'},
-		 // index de compteur	 
+
+		 searchmode:{type:Boolean,notify:true},
+		 // index de compteur
 		 index_fac_eau:{type:Number,notify:true,value:0},
 		 index_fac_elec:{type:Number,notify:true,value:0},
 		 date_fac:{type:Number,notify:true,value:0}
 	     
 	  },
 	  listeners: {
-          'save_validate': 'savethis_ecr',
+          /*'save_validate': 'savethis_ecr',*/
+          'save_requested': 'saverequested'
         },
 	  observers: [
           '_calculfacture_num(objet.id,objet)',
           '_calculdate(objet)',
           '_edited_item_change(edited_item_id,objet)',
+		  '_chargefamille(searchmode,objet.titulaire_id,objet)'
         ],
 	  _getprintlink:function(objet){
 		  if (objet && objet.id) {
@@ -153,6 +188,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			  return null;
 		  }
 		  
+	  },
+	  _getfamille_info:function(famillesinfo){
+		  if (famillesinfo && famillesinfo[0]){
+			  return famillesinfo[0];
+		  }
+		  return null;
 	  },
 	  _getparams_get:function(obj_id,objet){
 		  return {type:'get',action:'detailfacture',id:obj_id}
@@ -166,22 +207,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			  }
 		  	  this.set('show_loading',1);
 			  this.app = document.querySelector('#app');
-		      this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
+		      this.charge_url=this.app.url_api+':'+this.app.port_api+'/index';
 		      this.$.charge_compte_ecr.generateRequest();  
 		  }
 	  },
-	  retour_cpt_ecr:function(){
+	  /*retour_cpt_ecr:function(){
 		  this.set('show_loading',0);
+	  },*/
+	 _chargefamille:function(searchmode,titulaire_id,objet){
+			console.log(searchmode,titulaire_id);
+			if (searchmode){
+			   this.params_get_familleinfo.id=titulaire_id;
+			   this.app = document.querySelector('#app');
+		      this.familleinfo_url=this.app.url_api+':'+this.app.port_api+'/index';
+		      this.$.charge_familleinfo.generateRequest();
+			}
 	  },
 	  _calculfacture_num:function(id,objet){
 
-			if(id<0 && objet &&	(objet.facture_num=="" || !objet.facture_num)){
+			/*if(id<0 && objet &&	(objet.facture_num=="" || !objet.facture_num)){
 				this.app = document.querySelector('#app');
 				this.set('objet.facture_num','...');
 		        this.app = document.querySelector('#app');
 				this.$.get_new_facture_num.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
 		        this.$.get_new_facture_num.generateRequest();
-			}
+			}*/
+          if(id<0 && objet &&	(objet.facture_num=="" || !objet.facture_num)){
+              this.set('objet.facture_num','Fxxxxxxxx')  ;
+          }
+
 	  },
 	  _calculdate:function(objet){
 		  if (!objet.date) {
@@ -194,12 +248,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			  this.set('objet.date',yyyy+'-'+mm+'-'+dd);
 		  }
 	  },
-	  set_facture:function(){
-	        this.set('objet.facture_num',this.new_facture.num)  ;
-		  
-	  },
+
 	  show_ecriture_lgn_choice: function (facture_id,ecriture_id,facture_num,ecriture_factnum) {
-			if (facture_id<0 && ecriture_id>=0 && (!ecriture_factnum || facture_num==ecriture_factnum)){
+			if (facture_id<0 && ecriture_id>=0 && (!ecriture_factnum || facture_num==ecriture_factnum )){
 				return true;
 			} else {
 				return false;
@@ -214,7 +265,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			}
   	    
   	 },
-   	  savethis_ecr:function (event) {
+      saverequested:function(event,detail,moreecritures){
+	      console.log('save requested',detail);
+	      var facture=detail;
+	      facture.ecritures=this._get_ecr_cochees();
+	      if (moreecritures){
+
+	          for (var a in moreecritures){
+	          		if(moreecritures[a].id<0 && moreecritures[a] &&	(moreecritures[a].recu_num=="" || !moreecritures[a].recu_num)){
+              			moreecritures[a].recu_num='Rxxxxxxxx';  ;
+          			}
+                facture.ecritures.push(moreecritures[a]);
+			     }
+		  }
+	      this.$.profilfacture.sendsaveobj(facture);
+	  },
+	  get_ecr_cochess:function(){
+        return this._get_ecr_cochees();
+	  },
+   	  _get_ecr_cochees:function () {
 		  this.set('show_loading',1);
 		  this.app = document.querySelector('#app');
 		  var list= document.querySelectorAll('.lgn_ecr');
@@ -233,15 +302,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     			 // console.log('non acquit� '+list[c].uuid);
     		  }
     	  }
-		  this.set('params_ecr_save.body',{data:rep});
+    	  return rep;
+		 /* this.set('params_ecr_save.body',{data:rep});
 		  this.$.save_ecritures.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
-          this.$.save_ecritures.generateRequest();
+          this.$.save_ecritures.generateRequest();*/
 
       },
       
       save_ecr_validate:function(e,r,t){
     	  /*var liste_compteectritures = document.querySelector('#fam_liste_compte_ecritures'+this.objet.titulaire_id);
     	  liste_compteectritures.refreshthis();*/
+          this.set('show_loading',0);
 		  if (this.return_onsave){
 			  this.reply();
 		  }

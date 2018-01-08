@@ -14,7 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
 		<style>
   		</style>
-  		
+
   	 	<my-profil_behavior 
   	 		id="profilfamillesejour"
 	  		table_code="sejour" 
@@ -91,7 +91,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   		 		
   		
   		</my-profil_behavior>
-	  		
+
 	  	<iron-ajax
 			id="charge_tagclicked"
 		    method="GET"
@@ -214,8 +214,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  
 	  
       gettagclicked:function(){
-    	    this.$.profilfamillesejour.app.$.location.path="/appliairevoyage/periphListPage/"+this.emplobj_sel.uuid;
-			this.$.profilfamillesejour.app.$.location.path="/appliairevoyage/periphListPage/"+this.emplobj_sel.uuid;
+    	    this.$.profilfamillesejour.app.$.location.path="/appliairevoyage/periphListPage/"+this.emplobj_sel.id;
+			this.$.profilfamillesejour.app.$.location.path="/appliairevoyage/periphListPage/"+this.emplobj_sel.id;
 	  },
 
 	  getcompteurelec0:function(elem){

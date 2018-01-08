@@ -6,9 +6,12 @@
 	<script>
   Polymer({
 	  is: 'my-globaldata',
-	  properties: {
-
-	  },
+      properties: {
+          ignoreGlobalProperties: {
+              type: Boolean,
+              value: true
+          }
+      },
 
 	  set:function(variableName,data){
           Polymer.globalsManager.set(variableName, data);

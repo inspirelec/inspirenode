@@ -78,6 +78,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		 	right:5px;
     		color: var(--paper-blue-500);
 		 }
+
 		 .regionscroll {
 	        max-height: var(--liste_maxheight);
 	        overflow: var(--liste_overflow);
@@ -155,8 +156,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 						          </template>		
 						          <template is="dom-if" if="{{show_element(detail_code,'my-profiljoursconsigne')}}">
 						          	<my-profiljoursconsigne id="[[item.id]]" searchmode="{{searchmode}}" name="my-profiljoursconsigne" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" liste_soustable2="{{liste_soustable2}}" parent="{{parent}}"></my-profiljoursconsigne>
-						          </template>					          						          		
-					        </template>
+						          </template>
+									<template is="dom-if" if="{{show_element(detail_code,'my-profilconstante')}}">
+										<my-profilconstante id="[[item.id]]" searchmode="{{searchmode}}" name="my-profilconstante" hideothereditbutton_onedit="{{hideothereditbutton_onedit}}" hideother_onedit="{{hideother_onedit}}" edited_item_id="{{edited_item_id}}" objet="{{item}}" grants_acces="{{grants_acces}}" liste_soustable="{{liste_soustable}}" liste_soustable2="{{liste_soustable2}}" parent="{{parent}}"></my-profilconstante>
+									</template>
+							</template>
 					    </li>
 					</template>
 				</ul>

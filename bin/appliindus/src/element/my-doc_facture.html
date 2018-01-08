@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="/library/bower_components/polymer/polymer.html">
 
 <dom-module id="my-doc_facture">
 		  <template>
@@ -105,9 +105,9 @@
 			<div class="cadre">
 				  <p class="facture"><b>Facture N°{{facture_sel.facture_num}}, le {{facture_sel.date}}</b></p>			  
 				  <b>Dates de séjours : 
-					  <template is="dom-repeat" items="[[sejours]]" as="sejour">
-						<div class="sejour">du {{sejour.date_debut}} au {{sejour.date_fin}}</div>
-					  </template>
+					  <!--<template is="dom-repeat" items="[[sejour_sel]]" as="sejour">-->
+						<div class="sejour">du {{sejour_sel.date_debut}} au {{sejour_sel.date_fin}}</div>
+					  <!--</template>-->
 				  </b>
 				  </br>
 				 
@@ -279,7 +279,10 @@
 		   		 params_get_typeop:{type: Object,
 			   	 	  notify : true,
 			   	 	  value: {type:'get',action:'listtype_operation'}},
-					  
+
+				  sejour_sel:{type:Object,
+			    	  notify:true,
+			    	  computed: 'computesejour_sel(factures, sejours)'},
 			      facture_sel:{type:Object,
 			    	  notify:true,
 			    	  computed: 'computefacture_sel(factures)'},
@@ -382,7 +385,7 @@
 					  }
 					}
 				  }
-			  
+			      total=total.toFixed(2);
 				  this.set('total_fluide',total);
 				  return fluides;
 			  },
@@ -403,11 +406,28 @@
 					  }
 					}
 				  }
-			  
+			      total1=total1.toFixed(2);
+
 				  this.set('total_caution',total1);
 				  return caution;			  
 			  },
-			  computeaire_sel:function(aires){		  
+			  computesejour_sel:function(factures, sejours){
+				for (var s in sejours){
+					for (var f in factures){
+						var date_fac= new Date(factures[f].date);
+						date_fac.setHours(0, 0, 0, 0);
+						var date_fin_sejour= new Date(sejours[s].date_fin);
+						date_fin_sejour.setHours(0, 0, 0, 0);
+						var diff_date = date_fac-date_fin_sejour;
+
+						if( diff_date <= 1 && diff_date >= -1 ){
+							var selec_sejour = sejours[s];
+							return selec_sejour;
+						}
+					}
+				}
+			  },
+			  computeaire_sel:function(aires){
 				  return this._getobjinliste(aires,1);
 			  },
 			  computesociete_sel:function(societes){				  

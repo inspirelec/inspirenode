@@ -107,10 +107,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			   }
 			}	 ,
 
-		  _toArray(obj){
+		  _toArray:function(obj){
 		    	  return this.app._toArray(obj);
 		      },
-		  _disconnect(obj){
+		  _disconnect:function(obj){
 		    	  this.app = document.querySelector('#app');
 		    	  return this.app.disconnect();
 		      },

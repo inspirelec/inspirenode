@@ -7,11 +7,23 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-
+<link rel="import" href="/library/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/library/bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="/library/bower_components/iron-icons/editor-icons.html">
 <dom-module id="my-liste_famillesejours">
 
   <template>
 		<style >
+			.otherbutton{
+				position:absolute;
+				top:5px;
+				right:55px;
+				color: var(--paper-blue-500);
+			}
+			paper-dialog{
+				width:600px;
+				height:700px;
+			}
   		</style>
   		<my-sous_liste_behavior class="parametres_zone"
   			
@@ -37,32 +49,446 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   			dropdown_selobj="{{dropdown_selobj}}"
   			
   			liste_objets="{{liste_objets}}"  		>
-	
+		<paper-icon-button  class="otherbutton" mini icon="editor:attach-money" title="Cloture séjour" on-tap="cloturethis"></paper-icon-button>
 		</my-sous_liste_behavior>
+	  <iron-ajax
+			  id="refresh_infos_cloture"			    method="POST"
+			  url="{{refresh_infos_url}}"	    		headers="{{app.header_auth}}"
+			  params="{{params_refresh_infos.params}}"	handle-as="json"   	on-error="_disconnect"
+			  body="{{params_refresh_infos.body}}"      content-type="application/json"
+			  last-response="{{refresh_infos_cloture}}"   		debounce-duration="300"
+			  on-response="receive_infos_cloture">
+	  </iron-ajax>
+	  <iron-ajax
+			  id="restore_infos_cloture"			    method="POST"
+			  url="{{refresh_infos_url}}"	    		headers="{{app.header_auth}}"
+			  params="{{params_refresh_infos.params}}"	handle-as="json"   	on-error="_disconnect"
+			  body="{{params_refresh_infos.body}}"      content-type="application/json"
+			     		debounce-duration="300"
+			  >
+	  </iron-ajax>
+	  <iron-ajax
+			  id="cloture_sejour"			    method="POST"
+			  url="{{refresh_infos_url}}"	    		headers="{{app.header_auth}}"
+			  params="{{params_cloture_sejour.params}}"	handle-as="json"   	on-error="_disconnect"
+			  body="{{params_cloture_sejour.body}}"      content-type="application/json"
+			  debounce-duration="300"
+			  on-response="receivefacture_cloture"
+	  >
+	  </iron-ajax>
+
+	  <paper-dialog id="cloture_dialog" >
+		  <!-- <img style = "float:left;margin:0"  src="{{app.url_http}}:{{app.port_http}}/[[iconmax_sel]]" height="30" width="30"/> -->
+		  <p style="font-size:18px"><b>Cloture séjour étape [[step_cloture]]</b></p>
+
+		  <iron-collapse id="cloture_step_1" opened$="[[step1_is_opened]]" >
+	             Mise a jour des index et dates
+							  <div class="ligne">
+								  <paper-input class="input05cols" id="date_debut" label="Date debut" type="date" value="{{sejour_a_cloturer.date_debut}}">
+									  <!-- <iron-icon prefix height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon> -->
+								  </paper-input>
+								  <paper-input class="input05cols" id="date_fin" label="Date Fin" type="date" value="{{sejour_a_cloturer.date_fin}}"></paper-input>
+							  </div>
+			                  <div class="ligne">
+								  <my-combo_select liste="{{liste_soustable.tag_voyage}}" dropdown_selobj="{{emplobj_sel}}" class="input3cols" table="tag_voyage" id="emplacement_id" label="Emplacement" value_sel="{{sejour_a_cloturer.emplacement_id}}"></my-combo_select>
+							  </div>
+							  <div class="ligne">
+								  <paper-input class="input05cols" id="valeur0" label="depart Kwh" type="number" value="{{sejour_a_cloturer.valeur0}}">
+									  <paper-icon-button  suffix on-tap="getcompteurelec0" icon="restore" alt="Releve auto" title="Releve auto">
+								  </paper-input>
+								  <paper-input class="input05cols" id="valeur2" label="fin Kwh" type="number" value="{{sejour_a_cloturer.valeur2}}">
+									  <paper-icon-button  suffix on-tap="getcompteurelec2" icon="restore" alt="Releve auto" title="Releve auto">
+								  </paper-input>
+
+							  </div>
+							  <div class="ligne">
+								  <paper-input class="input05cols" id="valeur1" label="depart M3" type="number" value="{{sejour_a_cloturer.valeur1}}">
+									  <paper-icon-button  suffix on-tap="getcompteureau1" icon="restore" alt="Releve auto" title="Releve auto">
+								  </paper-input>
+								  <paper-input class="input05cols" id="valeur3" label="fin M3" type="number" value="{{sejour_a_cloturer.valeur3}}">
+									  <paper-icon-button  suffix on-tap="getcompteureau3" icon="restore" alt="Releve auto" title="Releve auto">
+								  </paper-input>
+							  </div>
+			  <div class="ligne">
+				  <paper-checkbox class="input1col" style="margin:auto" id="clos" checked="{{sejour_a_cloturer.clos}}"><b>Séjour Clos</b></paper-checkbox>
+			  </div>
+			  <div class="buttons">
+				  <paper-button dialog-dismiss on-tap="annuler_cloture">Annuler</paper-button>
+				  <paper-button  autofocus on-tap="getetape2">Suivant</paper-button>
+			  </div>
+		  </iron-collapse>
+		  <iron-collapse id="cloture_step_2" opened$="[[step2_is_opened]]" >
+			  Création de la facture de clôture
+
+			  <my-profilfacture id="facturecloture" hidealwaysbottombutton=true value_sel="{{edited_facture_id}}" name="my-profilfacture" liste_soustable2="{{refresh_infos_cloture}}" hideothereditbutton_onedit="{{hideotherbutton_facture}}" hideother_onedit="{{hideotherbutton_facture}}" edited_item_id="{{edited_facture_id}}" objet="{{item_facture}}" grants_acces="{{grants_clot}}" liste_soustable="{{liste_soustable}}" parent="{{titulaire}}"></my-profilfacture>
+			  <div>
+				  <paper-checkbox id="lgn_a_rendre_solde"  obj="{{ligne_ecriture_arendre_solde}}" checked="[[solde_restant]]">
+				     <paper-input class="input2col" style="text-align: right;" id="montantsold" label="Solde à rendre" type="number" step=0.01 value="{{solde_restant}}"><div suffix>€</div> </paper-input>
+				  </paper-checkbox>
+				  <paper-checkbox id="lgn_a_encaiss_solde"  style="padding-left: 60px;" obj="{{ligne_ecriture_aencaiss_solde}}" checked="[[solde_encaiss]]">
+					  <paper-input class="input2col" style="text-align: right;" id="montantsold" label="Paiement à encaisser" type="number" step=0.01 value="{{solde_encaiss}}"><div suffix>€</div> </paper-input>
+				  </paper-checkbox>
+			  </div>
+			  <div><paper-checkbox id="lgn_a_rendre_caution"  obj="{{ligne_ecriture_arendre_caution}}" checked="[[caution_restant]]">
+				      <paper-input class="input2col" style="text-align: right;" id="montantcaution" label="Caution à rendre" type="number" step=0.01 value="{{caution_restant}}"><div suffix>€</div> </paper-input>
+			      </paper-checkbox>
+				  <paper-checkbox id="lgn_a_encaiss_caution"  style="padding-left: 60px;" obj="{{ligne_ecriture_aencaiss_caution}}" checked="[[caution_encaiss]]">
+					  <paper-input class="input2col" style="text-align: right;" id="montantcaution" label="Caution à encaisser" type="number" step=0.01 value="{{caution_encaiss}}"><div suffix>€</div> </paper-input>
+				  </paper-checkbox>
+			  </div>
+
+			  <div class="buttons">
+				  <paper-button dialog-dismiss on-tap="annuler_cloture">Annuler</paper-button>
+				  <paper-button autofocus on-tap="getetape1">Précédent</paper-button>
+				  <paper-button dialog-confirm autofocus on-tap="fin_cloture">Valider et imprimer</paper-button>
+			  </div>
+		  </iron-collapse>
+		 <!-- <iron-collapse id="cloture_step_3" opened$="[[step3_is_opened]]" >
+			  Clôture du séjour
+			  <div class="ligne">
+				  <paper-checkbox class="input1col" style="margin:auto" id="clos" checked="{{sejour_a_cloturer.clos}}"><b>Séjour Clos</b></paper-checkbox>
+			  </div>
+			  <div class="buttons">
+				  <paper-button dialog-dismiss on-tap="annuler_cloture">Annuler</paper-button>
+				  <paper-button autofocus on-tap="getetape2">Précédent</paper-button>
+				  <paper-button dialog-confirm autofocus on-tap="fin_cloture">Valider et imprimer</paper-button>
+			  </div>
+		  </iron-collapse>-->
+	  </paper-dialog>
+
   </template>
-  <script>
+
+
+
+	<script>
   Polymer({
 
 	  is: 'my-liste_famillesejours',
 	  
-	  properties: {  
-  		 params_allfamillesejours:{type: Object,
+	  properties: {
+          app: {
+              type: Object
+          },
+          params_allfamillesejours:{type: Object,
 	   	 	  notify : true,
 	   	 	 computed:'_getparams_get(titulaire)'
 	        },
+		 params_refresh_infos:{type: Object,
+              notify : true,
+              value: {body:{},params:{action:'maj_sejour_refresh_infos_cloture',v:'voyage.1.1.1'}}
+          },
+		  params_cloture_sejour:{type: Object,
+              notify : true,
+              value: {body:{},params:{action:'maj_sejour_cloture',v:'voyage.1.1.1'}}
+          },
+		  solde_restant:{type:Number,notify:true,value:0},
+          caution_restant:{type:Number,notify:true,value:0},
+          solde_encaiss:{type:Number,notify:true,value:0},
+          caution_encaiss:{type:Number,notify:true,value:0},
 	  	 grants:{type:Object,
 	  	 		 notify : true,
 	  	 		computed:'_get_grants(titulaire)'
 	  	 	 },
+
 		  	 titulaire:{type:Object,notify:true},
 	     liste_famillesejours:{type:Array,
 	    	 notify:true},
-	    	 
-	     dropdown_selobj:{type:Object,notify:true},
+          refresh_infos_cloture:{type:Array,
+              notify:true},
+		  sejour_a_cloturer:{type:Object,notify:true,computed:'_get_sejour_a_clot(sejour_a_cloturer_id,liste_objets)'},
+          sejour_a_cloturer_id:{type:Number,notify:true},
+          sejour_a_cloturer_copie_origine:{type:Object,notify:true},
+		  step_cloture:{type:Number,notify:true,value:1},
+		  step1_is_opened:{type:Boolean,notify:true,computed:'_step1_is_opened(step_cloture)'},
+          step2_is_opened:{type:Boolean,notify:true,computed:'_step2_is_opened(step_cloture)'},
+          step3_is_opened:{type:Boolean,notify:true,computed:'_step3_is_opened(step_cloture)'},
+          edited_facture_id:{type:Number,notify:true,value:-2},
+          item_facture:{type:Object,notify:true,value:{id:-2}},
+		  ligne_ecriture_arendre_solde:{type:Object,notify:true,value:{"id":-1,"qte":1,"montant":0,"date":"","recu_num":"","signe":"-","calcul_solde":"O","type_operation":7,"libelle":"Rendu solde","pu":0,"titulaire_id":0}},
+          ligne_ecriture_arendre_caution:{type:Object,notify:true,value:{"id":-1,"qte":1,"montant":0,"date":"","recu_num":"","signe":"-","calcul_solde":"N","type_operation":2,"libelle":"Rendu caution","pu":0,"titulaire_id":0}},
+          ligne_ecriture_aencaiss_solde:{type:Object,notify:true,value:{"id":-1,"qte":1,"montant":0,"date":"","recu_num":"","signe":"+","calcul_solde":"O","type_operation":4,"libelle":"","pu":0,"titulaire_id":0}},
+          ligne_ecriture_aencaiss_caution:{type:Object,notify:true,value:{"id":-1,"qte":1,"montant":0,"date":"","recu_num":"","signe":"+","calcul_solde":"N","type_operation":1,"libelle":" cautionRendu","pu":0,"titulaire_id":0}},
+		  hideotherbutton_facture:{type:Boolean,notify:true,value:true},
+		  dropdown_selobj:{type:Object,notify:true},
+		  grants_clot:{type:Object,notify:true,value:{creation:false,
+			  modification:true,
+			  suppression:false,
+			  impression:false}},
 	     value_sel:{type:Number,notify:true,value:6},
 	     charge_table:{type:Boolean,notify:true}
 	  },
-	 
+      observers:[
+          'receive_infos_cloture(refresh_infos_cloture)',
+          'computeecriture_sel(refresh_infos_cloture)',
+          'computeecriture_caution(refresh_infos_cloture)'
+
+      ],
+      annuler_cloture:function(){
+          if (this.sejour_a_cloturer_copie_origine){
+              for (var a in this.sejour_a_cloturer_copie_origine) {
+                  this.sejour_a_cloturer[a]=this.sejour_a_cloturer_copie_origine[a];
+              }
+              if (this.sejour_a_cloturer) {
+                  this.set('sejour_a_cloturer_id',this.sejour_a_cloturer.id);
+
+                  this.app = document.querySelector('#app');
+                  this.set('params_refresh_infos.params.sejour_id',this.sejour_a_cloturer.id);
+                  this.set('params_refresh_infos.params.titulaire_id',this.sejour_a_cloturer.titulaire_id);
+                  this.set('params_refresh_infos.body',{data:this.sejour_a_cloturer});
+                  this.$.restore_infos_cloture.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+                  this.$.restore_infos_cloture.generateRequest();
+              }
+		  }
+
+	  },
+      cloturethis:function(){
+	      this.set('item_facture',{id:-2});
+	      this.set('edited_facture_id',-2);
+	      this.set('sejour_a_cloturer_id',null);
+	      var sejour_a_cloturer=null;
+           for  (var i=0;i<this.liste_objets.length;i++) {
+               if (this.liste_objets[i].clos==false) {
+                   sejour_a_cloturer=this.liste_objets[i];
+			   }
+		   }
+		   if (sejour_a_cloturer) {
+
+               var sejour_a_cloturer_copie_origine={};
+               for (var a in sejour_a_cloturer) {
+                   sejour_a_cloturer_copie_origine[a]=sejour_a_cloturer[a];
+			   }
+			   this.set('sejour_a_cloturer_copie_origine',sejour_a_cloturer_copie_origine);
+
+               this.set('sejour_a_cloturer_id',sejour_a_cloturer.id);
+               this.set('sejour_a_cloturer.clos',true);
+               var today = new Date();
+               var dd = today.getDate()+"";
+               var mm = today.getMonth()+1+""; //January is 0!
+               if (dd.length<2) {dd="0"+dd;}
+               if (mm.length<2) {mm="0"+mm;}
+               var yyyy = today.getFullYear();
+               this.set('sejour_a_cloturer.date_fin',yyyy+'-'+mm+'-'+dd);
+               this.set('step_cloture',1);
+               this.$.cloture_dialog.open();
+		   }
+	  },
+	  _get_sejour_a_clot:function(id,liste_objets){
+          for  (var i=0;i<liste_objets.length;i++) {
+              if (liste_objets[i].id==id) {
+                  return liste_objets[i];
+              }
+          }
+          return null;
+	  },
+      receive_infos_cloture:function(rep){
+
+          this.$.cloture_dialog.open();
+          var facturefictiv={id:-2};
+              var today = new Date();
+              var dd = today.getDate()+"";
+              var mm = today.getMonth()+1+""; //January is 0!
+              if (dd.length<2) {dd="0"+dd;}
+              if (mm.length<2) {mm="0"+mm;}
+              var yyyy = today.getFullYear();
+              facturefictiv.date=yyyy+'-'+mm+'-'+dd;
+
+          this.set('item_facture',facturefictiv)
+          //this.getetape2();
+          //console.log(rep);
+	  },
+	  getetape1:function(){
+          this.set('step_cloture',1);
+      },
+      _step1_is_opened:function(step_sel){
+          return step_sel==1;
+      },
+	  getetape2:function(){
+          this.set('step_cloture',2);
+          if (this.sejour_a_cloturer) {
+
+              this.set('sejour_a_cloturer_id',this.sejour_a_cloturer.id);
+
+              this.app = document.querySelector('#app');
+              this.set('params_refresh_infos.params.sejour_id',this.sejour_a_cloturer.id);
+              this.set('params_refresh_infos.params.titulaire_id',this.sejour_a_cloturer.titulaire_id);
+              this.set('params_refresh_infos.body',{data:this.sejour_a_cloturer});
+              this.$.refresh_infos_cloture.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+              this.$.refresh_infos_cloture.generateRequest();
+          }
+	  },
+      _step2_is_opened:function(step_sel){
+          return step_sel==2;
+      },
+	/*  getetape3:function(){
+          this.$.facturecloture.$.profilfacture.savethis();
+
+          this.set('step_cloture',3);
+	  },
+      _step3_is_opened:function(step_sel){
+          return step_sel==3;
+      },*/
+      fin_cloture:function(){
+          if (this.sejour_a_cloturer) {
+              var facture=this.item_facture;
+              facture.titulaire_id=this.sejour_a_cloturer.titulaire_id;
+
+              facture.ecritures=this.$.facturecloture.get_ecr_cochess();
+              var rcaution=this.$.lgn_a_rendre_caution;
+              var rsolde=this.$.lgn_a_rendre_solde;
+              var ecaution=this.$.lgn_a_encaiss_caution;
+              var esolde=this.$.lgn_a_encaiss_solde;
+                      //console.log('acquitement '+list[c].uuid);
+              rcaution.obj.facture_num = facture.facture_num;
+              rsolde.obj.facture_num = facture.facture_num;
+              ecaution.obj.facture_num = facture.facture_num;
+              esolde.obj.facture_num = facture.facture_num;
+              rcaution.obj.recu_num='Rxxxxxxxx';
+              rsolde.obj.recu_num='Rxxxxxxxx';
+              ecaution.obj.recu_num='Rxxxxxxxx';
+              esolde.obj.recu_num='Rxxxxxxxx';
+
+			  rcaution.obj.montant=this.caution_restant;
+			  rcaution.obj.pu=this.caution_restant;
+			  rcaution.obj.date=facture.date;
+			  rcaution.obj.titulaire_id=this.sejour_a_cloturer.titulaire_id;
+
+			  rsolde.obj.montant=this.solde_restant;
+			  rsolde.obj.pu=this.solde_restant;
+			  rsolde.obj.date=facture.date;
+			  rsolde.obj.titulaire_id=this.sejour_a_cloturer.titulaire_id;
+
+              ecaution.obj.montant=this.caution_encaiss;
+              ecaution.obj.pu=this.caution_encaiss;
+              ecaution.obj.date=facture.date;
+              ecaution.obj.titulaire_id=this.sejour_a_cloturer.titulaire_id;
+
+              esolde.obj.montant=this.solde_encaiss;
+              esolde.obj.pu=this.solde_encaiss;
+              esolde.obj.date=facture.date;
+              esolde.obj.titulaire_id=this.sejour_a_cloturer.titulaire_id;
+
+			  if (rsolde.checked){
+                  facture.ecritures.push(rsolde.obj);
+			  }
+              if (rcaution.checked){
+                  facture.ecritures.push(rcaution.obj);
+              }
+              if (esolde.checked){
+                  facture.ecritures.push(esolde.obj);
+              }
+              if (ecaution.checked){
+                  facture.ecritures.push(ecaution.obj);
+              }
+
+
+
+              this.set('sejour_a_cloturer_id',this.sejour_a_cloturer.id);
+              this.app = document.querySelector('#app');
+              this.set('params_cloture_sejour.params.sejour_id',this.sejour_a_cloturer.id);
+              this.set('params_cloture_sejour.params.titulaire_id',this.sejour_a_cloturer.titulaire_id);
+
+              this.set('params_cloture_sejour.body',{data:{sejour:this.sejour_a_cloturer,facture:facture}});
+              this.$.cloture_sejour.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+
+              this.$.cloture_sejour.generateRequest();
+          }
+	  },
+      receivefacture_cloture:function(event,infos){
+          this.set('item_facture',infos.response.element);
+          this.cloture_sejour_print();
+	  },
+      cloture_sejour_print:function(){
+
+          this.$.facturecloture.$.profilfacture.printthis();
+	  },
+      getcompteurelec0:function(elem){
+          this.app = document.querySelector('#app');
+          var eleccounter=this.app.lastetat[this.emplobj_sel.periph_elec_uuid];
+          if (eleccounter && eleccounter.expression){
+              this.set('sejour_a_cloturer.valeur0',eleccounter.expression.etat);
+          }
+
+      },
+      getcompteurelec2:function(elem){
+          this.app = document.querySelector('#app');
+          var eleccounter=this.app.lastetat[this.emplobj_sel.periph_elec_uuid];
+          if (eleccounter && eleccounter.expression){
+              this.set('sejour_a_cloturer.valeur2',eleccounter.expression.etat);
+          }
+      },
+      getcompteureau1:function(elem){
+          this.app = document.querySelector('#app');
+          var eaucounter=this.app.lastetat[this.emplobj_sel.periph_eau_uuid];
+          if (eaucounter && eaucounter.expression){
+              this.set('sejour_a_cloturer.valeur1',eaucounter.expression.etat);
+          }
+      },
+      getcompteureau3:function(elem){
+          this.app = document.querySelector('#app');
+          var eaucounter=this.app.lastetat[this.emplobj_sel.periph_eau_uuid];
+          if (eaucounter && eaucounter.expression){
+              this.set('sejour_a_cloturer.valeur3',eaucounter.expression.etat);
+          }
+      },
+      computeecriture_sel:function(ecritures){
+          var i=0;
+          var total=0;
+          for (var s in ecritures){
+              if (ecritures[s].montant !='NaN' && (ecritures[s].type_operation == 7 || ecritures[s].type_operation == 4 || ecritures[s].type_operation == 6 || ecritures[s].type_operation == 9 )){
+
+                  i = i + 1;
+                  if (ecritures[s].type_operation == 4){
+                      total= total + Number(ecritures[s].montant);
+                  }
+                  if (ecritures[s].type_operation == 6 || ecritures[s].type_operation == 9){
+                      total= total - Number(ecritures[s].montant);
+                  }
+                  if (ecritures[s].type_operation == 7){
+                      total= total - Number(ecritures[s].montant);
+                  }
+              }
+          }
+          total=total.toFixed(2);
+          if (total>0){
+              this.set('solde_restant',total);
+
+          } else {
+              this.set('solde_restant',0);
+		  }
+          if (total<0){
+              this.set('solde_encaiss',-total);
+		  } else {
+              this.set('solde_encaiss',0);
+          }
+          return total;
+
+
+      },
+      computeecriture_caution:function(ecritures){
+          var i=0;
+          var total1=0;
+          for (var s in ecritures){
+              if (ecritures[s].montant !='NaN' && (ecritures[s].type_operation == 2 || ecritures[s].type_operation == 1 || ecritures[s].type_operation == 3 )){
+                  i  = i + 1;
+                  if (ecritures[s].type_operation == 1){
+                      total1= total1 + Number(ecritures[s].montant);
+                  }
+                  if (ecritures[s].type_operation == 3){
+                      total1= total1 - Number(ecritures[s].montant);
+                  }
+                  if (ecritures[s].type_operation == 2){
+                      total1= total1 - Number(ecritures[s].montant);
+                  }
+              }
+          }
+          total1=total1.toFixed(2);
+          if (total1<0){
+              total1=0;
+          }
+          this.set('caution_restant',total1);
+
+		  return total1;
+      },
 
 	  _getparams_get:function(titulaire){
 		  if (titulaire) {

@@ -1,8 +1,13 @@
 {
-  "httpport": "1469",
-  "apiport": "1468",
-  "database_file":"../../data/mydb_airevoyage.db",
-  "menus_appli": { "menubutton": {
+  "appli_folder":"appliairevoyage",
+  "appli_link_adr_web":"appliairevoyage",
+  "automationfolderspe":"/../data/automation_airevoyage/",
+  "reqarrayspe":[
+    {"name":"request_action_appliphp',","require":"./serveur_api/request_action_appliphp"},
+    {"name":"request_action_appliairevoyage","require":"./serveur_api/request_action_appli"},
+    {"name":"dbmodel","require":"./dbmodel.js"}
+  ],
+   "menus_appli": { "menubutton": {
                           "accueilbutton": {
                               "name": "Plan",
                               "visible": true,
@@ -39,8 +44,18 @@
                               "href": "docPrint"
                           }
                       },
-			"menubuttoncountshow":4 ,
-			"with_graphique_on_tag_page":false ,
+               "parametres_liste":{
+                 "constantes":false,
+                 "jourconsignes":false,
+                 "emplacements":true,
+                 "aires":true,
+                 "societes":true,
+                 "sexes":true,
+                 "typecafs":true,
+                 "type_paiement":true,
+                 "type_operation":true,
+                 "tarifs":true
+               },
 			"titre_application":{"name":"Inspire Camping","size":"15"} ,
 			"icon_application":{"path":"/images/inspirathome.gif","width":15, "height":15}
 						

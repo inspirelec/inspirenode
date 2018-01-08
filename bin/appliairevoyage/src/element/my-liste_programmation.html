@@ -255,6 +255,87 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 										</paper-item>
 					            	</template>
 				            	</template>
+				            	<template is="dom-repeat" items="[[enfant2.enfants]]" as="enfant3" >
+									<paper-item class="taglist" id="[[enfant3.id]]" periph_id="[[enfant3.periphs]]" nom="[[enfant3.nom]]" ecriture_type="[[enfant3.ecriture_type]]" on-tap="_get_modetag">
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+										<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+										<label id="lab"><h4 id="nom">[[enfant3.nom]]</h4>
+										<h6 id="etat_[[enfant3.id]]" style="font-size: 9px"></h6>
+										</label>
+									</paper-item>
+									<template is="dom-if" if="{{!show(enfant3.ecriture_type,'TEMPERATURECONSIGNE')}}">
+										<template is="dom-repeat" items="[[enfant3.periphs]]" as="enfant3_periph" >
+											<paper-item class="taglist" periph_id="[[enfant3_periph.id]]" nom="[[enfant3_periph.nom]]" id="[[enfant3.id]]" ecriture_type="[[enfant3_periph.ecriture_type]]" on-tap="_get_modetag">
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{iconmax_sel}}" height="30" width="30"/>
+												<label id="lab"><h4 id="nom">[[enfant3_periph.nom]]</h4>
+												<h6 id="etat_[[enfant3_periph.id]]" style="font-size: 9px"></h6>
+												</label>
+											</paper-item>
+										</template>
+									</template>
+									<template is="dom-repeat" items="[[enfant3.enfants]]" as="enfant4" >
+										<paper-item class="taglist" id="[[enfant4.id]]" periph_id="[[enfant4.periphs]]" nom="[[enfant4.nom]]" ecriture_type="[[enfant4.ecriture_type]]" on-tap="_get_modetag">
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+											<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant4.icon}}" height="30" width="30"/>
+											<label id="lab"><h4 id="nom">[[enfant4.nom]]</h4>
+											<h6 id="etat_[[enfant4.id]]" style="font-size: 9px"></h6>
+											</label>
+										</paper-item>
+										<template is="dom-if" if="{{!show(enfant4.ecriture_type,'TEMPERATURECONSIGNE')}}">
+											<template is="dom-repeat" items="[[enfant4.periphs]]" as="enfant4_periph" >
+												<paper-item class="taglist" periph_id="[[enfant4_periph.id]]" nom="[[enfant4_periph.nom]]" id="[[enfant4.id]]" ecriture_type="[[enfant4_periph.ecriture_type]]" on-tap="_get_modetag">
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant4.icon}}" height="30" width="30"/>
+													<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{iconmax_sel}}" height="30" width="30"/>
+													<label id="lab"><h4 id="nom">[[enfant4_periph.nom]]</h4>
+													<h6 id="etat_[[enfant4_periph.id]]" style="font-size: 9px"></h6>
+													</label>
+												</paper-item>
+											</template>
+										</template>
+										<template is="dom-repeat" items="[[enfant4.enfants]]" as="enfant5" >
+											<paper-item class="taglist" id="[[enfant5.id]]" periph_id="[[enfant5.periphs]]" nom="[[enfant4.nom]]" ecriture_type="[[enfant4.ecriture_type]]" on-tap="_get_modetag">
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant4.icon}}" height="30" width="30"/>
+												<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant5.icon}}" height="30" width="30"/>
+												<label id="lab"><h4 id="nom">[[enfant5.nom]]</h4>
+												<h6 id="etat_[[enfant5.id]]" style="font-size: 9px"></h6>
+												</label>
+											</paper-item>
+											<template is="dom-if" if="{{!show(enfant5.ecriture_type,'TEMPERATURECONSIGNE')}}">
+												<template is="dom-repeat" items="[[enfant5.periphs]]" as="enfant5_periph" >
+													<paper-item class="taglist" periph_id="[[enfant5_periph.id]]" nom="[[enfant5_periph.nom]]" id="[[enfant5.id]]" ecriture_type="[[enfant5_periph.ecriture_type]]" on-tap="_get_modetag">
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{item.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant1.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant2.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant3.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant4.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{enfant5.icon}}" height="30" width="30"/>
+														<img style = "float:left;" id="icon" src="{{app.url_http}}:{{app.port_http}}/{{iconmax_sel}}" height="30" width="30"/>
+														<label id="lab"><h4 id="nom">[[enfant5_periph.nom]]</h4>
+														<h6 id="etat_[[enfant5_periph.id]]" style="font-size: 9px"></h6>
+														</label>
+													</paper-item>
+												</template>
+											</template>
+										</template>
+									</template>
+								</template>
 			            	</template>
 			            	
 		            	</template>
@@ -317,6 +398,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				<paper-button toggles raised class="green" id="Ve">Ve</paper-button>
 				<paper-button toggles raised class="green" id="Sa">Sa</paper-button>
 				<paper-button toggles raised class="green" id="Di">Di</paper-button>
+				<paper-button toggles raised class="green" id="VA">Vacances</paper-button>
+				<paper-button toggles raised class="green" id="FE">Fériés</paper-button>
 			</div>
 			<ul class="app-grid" style="margin-bottom:2px">
 		    	  <li class="item" >
@@ -324,7 +407,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	              </li>
 				  <template is="dom-if" if="{{show(ecriture_type_sel,'TEMPERATURECONSIGNE')}}">
 		              <li class="item" >
-		               <paper-input id="TEMPERATURECONSIGNE" minlength=1 maxlength=2 max=99 min=0 label="Temperature" step="0.5" type="number"> 
+		               <paper-input id="TEMPERATURECONSIGNE" minlength=1 maxlength=2 max=99 min=0 label="Consigne" step="0.5" type="number">
+		               <iron-icon prefix height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>
+		              	</paper-input>
+		              </li>
+	              </template>
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'CONSIGNE')}}">
+		              <li class="item" >
+		               <paper-input id="CONSIGNE" minlength=1 maxlength=2 max=99 min=0 label="Consigne" step="0.5" type="number">
 		               <iron-icon prefix height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>
 		              	</paper-input>
 		              </li>
@@ -341,6 +431,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
 		              </li>
 	              </template> 
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'VOLETRVARIABLE')}}">
+		              <li class="item" >
+						<paper-button id="VOLETRVARIABLE" on-tap="change_etat_VOLET" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
+		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
+		              </li>
+	              </template>
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'VOLETR')}}">
+		              <li class="item" >
+						<paper-button id="VOLETR" on-tap="change_etat_VOLET" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
+		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
+		              </li>
+	              </template>
+	              <template is="dom-if" if="{{show(ecriture_type_sel,'CHAUDIERE')}}">
+		              <li class="item" >
+						<paper-button id="CHAUDIERE" on-tap="change_etat_BINAIRE" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
+		              	<!-- <paper-input id="BINAIRE" minlength=1 maxlength=1 max=1 min=0 label="On-Off" step="1" type="number"></paper-input> -->
+		              </li>
+	              </template>
+
 	              <template is="dom-if" if="{{show(ecriture_type_sel,'VARIABLE')}}">
 		              <li class="item" >
 						<paper-button id="VARIABLE" on-tap="change_etat_BINAIRE" value="[[value_sel]]"><iron-icon height="60" width="60" src="{{app.url_http}}:{{app.port_http}}/[[value_icon_sel]]"></iron-icon>[[value_sel]]</paper-button>
@@ -465,7 +574,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	      },
 	  get_tag_periph:function(e,a){
 	    	  this.taguuid=e.currentTarget.uuid;
-	    	  this.app.$.location.path="/appliairevoyage/periphListPage/"+this.taguuid;
+	    	  this.app.$.location.path="/"+this.app.url_folder+"/periphListPage/"+this.taguuid;
 	    	  
 	      },
 
@@ -660,6 +769,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	    	  this.set('ecriture_type_sel',e.currentTarget.ecriture_type);
 			  this.set('periph_sel',e.currentTarget.periph_id);
 	    	  
+			  if (this.ecriture_type_sel=='VOLETR' || this.ecriture_type_sel=='VOLETRVARIABLE'){
+				  this.set('value_sel','UP');
+			  } else {
+				  this.set('value_sel','ON');
+			  }
+
 	    	  this.$.modif_prog_dialog.open();
 	      },
 
@@ -670,8 +785,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	    		  this.set('value_sel','ON');
 	    	  }
 	      },
+	  change_etat_VOLET:function(){
+    	  if (this.value_sel=='UP'){
+    		  this.set('value_sel','DOWN');
+    	  } else {
+    		  this.set('value_sel','UP');
+    	  }
+      },
 	  computeicon_sel:function(value_sel,iconmax_sel,iconmidle_sel,iconmin_sel){
-	    	  if (value_sel=='ON'){
+	    	  if (value_sel=='ON' || value_sel=='UP'){
 	    		  return iconmax_sel;
 	    	  } else {
 	    		  return iconmin_sel;

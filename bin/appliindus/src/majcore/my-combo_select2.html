@@ -155,7 +155,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        _charge(table,charge_table,where,limit){
 		  if(charge_table) {
 		      var last_charge=this.$.globaldata.get('select_charge_'+this.table);
-		      if (!last_charge || last_charge.where+'' != where+'') {
+		      if (!last_charge || last_charge.where+'' != where+'' || last_charge.limit+'' != limit+'') {
 
                   this.set('show_loading',1);
                   this.app = document.querySelector('#app');
@@ -173,7 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                       if (limit>=0) {
                           this.set('params_get.limit'," "+limit);
                       }
-                  this.$.globaldata.set('select_charge_'+this.table,{table:table,where:where});
+                  this.$.globaldata.set('select_charge_'+this.table,{table:table,where:where,limit:limit});
 
                   this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
                       this.$.charge.generateRequest();

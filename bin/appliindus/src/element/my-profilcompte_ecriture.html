@@ -101,7 +101,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		     },
 	     params_save:{type: Object,
 	   	 	  notify : true,
-	   	 	  value: {body:{},params:{action:'save',type:'maj',element:'compte_ecriture'/*v:'voyage.1.1.1'*/}}
+	   	 	  value: {body:{},params:{action:'saverecu',element:'compte_ecriture',v:'voyage.1.1.1'}}
 	        },
 	     params_delete:{type: Object,
 	   	 	  notify : true,
@@ -159,7 +159,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					 modification:false,
 					 suppression:false,
 					 impression:false};
-    	  }  else {
+    	  } else if (obj && obj.facture_num!=null){
+    		  return {creation:false,
+					 modification:false,
+					 suppression:false,
+					 impression:true};
+ 	     }  else {
     		  return grant_acces;
     	  }
       },
@@ -231,13 +236,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			}
 	  },
 	  _calculrecu_num:function(id,objet){
-			if(id<0 && objet &&	(objet.recu_num=="" || !objet.recu_num)){
+			/*if(id<0 && objet &&	(objet.recu_num=="" || !objet.recu_num)){
 				this.app = document.querySelector('#app');
 				this.set('objet.recu_num','...');
 				
 				this.$.get_new_recu_num.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
 		        this.$.get_new_recu_num.generateRequest();
-			}
+			}*/
+			    if(id<0 && objet &&	(objet.recu_num=="" || !objet.recu_num)){
+              this.set('objet.recu_num','Rxxxxxxxx')  ;
+          }
 	  },
 	  delete_fire:function(){
 		  this.set('objet.deleted','O');
@@ -261,7 +269,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  set_recu_delete:function(){
 		  var rep=this.objet;
 		  rep.facture_num='Annulé'
-		  rep.libelle=this.objet.libelle + ' (annulation '+this.objet.recu_num+')';
+		  if (this.objet.libelle) {
+		      rep.libelle=this.objet.libelle + ' (annulation '+this.objet.recu_num+')';
+		  } else {
+		      rep.libelle="" + ' (annulation '+this.objet.recu_num+')';
+		  }
+
 		  rep.id=null;
 		  rep.deleted='O'
 		  rep.uuid=null;

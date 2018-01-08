@@ -1214,7 +1214,56 @@ var database = {
 						             {"name" : "arg3" , "type" : "TEXT"},
 						             {"name" : "increment" , "type" : "TEXT"}
 						             ]
-						}
+						},
+
+
+                    {"name": "plan","in_database":true,
+                        "colonnes": [
+                            {"name" : "id" , "type" : " integer primary key autoincrement","formulaire" : "label"},
+                            {"name" : "uuid" , "type" : "TEXT","formulaire" : "label"},
+                            {"name" : "nom" , "type" : "TEXT","formulaire" : "input"},
+                            {"name" : "icon" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "images"},
+                            {"name" : "visible" , "type" : "TEXT", "formulaire" : "select" , "object" : [{"id":"N","nom":"Non visible"},
+                                    {"id":"O","nom":"Visible"}
+                                ]},
+
+                        ],
+                        "actionsreturnlist" : [{"name" : "Supprimer", "type" : "button", "action" : "index?type=maj&action=delete"},
+                            {"name" : "Annuler", "type" : "button", "action" : "index?type=maj&action=keep"},
+                            {"name" : "Enregistrer", "type" : "button", "action" : "index?type=maj&action=save"}
+                        ]
+                    },
+                    {"name": "plan_tag","in_database":true,
+                        "colonnes": [
+                            {"name" : "id" , "type" : " integer primary key autoincrement","formulaire" : "label"},
+                            {"name" : "uuid" , "type" : "TEXT","formulaire" : "label"},
+                            {"name" : "position_x" , "type" : "TEXT","formulaire" : "input"},
+                            {"name" : "position_y" , "type" : "TEXT","formulaire" : "input"},
+                            {"name" : "icon_plan" , "type" : "TEXT","formulaire" : "input"},
+                            {"name" : "tag" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "tag"},
+                            {"name" : "plan" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "plan"}
+                        ],
+                        "actionsreturnlist" : [{"name" : "Supprimer", "type" : "button", "action" : "index?type=maj&action=delete"},
+                            {"name" : "Annuler", "type" : "button", "action" : "index?type=maj&action=keep"},
+                            {"name" : "Enregistrer", "type" : "button", "action" : "index?type=maj&action=save"}
+                        ]
+                    },
+                    {"name": "plan_peripherique","in_database":true,
+                        "colonnes": [
+                            {"name" : "id" , "type" : " integer primary key autoincrement","formulaire" : "label"},
+                            {"name" : "uuid" , "type" : "TEXT","formulaire" : "label"},
+                            {"name" : "position_x" , "type" : "TEXT","formulaire" : "input"},
+                            {"name" : "position_y" , "type" : "TEXT","formulaire" : "input"},
+                            {"name" : "icon_plan" , "type" : "TEXT","formulaire" : "input"},
+                            {"name" : "peripherique" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "peripherique"},
+                            {"name" : "plan" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "plan"}
+                        ],
+                        "actionsreturnlist" : [{"name" : "Supprimer", "type" : "button", "action" : "index?type=maj&action=delete"},
+                            {"name" : "Annuler", "type" : "button", "action" : "index?type=maj&action=keep"},
+                            {"name" : "Enregistrer", "type" : "button", "action" : "index?type=maj&action=save"}
+                        ]
+                    }
+
 					]
 				};
 

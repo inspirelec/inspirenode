@@ -87,12 +87,10 @@ var reqarray=[	{name:'request',require:'request'},
 
 			];
 
-var apps={
+/*var apps={
 	indus:{
 		applicationtype:'inspireindus',
-		configfile:'../data/config_app_indus.json',
-        automationfolderspe:'/../data/automation_indus/',
-        lienweb:'/appliindus/',
+		configfile:'./config_app_indus.json',
 		reqarrayspe:[
 			{name:'request_action_appliphp',require:'./serveur_api/request_action_appliphp'},
 			{name:'request_action_appli_indus',require:'./serveur_api/request_action_appli'},
@@ -101,28 +99,24 @@ var apps={
 	},
     airevoyage:{
         applicationtype:'inspireairevoyage',
-        configfile:'../data/config_app_airevoyage.json',
-        automationfolderspe:'/../data/automation_airevoyage/',
-        lienweb:'/appliairevoyage/',
+        configfile:'./config_app_airevoyage.json',
         reqarrayspe:[
             {name:'request_action_appliphp',require:'./serveur_api/request_action_appliphp'},
-            {name:'request_action_appliairevoyage',require:'./serveur_api/request_action_appliairevoyage'},
+            {name:'request_action_appliairevoyage',require:'./serveur_api/request_action_appli'},
             {name:'dbmodel',require:'./dbmodel.js'}
         ]
     },
     piscine:{
         applicationtype:'inspirepiscine',
-        configfile:'../data/config_app_piscine.json',
-        automationfolderspe:'/../data/automation_piscine/',
-		lienweb:'/applipiscine/',
+        configfile:'./config_app_piscine.json',
         reqarrayspe:[
             {name:'request_action_applipiscine',require:'./serveur_api/request_action_appli'},
             {name:'dbmodel',require:'./dbmodel.js'}
         ]
     }
 
-}
-var consolemode=false;
+}*/
+consolemode=false;
 var InhibeConsole=function(){
     console._log=console.log;
     console._trace=console.trace;
@@ -155,21 +149,9 @@ process.argv.forEach(function (val, index, array) {
     if (val=='DEBUG') {
         consolemode=true;
     }
-    if (apps[val]){
-        appconfig=apps[val];
-        applicationtype=appconfig.applicationtype;
-        applienweb=appconfig.lienweb;
-        for (var reqappi in appconfig.reqarrayspe) {
-            reqarray.push(appconfig.reqarrayspe[reqappi]);
-		}
-
-	}
 });
 
-if (!appconfig) {
-    console.log('il manque un argument de lancement','indus, airevoyage, piscine ....');
-	process.exit();
-}
+
 
 if (consolemode) {
     console.log('console activée, pour la desactiver enlever l arg DEBUG');
@@ -200,7 +182,36 @@ global.obj={};
 
 var app = function(){
 	
-	this.config= require(appconfig.configfile);
+	this.config= function(){
+
+		var config_install=require('./../data/config.json');
+        appconfig=config_install.appli;
+        var config_app=require('./config_app_'+appconfig+'.json');
+        for (var p in config_install){
+            config_app[p]=config_install[p];
+        }
+        applicationtype='inspire'+appconfig;
+
+        for (var c in  config_app.reqarrayspe){
+            var req=config_app.reqarrayspe[c];
+            try {
+                //console.log('import de  la librairie ',req.require);
+                global.req[req.name]= require(req.require);
+
+            } catch (e) {
+                console.log('!!! Impossible de charger la librairie '+req.require);
+            }
+
+        }
+        applienweb="/"+config_app.appli_link_adr_web+"/";
+        return config_app;
+
+    }();
+    this.chargerequireapp=function(){
+
+
+
+	};
 	if (this.config.apiport==this.config.httpport) this.config.apiport-=1;
 	this.get_ip=function(){
 		var interfaces = global.req.os.networkInterfaces();
@@ -236,7 +247,7 @@ var app = function(){
 	});
 	this.serveurhttp.on('serveur_http.start',function(port,adresseip){
 		logger('INFO','Serveur web démarré http://'+adresseip+':'+port,'startstop');
-		console.log('Serveur web start démarré http://'+adresseip+':'+port+appconfig.lienweb);
+		console.log('Serveur web start démarré http://'+adresseip+':'+port+applienweb);
 	});
 };
 process.on('unhandledRejection', function(reason, p) {
@@ -272,7 +283,7 @@ serverapp.core.charge_all(function(){
 	global.automation={};
 	var fileautomations=global.req.fs.readdirSync(__dirname+'/serveur_api/automation/');
 	try{
-        var fileautomationsspe=global.req.fs.readdirSync(__dirname+appconfig.automationfolderspe);
+        var fileautomationsspe=global.req.fs.readdirSync(__dirname+serverapp.config.automationfolderspe);
 		for (var f in fileautomationsspe){
 			for(var ff in fileautomations){
 				if (fileautomations[ff]==fileautomationsspe[f]){
@@ -282,7 +293,7 @@ serverapp.core.charge_all(function(){
 		}
 	}
 	catch (e){
-        logger('WARNING','Pas de dossier automation spécifique dans'+__dirname+appconfig.automationfolderspe,'startstop');
+        logger('WARNING','Pas de dossier automation spécifique dans'+__dirname+serverapp.config.automationfolderspe,'startstop');
 	}
 
 	for (var i = 0; i < fileautomations.length; i++) {
@@ -312,8 +323,8 @@ serverapp.core.charge_all(function(){
                     var name=automationfile.split(".")[0];
                     logger('INFO','Automation spé chargement '+name ,'startstop');
 
-                    global.automation[name]= require('.'+appconfig.automationfolderspe+automationfile);
-                    global.automation[name].source=appconfig.automationfolderspe+automationfile;
+                    global.automation[name]= require('.'+serverapp.config.automationfolderspe+automationfile);
+                    global.automation[name].source=serverapp.config.automationfolderspe+automationfile;
                     global.automation[name].type='SPECIFIQUE';
                     logger('INFO','Automation spé chargée ('+global.automation[name].id+') '+global.automation[name].nom ,'startstop');
                     //global.automation[name].start();

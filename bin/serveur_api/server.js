@@ -10,6 +10,7 @@ var Server = function server(adresseip,port,app) {
            this.httpserver.listen(this.port, this.adresseip)
 			   .on('error', function(err)
            {
+           	console.log(err);
            	process.exit();
            });
 		this.emit('serveur_api.start',this.port,this.adresseip);

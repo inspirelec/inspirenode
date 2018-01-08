@@ -15,11 +15,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <template>
 		<style >
-		 .other-button{
+		 .otherbutton{
 		 	position:absolute;
 		 	top:5px;
 		 	right:55px;
-    		color: var(--paper-red-500);
+			 color: var(--paper-blue-500);
 		 }
   		</style>
   		<my-combo_select id="charge_sexe" hidden charge_table liste="{{liste_soustable.sexe}}"   table="sexe" ></my-combo_select>
@@ -64,7 +64,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
    				
   			</div>
   			
-  			<!-- <paper-icon-button  class="button_top_right other-button"  mini icon="cached" title="Recalculer" on-tap="recalculthis"></paper-icon-button>-->
+  			<paper-icon-button  class="button_top_right otherbutton"  mini icon="track-changes" title="Recalculer" on-tap="recalculthis"></paper-icon-button>
   			
 		</my-sous_liste_behavior>
 		
@@ -77,6 +77,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			    handle-as="json"
 			    on-error="_disconnect"
 	    		on-response="calcul_validate"
+				last-response="{{liste_objets}}"
 			    debounce-duration="300">
 			</iron-ajax>
   </template>
@@ -97,9 +98,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		   	 	  notify : true,
 		   	 	 computed:'_getcalcul_get(titulaire)'
 		    },
-		   	 charge_url: {type:String, 
+		   	 charge_url: {type:String,
 		   		    notify : true,
-		   		  	value:null },
+		   		  	value:null } ,
+          calcul_url: {type:String,
+              notify : true,
+              value:null },
 	  	 grants:{type:Object,
 	  	 		 notify : true,
 	  	 		computed:'_get_grants(titulaire)'
@@ -129,18 +133,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	    	 	computed: '_compute_solde(liste_objets,liste_objets.length,edited_item_id)'},
 	  },
 	  observers:[
-		  '_selection_titulaire(titulairesel,searchmode)',
+		  '_selection_titulaire(titulairesel,searchmode,famille_id)',
 	  ],
-	  recalculthis(){
+	  recalculthis:function(){
     	  this.set('show_loading',1);
     	  this.app = document.querySelector('#app');
-	      this.charge_url=this.app.url_api+':'+this.app.port_api+'/index'
-	      this.$.charge.generateRequest();  
+	      this.calcul_url=this.app.url_api+':'+this.app.port_api+'/index'
+	      this.$.launchcalcul.generateRequest();
 	  },
-	  _selection_titulaire(titulairesel,searchmode){
-		  if (searchmode) {
-			  this.set('titulaire',titulairesel);	  
-		  } 
+	  _selection_titulaire:function(titulairesel,searchmode,famille_id){
+		  if (searchmode && famille_id && titulairesel) {
+			  this.set('titulaire',titulairesel);
+		  } else if (searchmode && !famille_id && !titulairesel){
+			  this.set('titulaire',titulairesel);
+		  }
 		  
 	  },
       _showwhereisnull : function(liste_objets,titulaire){
@@ -168,16 +174,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					 impression:false};
 		  }
 	  },
+  _getcalcul_get:function(titulaire){
+      if (titulaire) {
+          if (titulaire.id!=''){
+              return  {action:'refresh_infos_cloture',titulaire_id:'='+titulaire.id,v:'voyage.1.1.1'} ;
+          }
+      }
 
+  },
 	  _getparams_get:function(titulaire){
 		  if (titulaire) {
 			  if (titulaire.id!=''){
 				  return  {type:'get',action:'listcompte_ecriture',titulaire_id:'='+titulaire.id} ;
 			  } else {
-				  return  {type:'get',action:'listcompte_ecriture'} ;
+				  return  {type:'get',action:'listcompte_ecriture',limit:25} ;
 			  }
 		  } else if (!this.hidesearchbox){
-			  return  {type:'get',action:'listcompte_ecriture'};
+			  return  {type:'get',action:'listcompte_ecriture',limit:25};
 		  } else {
 			  return  {type:'get',action:'listcompte_ecriture',titulaire_id:'=-1'} ;
 		  }
@@ -186,7 +199,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  _compute_solde:function(compte_ecritures_Response,nblignes,edited_item_id){
 		  var solde_calc=0;
 		  for (l in compte_ecritures_Response) {
-			  if(compte_ecritures_Response[l].montant && compte_ecritures_Response[l].calcul_solde=='O'){
+			  if(compte_ecritures_Response[l].montant !='NaN' && compte_ecritures_Response[l].montant && compte_ecritures_Response[l].calcul_solde=='O'){
 				  if (compte_ecritures_Response[l].signe=="-"){
 					  solde_calc-=compte_ecritures_Response[l].montant*1;
 				  } else {

@@ -1,7 +1,7 @@
 /**
  * Gestion des volets roulants.
  */
-var VR={id:50,nom:"Volets_roulants",etat:"OFF",lastrun:null};
+var VR={id:52,nom:"Volets_roulants",etat:"OFF",lastrun:null};
 var timer=null;
 var timer_1=null;
 var timer_2=null;

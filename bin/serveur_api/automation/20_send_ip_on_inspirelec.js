@@ -48,14 +48,18 @@ var get_ip=function(){
 
 function send_ip(){
 	var adresseip=get_ip()[0];
-
-	global.req.comm.perso_get('www.inspirelec.com','/adr/dnsdynamic.php?'+
+	
+	var adr='/adr/dnsdynamic.php?'+
 			'id=' +	obj.app.core.findobj('idapplication','constantes').valeur+
 			'&iplocal=local'+adresseip +
 			'&apiport='+global.obj.app.config.apiport +
 			'&httpport='+global.obj.app.config.httpport+
 		    '&ap='+applienweb+
-		    '&ver='+appversion
+		    '&ver='+appversion+
+	        '&alerte='+global.obj.app.config.alerte_sendiponinspirelec;
+			
+    logger('INFO',{msg:'Envoi info ip',adr:adr},'automation_'+send_ip_on_inspirelec.nom);
+	global.req.comm.perso_get('www.inspirelec.com',adr
 			,80,function(err,httpResponse,body){
 		//console.log(body);
 	});

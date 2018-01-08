@@ -192,7 +192,14 @@
     <app-location id="location" route="{{route}}"></app-location>
     <!-- ip.../appli/main -->
 
+    <app-route id="route" route="{{route}}" pattern="/:typeappli" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <!-- reglages, appli, applicamp ... -->
     
+    <app-route id="subroute" route="{{subroute}}"  pattern="/:page"   data="{{subrouteData}}" queryParams="{{queryparams}}" tail="{{subsubroute}}"></app-route>
+    <!-- login, main, ... -->
+
+
+<!--<app-drawer-layout id="drawerlayalerte" responsiveWidth="150px">-->
 
 
 <app-drawer-layout id="drawerlaymenu" responsiveWidth="500px">
@@ -213,7 +220,7 @@
 				</iron-ajax>
 	        <iron-selector selected="[[subrouteData.page]]" attr-for-selected="name" class="drawer-list" role="navigation">
                 <template is="dom-repeat" items="[[_toArray(menuResponse.menubutton)]]">
-					<a name="[[item.name]]" href="/appliairevoyage/[[item.href]]">[[item.name]]</a>
+					<a name="[[item.name]]" href="/[[url_folder]]/[[item.href]]">[[item.name]]</a>
 		        </template>
 	        </iron-selector>
     	</app-drawer>
@@ -251,12 +258,13 @@
 	          <my-famillepage name="famillepage" ></my-famillepage>
 	          <my-facturepage name="facturepage" ></my-facturepage>
 	          <my-recupage name="recupage" ></my-recupage>
-	          <my-parametrepage name="parametrepage" ></my-parametrepage>
+	          <my-parametrepage params="[[menuResponse.parametres_liste]]" name="parametrepage" ></my-parametrepage>
 			  <my-prog_modes name="prog_modes" ></my-prog_modes>
 			  <my-prog_graphiques name="prog_graphiques" ></my-prog_graphiques>
 	          <my-docPrint name="docPrint" ></my-docPrint>
 	          <my-planpage name="planpage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-planpage>
 	          <my-periphListPage name="periphListPage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-periphListPage>
+			 <!-- <my-testPage name="testPage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-testPage>-->
           </iron-pages>
           
 		</app-header-layout>
@@ -297,8 +305,7 @@
 		        </div>
 
 		</app-drawer>
-  </app-drawer-layout>
-
+</app-drawer-layout>
 	<my-login id="loginbox" header_auth="{{header_auth}}"></my-login>
 	<!-- <div  id="loginbox">
     <paper-material elevation="3">
@@ -385,7 +392,7 @@
       properties: {
     	  config_file:{type:String,
 	          	notify: true,
-		  		value:"/data/config_app_airevoyage.json"},
+		  		value:"config_app.json"},
     	  header_auth: {type: Object, 
     		  	value:null, notify : true },
     	  user_auth: {type: Object, 
@@ -426,11 +433,13 @@
 		  url_http:{type:String,
 	          	notify: true,
     		  	value:window.location.protocol+"//"+window.location.hostname},
+		  url_folder:{type:String,
+		        notify:true},
 		  port_http:{type:String,
 	          	notify: true,
     		  	value:window.location.port||1389},
-    		  	
-    	  queryparams:{type:Object, 
+		  config:{type:Object,notify:true},
+    	  queryparams:{type:Object,
     		  notify:true}
     	  
       },
@@ -449,10 +458,10 @@
         },
       _showhidePlan : function(){
     	  var largeur_fenetre=window.innerWidth;
-    	  if (this.$.location.path=="/appliairevoyage/planpage" && largeur_fenetre<1100){
-    		  this.$.location.path="/appliairevoyage/tagListPage";
-    	  } /*else if (this.$.location.path=="/applipiscine/tagListPage" && largeur_fenetre>=1100) {
-    		  this.$.location.path="/applipiscine/planpage";
+    	  if (this.$.location.path=="/"+this.url_folder+"/planpage" && largeur_fenetre<1100){
+    		  this.$.location.path="/"+this.url_folder+"/tagListPage";
+    	  } /*else if (this.$.location.path=="/appliindus/tagListPage" && largeur_fenetre>=1100) {
+    		  this.$.location.path="/appliindus/planpage";
     	  }*/
       },
         _httpadressechanget:function(routeDatat){
@@ -494,14 +503,16 @@
   	      this.set('alertes',[]);
   	      this.set('lastupdatetime',null);
   	      this.$.alertnotif.label=0;
-    	  this.$.location.path="/appliairevoyage/";
+    	  this.$.location.path="/"+this.url_folder+"/";
      	 this.$.loginbox.openlogin();
       },
       _seturls_ports : function(event){
         	var data=event.detail.response
         	if (data) {
             	this.port_api=data.apiport || 1338;
-            	this.port_http=data.httpport || 1339;	
+            	this.port_http=data.httpport || 1339;
+            	this.url_folder=data.appli_link_adr_web;
+            	this.set('config',data);
         	}
 
        },
@@ -522,7 +533,7 @@
       _charge_appli: function(){
     	  this.charge_menu_url=this.url_api+':'+this.port_api+'/index'
           this.$.charge_menu.generateRequest();
-    	  this.$.location.path="/appliairevoyage/planpage";
+    	  this.$.location.path="/"+this.url_folder+"/planpage";
       },
       _acquitement_Reponse: function(){
     	  //console.log('update style acquitements');

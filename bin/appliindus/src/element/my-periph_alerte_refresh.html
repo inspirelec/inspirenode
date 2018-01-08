@@ -40,6 +40,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	   	 	  value: '0'},
    	  	header_auth: {type: Object, 
     		  	value:null, notify : true },
+
+		  alertes:{type: Array,notify:true},
+          alertes_nb:{type: Number,notify:true},
+          alerte_loader_show:{type: Boolean,notify:true},
+
 	     params_get_alerte:{type: Object,
 	   	 	  notify : true,
 	   	 	  value: {action:'getalerte',v:'indus.1.1.1'}},
@@ -60,6 +65,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	      },
 	   _start_alerte_Response: function(header_auth,params_get_alerte){
 	    	  if (header_auth){
+	    	      this.set('alerte_loader_show',true);
 	    		 this.app = document.querySelector('#app');
 		         this.params_get_alerte.updateTime=this.lastupdatetime;
 		         this.$.get_alerte.url=this.app.url_api+':'+this.app.port_api+'/index'
@@ -85,23 +91,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  	    	this.params_get_alerte.updateTime=this.lastupdatetime;
 		    	//console.log(get_etat_Response)  ;
 		    	var nbetat=0;
-		    	this.app.alertes=this.get_alerte_Response.data;
+		    	this.set('alertes',this.get_alerte_Response.data);
 		    	
-		    	if (!this.app.alertes) this.app.alertes=[];
+		    	if (!this.alertes) this.set('alertes',[]);
 		    	this.app.fire('Alertechange', {data: get_alerte_Response});
 		    	var nb_alertes=0;
-		    	for (var a in this.app.alertes){
-		    		this.app.alertes[a].checked=false;
-		    		if (this.app.alertes[a].etat=="0" || this.app.alertes[a].etat=="1" ) { 
+		    	for (var a in this.alertes){
+		    		this.alertes[a].checked=false;
+		    		if (this.alertes[a].etat=="0" || this.alertes[a].etat=="1" ) {
 		    			nb_alertes++;
 		    		}
 		    	}			    	
 		    	//this.app.$.alertnotif.label=nb_alertes;
-		    	this.set('app.alertes_nb',nb_alertes);
-		    	this.set('app.alerte_loader_show',false);
+		    	this.set('alertes_nb',nb_alertes);
+		    	this.set('alerte_loader_show',false);
 		    	
 	    	  }
-	    	  if (this.$.get_alerte.url && this.app && this.app.header_auth){
+	    	  if (this.$.get_alerte.url && this.app && this.header_auth){
 	    		  this.$.get_alerte.generateRequest();  
 	    	  }
 	    	  

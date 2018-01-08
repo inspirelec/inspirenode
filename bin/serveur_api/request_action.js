@@ -22,7 +22,7 @@ var Request_action = function(req,res,app,user) {
 	};
 	
 	this.traitementrequete= function(variables){
-		//console.log(JSON.stringify(req.url));
+		console.log(JSON.stringify(req.url));
 		var url_parts = global.req.url.parse((req.url), true);
 		//var variables=url_parts.query;
 		var user=this.user;
@@ -55,10 +55,6 @@ var Request_action = function(req,res,app,user) {
 				case 'home':
 					//console.log('appli Home');
 					this.traiteaction=global.req.request_action_appliphp;
-					break;
-				case 'camp':
-					//console.log('appli Camp');
-					this.traiteaction=global.req.request_action_appli_camping;
 					break;
 				case 'indus':
 					//console.log('appli Camp');

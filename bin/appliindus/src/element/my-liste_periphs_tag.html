@@ -17,8 +17,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="my-liste_periphs_tag">
 
   <template>
-	  <!--include="app-grid-style"-->
-		<style>
+	  <style include="app-grid-style">
+
   		  :host {
           display: block;
           --app-grid-columns: 5;
@@ -108,20 +108,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	
 	
 	<div>
-		<template is="dom-repeat" items="[[periphs_tag_by_categ]]">
-		
-		    <my-liste_periphs_accordion
-		    	accordionname="[[item.categ.nom]]"
-		    	periphs_liste="[[item.periphs]]"
-		    	accordionicon="[[item.categ.iconMax]]"
-		    	periph_temp_uuid="[[periph_temp_uuid]]"
-				ecriture_type="[[item.ecriture_type]]" 
-				lastupdatetime="{{lastupdatetime}}"
-		      >
-		    </my-liste_periphs_accordion>
+		<template is="dom-if" if="{{show_by_categ(1,app,tagid)}}">
+			<template is="dom-repeat" items="[[periphs_tag_by_categ]]">
 
-	     </template>
-	     
+				<my-liste_periphs_accordion
+					accordionname="[[item.categ.nom]]"
+					periphs_liste="[[item.periphs]]"
+					accordionicon="[[item.categ.iconMax]]"
+					periph_temp_uuid="[[periph_temp_uuid]]"
+					ecriture_type="[[item.ecriture_type]]"
+					lastupdatetime="{{lastupdatetime}}"
+				  >
+				</my-liste_periphs_accordion>
+
+			 </template>
+		</template>
+		<template is="dom-if" if="{{show_by_categ(0,app,tagid)}}">
+			<ul class="app-grid" >
+				<template is="dom-repeat" items="[[periphs_tag_Response]]">
+					<template is="dom-if" if="[[item.visible]]">
+						<li class="item">
+							<my-periph_manager periph=[[item]]
+											   ecriture_type="[[item.ecriture_type]]"
+											   lastupdatetime="{{lastupdatetime}}"></my-periph_manager>
+						</li>
+					</template>
+				</template>
+			</ul>
+			<template is="dom-repeat" items="[[periphs_tag_by_categ]]">
+				<my-liste_graphique_highchart periphs="[[item.periphs]]"></my-liste_graphique_highchart>
+			</template>
+		</template>
      </div>
     
 
@@ -232,8 +249,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        },
        detached: function() {
          window.removeEventListener('resize', this._updateGridStyles);
-       }	, 
-	      
+       }	,
+      show_by_categ: function (type1,app) {
+          //console.log('OK',periph.nom,periph.uuid,ecriture_type,periph.ecriture_type,periph.ecriture_type==ecriture_type);
+          if (app) {
+              return type1==app.config.regroup_periph_by_categ;
+		  }
+          return null;
+      },
 		sort_by : function() {
 			   var fields = [].slice.call(arguments),
 			       n_fields = fields.length;

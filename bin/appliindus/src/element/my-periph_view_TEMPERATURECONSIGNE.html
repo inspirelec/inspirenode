@@ -270,15 +270,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	    		 }
 			     if (periph.ecriture_max_value && periph.ecriture_min_value) {
 			        	this.$.slider.min=0;
-						//if(Number(periph.ecriture_max_value)<Number(periph.ecriture_min_value)){
-							/*valeur max et min inversé sur le periph*/
-							//this.$.slider.max=Number(periph.ecriture_min_value);
-							//this.$.slider.min=Number(periph.ecriture_max_value);
-					    //} else {
-							this.$.slider.max=Number(periph.ecriture_max_value);
-							this.$.slider.min=Number(periph.ecriture_min_value);
-						//}
-
+			        	this.$.slider.max=Number(periph.ecriture_max_value);
+			        	this.$.slider.min=Number(periph.ecriture_min_value);
 			     }
 	    		 this.set('etat_slider',Number(etat.etat));
 	    	 }

@@ -151,13 +151,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	    	  this.charge_alltag_url=this.app.url_api+':'+this.app.port_api+'/index'
 	    	  this.$.charge_alltag.generateRequest();
 	      },
-      refreshdata(){
-		  this.$.charge_alltag.generateRequest();  
-	  } ,   
+      refreshdata:function(){
+		  this.$.charge_alltag.generateRequest();
+	  } ,
 	  get_tag_periph: function(e,a){
 	    	  this.taguuid=e.currentTarget.uuid;
 	    	  this.tagid=e.currentTarget.tagid;
-	    	  this.app.$.location.path="/appliairevoyage/periphListPage/"+this.tagid;
+	    	  this.app.$.location.path="/"+this.app.url_folder+"/periphListPage/"+this.tagid;
 	    	  
 	      },
 	  _disconnect: function(obj){

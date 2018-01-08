@@ -1,0 +1,10 @@
+{
+  "httpport": "1389",
+  "apiport": "1388",
+  "appli": "indus",
+  "path_database_files": "../../data/",
+  "database_file": "mydb_indus",
+  "regroup_periph_by_categ": false,
+  "mainframedisposition": 1,
+  "alerte_sendiponinspirelec":"N"
+}

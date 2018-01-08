@@ -47,7 +47,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	           x-label="{{titreX_graphique}}" 
 	           y-label="{{titreY_graphique}}"
 	          >
-	           
+
 	    </highcharts-chart>
    <paper-dialog id="modal" withBackdrop>
 	  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
@@ -191,7 +191,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		  }
 		  this.set('uuids',uuids_sel);
 	  },
-       _chargedata(uuids,resolution,position){
+       _chargedata:function(uuids,resolution,position){
 		  this.app = document.querySelector('#app');
 		  this.params_get_historique.uuid=" in ("+uuids+")";
 		  this.set('loadingmessage','Chargement ('+resolution+')');
@@ -213,24 +213,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		  }
 		  if (resolution=='jour'){
 			  if (position<0) position=0;
-			  var position_back=position*-93-93;
-			  var position_last=position*-93+1;
+			  var position_back=position*-3-3;
+			  var position_last=position*-3+1;
 			  this.params_get_historique.action='listhistorique_jour';
-			  this.params_get_historique.timestamp=" between date('now','"+position_back+" day') and date('now','"+position_last+" day')";   
+			  this.params_get_historique.timestamp=" between date('now','start of month','"+position_back+" month') and date('now','start of month','"+position_last+" month')";
 		  }
 		  if (resolution=='mois'){
 			  if (position<0) position=0;
-			  var position_back=position*-730-730;
-			  var position_last=position*-730+1;
+			  var position_back=position*-24-24;
+			  var position_last=position*-24+1;
 			  this.params_get_historique.action='listhistorique_mois';
-			  this.params_get_historique.timestamp=" between date('now','"+position_back+" day') and date('now','"+position_last+" day')";   
+			  this.params_get_historique.timestamp=" between date('now','start of month','"+position_back+" month') and date('now','start of month','"+position_last+" month')";
 		  }
 		  if (resolution=='an'){
 			  if (position<0) position=0;
-			  var position_back=position*-1460-1460;
-			  var position_last=position*-1460+1;
+			  var position_back=position*-5-5;
+			  var position_last=position*-5+1;
 			  this.params_get_historique.action='listhistorique_an';
-			  this.params_get_historique.timestamp=" between date('now','"+position_back+" day') and date('now','"+position_last+" day')";   
+			  this.params_get_historique.timestamp=" between date('now','start of year','"+position_back+" year') and date('now','start of year','"+position_last+" year')";
 		  }
 	      this.charge_historique_url=this.app.url_api+':'+this.app.port_api+'/index'
 		  this.$.charge_historique.generateRequest();
@@ -359,14 +359,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			   }
 			}	 ,
 
-		  _toArray(obj){
+		  _toArray:function(obj){
 		    	  return this.app._toArray(obj);
 		      },
-		  _disconnect(obj){
+		  _disconnect:function(obj){
 		    	  this.app = document.querySelector('#app');
 		    	  return this.app.disconnect();
 		      },
-	      
+
   })
   </script>
 
