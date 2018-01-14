@@ -1,0 +1,157 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<!--
+<link rel="import" href="../element/my-periph_view_PLAYER.html">
+-->
+
+
+
+<dom-module id="my-headerdrawer">
+
+  <template>
+  		<style>
+
+			:host {
+				display: block;
+				--app-primary-color: #4285f4;
+				--app-secondary-color: black;
+				--title_background_color:rgba(50, 170, 25, 0.5);
+				--max_widthliste:90%;
+				--liste_maxheight:30vh;
+				--liste_overflow:auto;
+			}
+			my-sous_liste_behavior ul{
+				margin:0;
+			}
+			@media print {
+				app-header { display:none; }
+			}
+			paper-button {
+				display: block;
+				background: #4285f4;
+				color: #fff;
+			}
+			paper-menu {
+				display: block;
+			}
+			paper-menu-button {
+				margin: auto;
+			}
+			paper-badge {
+				right:10px;
+				top: 10px;
+
+			}
+			app-header {
+				background-color: var(--app-primary-color);
+				color: #fff;
+			}
+			app-header paper-icon-button {
+				--paper-icon-button-ink-color: white;
+			}
+			.drawer-list {
+				margin: 0 20px;
+			}
+
+			.drawer-list a {
+				display: block;
+				padding: 0 16px;
+				line-height: 40px;
+				text-decoration: none;
+				color: var(--app-secondary-color);
+			}
+			.drawer-list a.iron-selected {
+				color: black;
+				font-weight: bold;
+			}
+			.drawer-list a.subroute {
+				padding-left: 32px;
+			}
+
+
+  		</style>
+
+
+	  <app-toolbar>
+		  <paper-icon-button icon="menu" on-tap="_togglemenu"></paper-icon-button>
+		  <div main-title>[[menuresponse.titre_application.name]]</div>
+
+		  <div style="font-size:12px">[[user_auth]]</div>
+		  <paper-icon-button id="disconnect" on-tap="_disconnect" icon="icons:cancel" alt="disconnect" ></paper-icon-button>
+		  <div hidden$="{{!alertetoggle}}">
+			  <paper-icon-button  id="number" on-tap="_togglealerte" icon="social:notifications" alt="inbox" ></paper-icon-button>
+			  <paper-badge id="alertnotif"  for="number" label="[[alertes_nb]]"></paper-badge>
+		  </div>
+		  <div hidden$="{{alertetoggle}}">
+			  <paper-icon-button  id="number1" on-tap="_openalerte" icon="social:notifications" alt="inbox" ></paper-icon-button>
+			  <paper-badge id="alertnotif1"  for="number1" label="[[alertes_nb]]"></paper-badge>
+		  </div>
+	  </app-toolbar>
+
+		
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-headerdrawer',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+          subrouteData:{type:Object,notify:true},
+          lastupdatetime:{type: String,notify :true},
+          alertetoggle:{type:Boolean,notify:true}
+	  },
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+        	//this.importHref(this.resolveUrl('../element/my-periph_view_' + this.periph.ecriture_type + '.html'), null, null, true);	
+	        
+	      },
+	  _togglemenu:function(){
+	    //var t=  document.getElementsByClassName('menu');
+	    //var t=document.querySelector('app-drawer.menu');
+		  var nodelist=document.querySelectorAll('.menu');
+          for (i = 0; i < nodelist.length; ++i) {
+              nodelist[i].toggle();
+          }
+
+	  },
+      _togglealerte:function(){
+          //var t=  document.getElementsByClassName('menu');
+          //var t=document.querySelector('app-drawer.menu');
+          var nodelist=document.querySelectorAll('.alertedrawer');
+          for (i = 0; i < nodelist.length; ++i) {
+              nodelist[i].toggle();
+          }
+
+      },
+      _openalerte:function(){
+          //var t=  document.getElementsByClassName('menu');
+          //var t=document.querySelector('app-drawer.menu');
+          var nodelist=document.querySelectorAll('.alertedrawer');
+          for (i = 0; i < nodelist.length; ++i) {
+              nodelist[i].open();
+          }
+
+      },
+	  _toArray:function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+	  _disconnect:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+  })
+  </script>
+
+</dom-module>

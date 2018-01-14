@@ -1,0 +1,209 @@
+
+<!-- <link rel="import" href="/library/bower_components/iron-ajax/iron-request.html"> -->
+<link rel="import" href="../element/my-liste_periphselection.html">
+<link rel="import" href="/library/bower_components/paper-toggle-button/paper-toggle-button.html">
+<dom-module id="my-planview">
+
+  <template>
+
+    <style>
+      :host {
+		  		--plan-max-width: 100vw;		
+		  		--plan-max-height: 80vh;
+				text-align: center;				
+		      }
+    
+      .plan{		  
+      	max-width: 100%/*var(--plan-max-width);*/;
+        max-height: var(--plan-max-height);
+		<!-- si ratio paysage alors height:100vh ou si ratio portrait alors width:100%-->
+      }
+	  .add-button{
+		  position:fixed;
+          bottom:80px;
+          right:50px;
+		  /*float:right top;*/
+		  --paper-fab-background: #4285f4;
+		  --paper-fab-keyboard-focus-background:  #4285f4;
+	  }
+	  .toggle-button{
+		  position:fixed;
+		  bottom:50px;
+		  right:45px;
+		  /*float:right top;*/
+		  --paper-fab-background: #4285f4;
+		  --paper-fab-keyboard-focus-background:  #4285f4;
+	  }
+	  .regionscroll {
+		  max-height: var(--liste_maxheight);
+		  overflow: var(--liste_overflow);
+	  }
+
+    </style>
+        <div><img id="planimg" ondragover="allowDrop(event)" ondrop="drop(event)" class="plan" src="{{app.url_http}}:{{app.port_http}}/{{infoplan.icon}}"/></div>
+
+    <iron-ajax
+		id="charge_alltag"
+	    method="GET"
+	    url="{{charge_alltag_url}}"
+	    headers="{{app.header_auth}}"
+	    params="{{params_alltag}}"
+	    handle-as="json"
+	    on-error="_disconnect"
+	    last-response="{{tag_Response}}"
+	    debounce-duration="300">
+	</iron-ajax>
+	<template is="dom-repeat" items="[[tag_Response.tags]]">
+        <my-plan_tag_icon draggable="{{mode_creation}}" mode_creation="[[mode_creation]]" ondragstart="drag(event)" style="z-index:99999;" tag="{{item}}" plan_dim="{{plan_dim}}" lastupdatetime="{{lastupdatetime}}">[[item.nom]]</my-plan_tag_icon>
+	</template>
+
+	  <paper-fab class="add-button" hidden$="{{!mode_creation}}" mini icon="add" title="Créer" on-tap="addperiphonplan"></paper-fab>
+	  <paper-toggle-button class="toggle-button" active="{{mode_creation}}"></paper-toggle-button>
+      <my-liste_periphselection id="dialogperiphselection"  infoplan="{{infoplan}}" tag_liste="{{tag_Response.tags}}" tag_sel="{{tag_sel}}" periph_sel="{{periph_sel}}"></my-liste_periphselection>
+    
+  </template>
+  <script>
+	  var eledrag=null;
+	  var elepickpos=null;
+      function drag(ev,ui) {
+          ev.dataTransfer.setData("text", ev.target.id);
+          eledrag=ev.target;
+          elepickpos={X:ev.x,Y:ev.y};
+      };
+      function allowDrop(ev) {
+          ev.preventDefault();
+      };
+      function drop(ev,ui) {
+          ev.preventDefault();
+          //console.log(elepickpos.X,ev.offsetX,elepickpos.Y,ev.offsetY);
+          //eledrag.movepositiontag(ev.x-elepickpos.X,ev.y-elepickpos.Y);
+		  if (eledrag) {
+              eledrag.setpositiontag(ev.offsetX, ev.offsetY);
+              eledrag=null;
+          }
+          //var data = ev.dataTransfer.getData("text");
+          //ev.target.appendChild(document.getElementById(data));
+      };
+    Polymer({
+
+      is: 'my-planview',
+      behaviors: [
+                  Polymer.IronResizableBehavior
+                ],
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+          infoplan:{type:Object,notify:true},
+
+   		 params_alltag:{type: Object,
+	   	 	  notify : true,
+	   	 	  value: {action:'alltagplan',v:'indus.1.1.1'}},
+	   	 plan_dim:{type: Object,
+	   		  notify:true,
+	   		  value:{}},
+          plan_dim_icon:{type: Object,
+              notify:true,
+              value:{}},
+	   	 charge_alltag_url: {type:String, 
+	   		    notify : true,
+	   		  	value:null },
+		  infoplan:{type:String,notify:true},
+          tag_sel:{type:String,notify:true},
+		  mode_creation:{type:Boolean,notify:true,value:false},
+		  periph_sel:{type:String,notify:true}
+
+      },
+		observers:['_getalltagplan(infoplan)'],
+   	  ready: function() {
+ 	       this.app = document.querySelector('#app');
+
+      },
+
+      listeners: {
+          'iron-resize': '_onIronResize'
+          
+        },
+        addperiphonplan:function(){
+          this.$.dialogperiphselection.open();
+		},
+        refreshliste:function(){
+            this.charge_alltag_url=this.app.url_api+':'+this.app.port_api+'/index'
+            this.$.charge_alltag.generateRequest();
+		},
+		_getalltagplan:function(infoplan){
+            this.app = document.querySelector('#app');
+            this.set('plan',infoplan.icon);
+            this.set('plan_dim.image',infoplan.icon);
+            var img = this.$.planimg;
+            this.set('params_alltag.idplan',infoplan.id);
+            var self=this;
+            this.refreshliste();
+            img.onload = function(im){
+                self.set('plan_dim.imagesize',{width:im.currentTarget.naturalWidth,height:im.currentTarget.naturalHeight});
+                self._onIronResize(self);
+            }
+            img.onmousedown=function(e){
+                var ratioX=e.offsetX/self.plan_dim.rect.width;
+                var ratioY=e.offsetY/self.plan_dim.rect.height;
+                var pixelX=Math.round(self.plan_dim.imagesize.width*ratioX);
+                var pixelY=Math.round(self.plan_dim.imagesize.height*ratioY);
+                console.log(pixelX,pixelY,self.plan_dim.imagesize);
+			}
+        },
+      attached: function() {
+          this.async(this.notifyResize, 1);
+        },
+      get_parent: function() {
+        if (this.parentNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+          return this.parentNode.host;
+        }
+        return this.parentNode;
+      },
+	  _disconnect: function(obj){
+    	  this.app = document.querySelector('#app');
+    	  return this.app.disconnect();
+      },
+      _onIronResize: function(self){
+    	  //console.log("Image loaded: " + document.getElementById("planimg").complete);
+    	  var planimg = this.$$('#planimg');//document.querySelector('#planimg');
+  
+    	  var rect = planimg.getBoundingClientRect();
+		  
+    	  //var bassinSportif = document.querySelector('#bassinSportif');  
+    	  //var obj_bassinSportif = bassinSportif.getBoundingClientRect();
+		  //http://192.168.1.10:1389/images/plan_couleur.png
+		  //dimensions réelles du plan : 5332px 3285px
+		  //position sur plan taille reel : 2436px 393px
+		  
+		  
+		  var hauteur_fenetre=window.innerHeight-64;
+		  var hauteur_dispo_pourc=Math.round(100-rect.top/hauteur_fenetre*100);
+		  if (!self || !self.customStyle) self=this;
+		  if (self.customStyle) {
+			  self.customStyle['--plan-max-height']=hauteur_dispo_pourc+"vh";
+			  self.updateStyles();
+			  self.set('plan_dim.rect',rect);
+			  /*self.set('plan_dim_icon',self.plan_dim);*/
+			  //self.plan_dim.imagesize={width:5332,height:2436};
+			  /*var ratio = rect.width/5332;
+			  self.customStyle['--grandbassin-left']=(2436*ratio+rect.left)+"px";
+			  self.customStyle['--grandbassin-top']=(393*ratio+rect.top)+"px";*/
+			  
+			  
+		  }
+
+      }
+      
+    });
+
+    
+	
+		
+		//getJsonObject(affiche_circuit_personnel,'index.php?action=circuitpersonnel&v='+version);
+	//	getJsonObject(affiche_icon_emplacement,'index.php?action=listtagplan&v='+version);
+
+  </script>
+
+</dom-module>
+	   	 	  

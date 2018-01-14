@@ -392,36 +392,16 @@ module.exports =function(variables,res,user,req){
 			var result={};
 			result.tags=[];
 
-            var sql="Select 'plan_tag' type,pt.* from plan_tag pt where plan='"+variables.idplan+"' "+
-				"union Select 'plan_peripherique' type,pp.* from plan_peripherique pp where plan='"+variables.idplan+"'; ";
+            var sql="Select 'plan_peripherique' type,pp.* from plan_peripherique pp where plan='"+variables.idplan+"'; ";
             //var dataarray=[variables.idplan,variables.idplan];
             global.obj.app.db.sqlorder(sql,
                 function(rows){
                     if(rows && rows[0]){
                     	for (var t in rows){
-                    		if(rows[t].type=='plan_tag'){
-                                var pe=global.obj.app.core.findobj(rows[t].tag,'tags');
-                                var pemin={};
-                                pemin.id=rows[t].id;
-                                pemin.table=rows[t].type;
-                                pemin.nom=pe.nom;
-                                pemin.parent_tag=[];
-                                pemin.icon=pe.icon;
-                                pemin.periph_id=pe.id;
-                                pemin.tag_uuid=pe.id;
-                                pemin.uuid=pe.uuid;
-                                pemin.visible=pe.visible;
-                                pemin.position_x=rows[t].position_x;
-                                pemin.position_y=rows[t].position_y;
-                                pemin.icon_plan=rows[t].icon_plan;
-                                pemin.type=pe.type;
-                                pemin.typeprog=pe.typeprog;
-                                result.tags.push(pemin);
-							}
 							if(rows[t].type=='plan_peripherique'){
-                                var pe=global.obj.app.core.findobj(rows[t].tag,'peripheriques');
+                                var pe=global.obj.app.core.findobj(rows[t].peripherique,'peripheriques');
                                 if (!pe) {
-                                	pe=global.obj.app.core.findobj(rows[t].tag,'peripheriques_chauffage');
+                                	pe=global.obj.app.core.findobj(rows[t].peripherique,'peripheriques_chauffage');
 								}
                                 var pemin={};
                                 pemin.id=rows[t].id;
@@ -431,9 +411,10 @@ module.exports =function(variables,res,user,req){
                                 pemin.parent_tag=[];
                                 pemin.categorie=pe.categorie;
                                 pemin.uuid=pe.uuid;
+                                pemin.action=rows[t].action;
                                 pemin.ecriture_max_value=pe.ecriture_max_value;
                                 pemin.ecriture_min_value=pe.ecriture_min_value;
-
+                                pemin.ecriture_type=pe.ecriture_type;
                                 pemin.tag_uuid=pe.tag[0].id;
                                 pemin.visible=pe.visible;
                                 pemin.position_x=rows[t].position_x;

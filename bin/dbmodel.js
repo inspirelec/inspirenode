@@ -1233,21 +1233,6 @@ var database = {
                             {"name" : "Enregistrer", "type" : "button", "action" : "index?type=maj&action=save"}
                         ]
                     },
-                    {"name": "plan_tag","in_database":true,
-                        "colonnes": [
-                            {"name" : "id" , "type" : " integer primary key autoincrement","formulaire" : "label"},
-                            {"name" : "uuid" , "type" : "TEXT","formulaire" : "label"},
-                            {"name" : "position_x" , "type" : "TEXT","formulaire" : "input"},
-                            {"name" : "position_y" , "type" : "TEXT","formulaire" : "input"},
-                            {"name" : "icon_plan" , "type" : "TEXT","formulaire" : "input"},
-                            {"name" : "tag" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "tag"},
-                            {"name" : "plan" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "plan"}
-                        ],
-                        "actionsreturnlist" : [{"name" : "Supprimer", "type" : "button", "action" : "index?type=maj&action=delete"},
-                            {"name" : "Annuler", "type" : "button", "action" : "index?type=maj&action=keep"},
-                            {"name" : "Enregistrer", "type" : "button", "action" : "index?type=maj&action=save"}
-                        ]
-                    },
                     {"name": "plan_peripherique","in_database":true,
                         "colonnes": [
                             {"name" : "id" , "type" : " integer primary key autoincrement","formulaire" : "label"},
@@ -1255,8 +1240,14 @@ var database = {
                             {"name" : "position_x" , "type" : "TEXT","formulaire" : "input"},
                             {"name" : "position_y" , "type" : "TEXT","formulaire" : "input"},
                             {"name" : "icon_plan" , "type" : "TEXT","formulaire" : "input"},
+                            {"name" : "icon_plan" , "type" : "TEXT","formulaire" : "input"},
                             {"name" : "peripherique" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "peripherique"},
-                            {"name" : "plan" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "plan"}
+                            {"name" : "plan" , "type" : "TEXT","formulaire" : "select" , "linkobject" : "plan"},
+                            {"name" : "action" , "type" : "TEXT","formulaire" : "select","object" : [{"id":"nothing","nom":"Rien faire"},
+                                    {"id":"tag","nom":"Ouvrir la pièce"},
+                                    {"id":"famille","nom":"Famille sinon pièce"},
+                                    {"id":"switchonoff","nom":"Switch ON/OFF"}]
+                            },
                         ],
                         "actionsreturnlist" : [{"name" : "Supprimer", "type" : "button", "action" : "index?type=maj&action=delete"},
                             {"name" : "Annuler", "type" : "button", "action" : "index?type=maj&action=keep"},

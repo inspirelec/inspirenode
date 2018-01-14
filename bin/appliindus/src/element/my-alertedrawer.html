@@ -1,0 +1,258 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<!--
+<link rel="import" href="../element/my-periph_view_PLAYER.html">
+-->
+
+
+
+<dom-module id="my-alertedrawer">
+
+  <template>
+  		<style>
+
+			:host {
+				display: block;
+				--app-primary-color: #4285f4;
+				--app-secondary-color: black;
+				--title_background_color:rgba(50, 170, 25, 0.5);
+				--max_widthliste:90%;
+				--liste_maxheight:30vh;
+				--liste_overflow:auto;
+			}
+			my-sous_liste_behavior ul{
+				margin:0;
+			}
+			@media print {
+				app-header { display:none; }
+			}
+			paper-button {
+				display: block;
+				background: #4285f4;
+				color: #fff;
+			}
+			paper-menu {
+				display: block;
+			}
+			paper-menu-button {
+				margin: auto;
+			}
+			paper-badge {
+				right:10px;
+				top: 10px;
+
+			}
+			.acquiter{
+				background: #fff;
+				color: var(--app-primary-color);
+				padding:10px;
+			}
+			.acquiter iron-icon{
+				padding-left:10px;
+			}
+			.touscocher{
+				align-self: center;
+				padding: 8px 16px;
+				--paper-checkbox-label-spacing: 0;
+				--paper-checkbox-margin: 8px 16px 8px 0;
+				--paper-checkbox-vertical-align: top;
+				width:100%;
+				text-align:left;
+				padding:0px 16px;
+				color: var(--app-primary-color);
+				line-height:2em;
+			}
+			app-header {
+				background-color: var(--app-primary-color);
+				color: #fff;
+			}
+			app-header paper-icon-button {
+				--paper-icon-button-ink-color: white;
+			}
+			.drawer-list {
+				margin: 0 20px;
+			}
+
+			.drawer-list a {
+				display: block;
+				padding: 0 16px;
+				line-height: 40px;
+				text-decoration: none;
+				color: var(--app-secondary-color);
+			}
+			.drawer-list a.iron-selected {
+				color: black;
+				font-weight: bold;
+			}
+			.drawer-list a.subroute {
+				padding-left: 32px;
+			}
+
+			.centered {
+				margin:0 auto;
+			}
+			#alerte_etat_0 {
+				border: 1px solid var(--paper-green-200);
+				--paper-checkbox-checked-color: var(--paper-green-500);
+				--paper-checkbox-checked-ink-color: var(--paper-green-500);
+				--paper-checkbox-unchecked-color: var(--paper-green-900);
+				--paper-checkbox-unchecked-ink-color: var(--paper-green-900);
+				--paper-checkbox-label-color: var(--paper-green-500);
+			}
+			#alerte_etat_1 {
+				border: 1px solid var(--paper-red-200);
+				--paper-checkbox-checked-color: var(--paper-red-500);
+				--paper-checkbox-checked-ink-color: var(--paper-red-500);
+				--paper-checkbox-unchecked-color: var(--paper-red-900);
+				--paper-checkbox-unchecked-ink-color: var(--paper-red-900);
+				--paper-checkbox-label-color: var(--paper-red-500);
+			}
+			.item_alerte {
+				align-self: center;
+				padding: 8px 16px;
+				--paper-checkbox-label-spacing: 0;
+				--paper-checkbox-margin: 8px 16px 8px 0;
+				--paper-checkbox-vertical-align: top;
+				width:100%;
+				text-align:left;
+			}
+			.item_alerte .subtitle {
+				display: block;
+				font-size: 0.8em;
+				margin-top: 2px;
+				max-width: 150px;
+			}
+  		</style>
+
+
+		  <paper-spinner id="loader_alerte" active$="[[alerte_loader_show]]" style="float:left;margin:6px;z-index:100"></paper-spinner>
+		  <paper-button  class="acquiter" on-tap="_send_acquitement">Acquiter<iron-icon  icon="send"></iron-icon> </paper-button>
+		  <paper-checkbox on-change="alerte_tous_cocher" id="alerte_checkall" class="touscocher" >
+			  Tous cocher [[alertetypealwaysopen]] ([[alertes_nb]])
+		  </paper-checkbox>
+		  <div style="height:100%;overflow: auto;">
+			  <template is="dom-repeat" items="[[alertes]]">
+				  <template is="dom-if" if="{{_acquitement_color(item.etat,'1')}}">
+					  <paper-checkbox id="alerte_etat_1" uuid="[[item.uuid]]" class="item_alerte" checked$="{{item.checked}}">
+						  [[item.libelle]]
+						  <br>
+						  <span class="subtitle">
+					    [[item.commentaire]] [[item.date_alerte]]
+							  </br>
+							  Num : [[item.id]]
+					  </span>
+					  </paper-checkbox>
+				  </template>
+				  <template is="dom-if" if="{{_acquitement_color(item.etat,'0')}}">
+					  <paper-checkbox id="alerte_etat_0" uuid="[[item.uuid]]" class="item_alerte" checked$="{{item.checked}}">
+						  [[item.libelle]]
+						  <br>
+						  <span class="subtitle">
+					    [[item.commentaire]] [[item.date_alerte]]
+							  </br>
+							  Num : [[item.id]]
+					  </span>
+					  </paper-checkbox>
+				  </template>
+			  </template>
+			  <div style="height:80px;width:100%"></div>
+		  </div>
+
+
+
+	  <my-periph_alerte_refresh alerte_loader_show="{{alerte_loader_show}}"
+								alertes_nb="{{alertes_nb}}"
+								alertes="{{alertes}}"
+								header_auth="{{header_auth}}"></my-periph_alerte_refresh>
+
+	  <iron-ajax
+			  id="send_acquitement"
+			  method="GET"
+			  headers="{{header_auth}}"
+			  params={{params_acquitement}}
+			  handle-as="json"
+			  on-response="_acquitement_Reponse"
+			  on-error="disconnect"
+			  debounce-duration="300">
+	  </iron-ajax>
+		
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-alertedrawer',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+          params_acquitement:{type: Object,
+              notify : true,
+              value: {action:'setacquitementalerte',v:'indus.1.1.1'}},
+          alertes:{type: Array,notify:true},
+          alertes_nb:{type: Number,notify:true},
+          alerte_loader_show:{type: Boolean,notify:true}
+	  },
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+        	//this.importHref(this.resolveUrl('../element/my-periph_view_' + this.periph.ecriture_type + '.html'), null, null, true);	
+	        
+	      },
+      _acquitement_Reponse: function(){
+          //console.log('update style acquitements');
+          this.updateStyles();
+          this.set('alerte_loader_show',false);
+      },
+      _acquitement_color: function(etat,test){
+          return etat==test;
+      },
+      alerte_tous_cocher:function(a,b,c){
+          var list= document.querySelectorAll('.item_alerte');
+          for (var c in list){
+              list[c].checked=a.currentTarget.checked;
+          }
+      },
+      _send_acquitement: function(){
+          this.set('alerte_loader_show',true);
+          var list= document.querySelectorAll('.item_alerte');
+          var rep=[];
+          for (var c in list){
+
+              if (list[c].checked){
+                  //console.log('acquitement '+list[c].uuid);
+                  rep.push(list[c].uuid);
+              } else {
+                  // console.log('non acquité '+list[c].uuid);
+              }
+          }
+          if (rep.length>0){
+              this.params_acquitement.data=rep;
+              this.$.send_acquitement.url=this.app.url_api+':'+this.app.port_api+'/index'
+              this.$.send_acquitement.generateRequest();
+          }
+
+          //console.log('fin');
+      },
+	  _toArray:function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+	  _disconnect:function(obj){
+	    	  this.app = document.querySelector('#app');
+          		this.set('alertes',[]);
+          		this.$.alertnotif.label=0;
+	    	  return this.app.disconnect();
+	      },
+
+  })
+  </script>
+
+</dom-module>

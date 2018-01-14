@@ -58,7 +58,7 @@ var Request_action = function(req,res,app,user) {
 					break;
 				case 'indus':
 					//console.log('appli Camp');
-					this.traiteaction=global.req.request_action_appli_indus;
+					this.traiteaction=global.req.request_action_appli;
 					break;
 				case 'acces':
 					//console.log('appli Camp');
@@ -66,11 +66,11 @@ var Request_action = function(req,res,app,user) {
 					break;
 				case 'piscine':
 					//console.log('appli Home');
-					this.traiteaction=global.req.request_action_applipiscine;
+					this.traiteaction=global.req.request_action_appli;
 					break;
 				case 'voyage':
 					//console.log('appli Home');
-					this.traiteaction=global.req.request_action_appliairevoyage;
+					this.traiteaction=global.req.request_action_appli;
 					break;
 					
 				default:

@@ -1,10 +1,10 @@
 {
-  "appli_folder":"appliairevoyage",
-  "appli_link_adr_web":"appliairevoyage",
+  "appli_folder":"appliindus",
+  "appli_link_adr_web":"flotile",
   "automationfolderspe":"/../data/automation_airevoyage/",
   "reqarrayspe":[
     {"name":"request_action_appliphp',","require":"./serveur_api/request_action_appliphp"},
-    {"name":"request_action_appliairevoyage","require":"./serveur_api/request_action_appli"},
+    {"name":"request_action_appli","require":"./serveur_api/request_action_appli"},
     {"name":"dbmodel","require":"./dbmodel.js"}
   ],
    "menus_appli": { "menubutton": {
@@ -18,9 +18,10 @@
                               "visible": true,
                               "href": "tagListPage"
                           },
+                          "calendarbutton": {"name":"Calendrier","visible":true,"href":"calendarpage"},
                           "famillebutton": {
                               "name": "Familles",
-                              "visible": true,
+                              "visible": false,
                               "href": "famillepage/-1"
                           },
                           "facturebutton": {

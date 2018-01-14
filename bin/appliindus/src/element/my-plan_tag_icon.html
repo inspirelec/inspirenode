@@ -7,6 +7,18 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
+<link rel="import" href="/library/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/library/bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="/library/bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="/library/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/library/bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="/library/bower_components/iron-icons/social-icons.html">
+
+<link rel="import" href="../element/my-periph_view_BINAIRE.html">
+<link rel="import" href="../element/my-periph_view_BINVAR.html">
+<link rel="import" href="../element/my-periph_view_VOLETR.html">
+<link rel="import" href="../element/my-periph_view_VARIABLE.html">
+<link rel="import" href="../element/my-periph_view_VOLETRVARIABLE.html">
 
 <dom-module id="my-plan_tag_icon">
 
@@ -16,7 +28,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   		  	    --position-top: 100px;
 		  		--position-left: 100px;
 		      }     
-		      .tag_icon{
+			  div.tag_icon{
+				  position : absolute;
+				  top: var(--position-top);
+				  left: var(--position-left);
+			  }
+			  paper-button.tag_icon{
 		      	position : absolute;
 		      	top: var(--position-top);
 		      	left: var(--position-left);
@@ -27,7 +44,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		      	margin:0px;
 		      	min-width:1em;
 		      }
+			  paper-icon-button.small {
+				  position:relative;
+				  right:15px;
+				  top:-25px;
+				  width: 30px;
+				  height: 30px;
+				  padding-top: 0px;
+				  padding-bottom: 0px;
+			  }
   		</style>
+        <div  class="tag_icon" hidden$="[[!mode_creation]]">
+			<paper-icon-button   class="small" id="delbutton" on-tap="deletethis" icon="remove-circle-outline" alt="remove" title="remove">
+			</paper-icon-button>
+			<paper-icon-button   class="small" style="right:25px;" id="settingbutton" on-tap="paramthis" icon="settings" alt="parametres" title="parametres">
+			</paper-icon-button>
+		</div>
   		<paper-button  id="tag_icon" class="tag_icon" on-tap="get_tag_periph" tag_uuid="{{tag.tag_uuid}}" uuid="{{tag.uuid}}">
 	  		<iron-icon icon="{{tag.icon_plan}}" src="{{app.url_http}}:{{app.port_http}}/[[etat_icon]]"></iron-icon>
 	  		{{etat.expr1}}<br/>
@@ -36,7 +68,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  		<paper-tooltip>{{tag.nom}}</paper-tooltip>
   		</paper-button>
 
-
+<div hidden>
+	<template is="dom-if" if="{{show(tag.ecriture_type,'BINAIRE')}}">
+		<my-periph_view_BINAIRE  id="cmd" periph="[[tag]]" ecriture_type="BINAIRE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_BINAIRE>
+	</template>
+	<template is="dom-if" if="{{show(tag.ecriture_type,'BINVAR')}}">
+		<my-periph_view_BINVAR  id="cmd" periph="[[tag]]" ecriture_type="BINVAR" lastupdatetime="{{lastupdatetime}}"></my-periph_view_BINVAR>
+	</template>
+	<template is="dom-if" if="{{show(tag.ecriture_type,'VARIABLE')}}">
+		<my-periph_view_BINVAR  id="cmd" periph="[[tag]]" ecriture_type="VARIABLE" lastupdatetime="{{lastupdatetime}}"></my-periph_view_BINVAR>
+	</template>
+</div>
+	  <iron-ajax
+			  id="charge_alltagfamille"
+			  method="GET"
+			  url="{{charge_alltagfamille_url}}"
+			  headers="{{app.header_auth}}"
+			  params="{{params_alltagfamille}}"
+			  handle-as="json"
+			  on-error="_disconnect"
+			  last-response="{{tagfamille_Response}}"
+			  on-response="getpagetagfamille"
+			  debounce-duration="300">
+	  </iron-ajax>
 	  <iron-ajax
 			  id="save"
 			  method="POST"
@@ -50,6 +104,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			  last-response="{{save_Response}}"
 			  debounce-duration="300">
 	  </iron-ajax>
+	  <iron-ajax
+			  id="delete"
+			  method="POST"
+			  headers="{{app.header_auth}}"
+			  body="{{params_delete.body}}"
+			  params="{{params_delete.params}}"
+			  content-type="application/json"
+			  handle-as="json"
+			  on-error="_disconnect"
+			  on-response="delete_validate"
+			  last-response="{{delete_Response}}"
+			  debounce-duration="300">
+	  </iron-ajax>
+	  <paper-dialog id="delete_dialog">
+		  <h2>Suppression</h2>
+		  <p>Voulez vous supprimer cette ligne</p>
+		  <div class="buttons">
+			  <paper-button dialog-dismiss>Annuler</paper-button>
+			  <paper-button dialog-confirm autofocus on-tap="_send_delete">Supprimer</paper-button>
+		  </div>
+	  </paper-dialog>
+	  <paper-dialog id="actions_dialog">
+		  <h2>Action</h2>
+		  <paper-radio-group selected="{{action_sel}}" >
+			  <paper-radio-button name="nothing">Rien faire</paper-radio-button>
+			  <paper-radio-button name="tag">Ouvrir la pièce</paper-radio-button>
+			  <paper-radio-button hidden$="{{paramfamilleishidden}}"name="famille">Famille sinon pièce</paper-radio-button>
+			  <paper-radio-button hidden$="{{paramswitchonoffishidden}}" name="switchonoff">Switch ON/OFF</paper-radio-button>
+		  </paper-radio-group>
+		  <div class="buttons">
+			  <paper-button dialog-dismiss>Annuler</paper-button>
+			  <paper-button dialog-confirm autofocus on-tap="_send_actionsave">Valider</paper-button>
+		  </div>
+	  </paper-dialog>
   </template>
   <script>
 
@@ -73,17 +161,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	     taguuid:{type:String,
 	    	 notify :true,
 	    	 value:null},
+          paramfamilleishidden:{
+	        type:Boolean,notify:true,computed:'_paramfamilleishidden(tag)'
+		  },
+          paramswitchonoffishidden:{
+              type:Boolean,notify:true,computed:'_paramswitchonoffishidden(tag)'
+          },
 	     plan_dim:{type:Object,
 	    	 notify:true
 	    },
+          action_sel:{type:String,notify:true},
+          params_alltagfamille:{type: Object,
+              notify : true,
+              value: {type:'get',action:'listtagfamille',uuid:''}},
+
           params_save:{type: Object,
               notify : true,
-              value: {body:{},params:{action:'save',type:'maj',element:''/*v:'voyage.1.1.1'*/}}
+              value: {body:{},params:{action:'save',type:'maj',element:'plan_peripherique'/*v:'voyage.1.1.1'*/}}
           },
+          params_delete:{type: Object,
+              notify : true,
+              value: {body:{},params:{action:'delete',type:'maj',element:'plan_peripherique'/*v:'voyage.1.1.1'*/}}
 	  },
-      observers: [
-                  '_update_positions(plan_dim,plan_dim.rect,plan_dim.imagesize,tag.position_x,tag.position_y)'
-                ],
+	  },
+
+      observers:['_update_positions(plan_dim,plan_dim.rect,plan_dim.imagesize,tag.position_x,tag.position_y)'],
 
 	  ready: function() {
 	        this.app = document.querySelector('#app');
@@ -97,17 +199,71 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			  this.customStyle['--position-left']=(this.tag.position_x*ratio+plan_dim.rect.left)+"px";
 			  this.customStyle['--position-top']=( this.tag.position_y*ratio+plan_dim.rect.top)+"px";
 			  this.updateStyles();
-	 
 		  }
 
+	  },
+      _paramswitchonoffishidden:function(tag){
+          this.app = document.querySelector('#app');
+		  if (tag.ecriture_type=='BINAIRE' || tag.ecriture_type=='BINVAR' || tag.ecriture_type=='VARIABLE'){
+		      return false;
+		  }
+          return true;
+      },
+      _paramfamilleishidden:function(tag){
+          this.app = document.querySelector('#app');
+          for (var m in this.app.menuresponse.menubutton){
+              if (m=='famillebutton'){
+                  return false;
+			  }
+		  }
+		  return true;
+	  },
+      paramthis:function (event) {
+          this.$.actions_dialog.open();
+      },
+      _send_actionsave:function (event) {
+          this.set('tag.action',this.action_sel);
+          this.send_savethis();
+      },
+      deletethis:function (event) {
+          this.$.delete_dialog.open();
+      },
+      _send_delete:function (event) {
+          /*if (this.on_delete_fire && this.objet && this.objet.id>=0) {
+              this.fire('delete');
+          }else {*/
+              this._send_delete2(event);
+          /*}*/
+
+      },
+
+      _send_delete2:function (event){
+          //this.set('show_loading',1);
+          this.set('params_delete.body',{data:this.tag});
+          this.$.delete.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.delete.generateRequest();
+      },
+      delete_validate:function(e,r,t){
+          //this.set('show_loading',0);
+          this.parentNode.refreshliste();
+
+      },
+      save_validate: function(a,b,c){
+	      if (this.save_Response.element){
+	          this.set('tag.id',this.save_Response.element.id);
+              this.set('tag.uuid',this.save_Response.element.uuid);
+		  }
+
+	  },
+	  send_savethis:function(){
+          this.set('params_save.body',{data:this.tag});
+          this.$.save.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+          this.$.save.generateRequest();
 	  },
 	  setpositiontag:function(X,Y){
 	    this.set('tag.position_x',X);
 	    this.set('tag.position_y',Y);
-	    this.set('params_save.params.element',this.tag.table);
-          this.set('params_save.body',{data:this.tag});
-          this.$.save.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
-          this.$.save.generateRequest();
+          this.send_savethis();
 	  },
       movepositiontag:function(X,Y){
           this.set('tag.position_x',this.tag.position_x*1+X);
@@ -136,9 +292,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     		 return null;
 	      },
 	  get_tag_periph: function(e,a){
-	    	  this.taguuid=e.currentTarget.tag_uuid;
-	    	  this.app.$.location.path="/"+this.app.url_folder+"/periphListPage/"+this.taguuid;
-	    	  
+          this.taguuid=e.currentTarget.tag_uuid;
+
+	      if (this.tag.action=='tag'){
+              this.app.$.location.path="/"+this.app.url_folder+"/periphListPage/"+this.taguuid;
+		  } else if (this.tag.action=='famille') {
+              this.set('params_alltagfamille.uuid',this.taguuid);
+              this.$.charge_alltagfamille.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
+              this.$.charge_alltagfamille.generateRequest();
+		  } else if (this.tag.action=='switchonoff') {
+	          var cmd=this.querySelector('#cmd');
+			  cmd.change_etat();
+	      } else {
+
+		  }
+
+	  },
+	  getpagetagfamille:function(){
+		  if (this.tagfamille_Response && this.tagfamille_Response.length>0){
+			  this.app.$.location.path="/"+this.app.url_folder+"/famillepage/"+this.tagfamille_Response[0].titulaire_id;
+		  } else {
+			  this.app.$.location.path="/"+this.app.url_folder+"/periphListPage/"+this.taguuid;
+		  }
+
 	      },
 	  _disconnect: function(obj){
 	    	  this.app = document.querySelector('#app');
@@ -146,7 +322,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	      },
 	  _toArray: function(obj){
 	    	  return this.app._toArray(obj);
-	      }
+	      },
+      show: function (periph_ecriture_type,ecriture_type) {
+          //console.log('OK',periph.nom,periph.uuid,ecriture_type,periph.ecriture_type,periph.ecriture_type==ecriture_type);
+
+          return periph_ecriture_type==ecriture_type;
+      }
   })
   </script>
 

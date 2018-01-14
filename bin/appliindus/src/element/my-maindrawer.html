@@ -1,0 +1,129 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+
+<!--
+<link rel="import" href="../element/my-periph_view_PLAYER.html">
+-->
+
+
+
+<dom-module id="my-maindrawer">
+
+  <template>
+  		<style>
+
+			:host {
+				display: block;
+				--app-primary-color: #4285f4;
+				--app-secondary-color: black;
+				--title_background_color:rgba(50, 170, 25, 0.5);
+				--max_widthliste:90%;
+				--liste_maxheight:30vh;
+				--liste_overflow:auto;
+			}
+			my-sous_liste_behavior ul{
+				margin:0;
+			}
+			@media print {
+				app-header { display:none; }
+			}
+			paper-button {
+				display: block;
+				background: #4285f4;
+				color: #fff;
+			}
+			paper-menu {
+				display: block;
+			}
+			paper-menu-button {
+				margin: auto;
+			}
+			paper-badge {
+				right:10px;
+				top: 10px;
+
+			}
+			app-header {
+				background-color: var(--app-primary-color);
+				color: #fff;
+			}
+			app-header paper-icon-button {
+				--paper-icon-button-ink-color: white;
+			}
+			.drawer-list {
+				margin: 0 20px;
+			}
+
+			.drawer-list a {
+				display: block;
+				padding: 0 16px;
+				line-height: 40px;
+				text-decoration: none;
+				color: var(--app-secondary-color);
+			}
+			.drawer-list a.iron-selected {
+				color: black;
+				font-weight: bold;
+			}
+			.drawer-list a.subroute {
+				padding-left: 32px;
+			}
+
+
+  		</style>
+
+	  <iron-pages role="main" selected="[[subrouteData.page]]" attr-for-selected="name">
+		  <!--<my-acceuilPage name="acceuilPage" lastupdatetime="{{lastupdatetime}}"></my-acceuilPage>-->
+		  <my-tagListPage name="tagListPage"></my-tagListPage>
+		  <my-progmodepage name="progmodepage" ></my-progmodepage>
+		  <my-famillepage name="famillepage" ></my-famillepage>
+		  <my-facturepage name="facturepage" ></my-facturepage>
+		  <my-recupage name="recupage" ></my-recupage>
+		  <my-parametrepage params="[[menuresponse.parametres_liste]]" name="parametrepage" ></my-parametrepage>
+		  <my-prog_modes name="prog_modes" ></my-prog_modes>
+		  <my-prog_graphiques name="prog_graphiques" ></my-prog_graphiques>
+		  <my-docPrint name="docPrint" ></my-docPrint>
+		  <my-planpage name="planpage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-planpage>
+		  <my-periphListPage name="periphListPage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-periphListPage>
+		  <my-calendarpage name="calendarpage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-calendarpage>
+		  <!-- <my-testPage name="testPage" lastupdatetime="{{lastupdatetime}}" header_auth="{{header_auth}}"></my-testPage>-->
+	  </iron-pages>
+
+		
+  </template>
+  <script>
+  Polymer({
+
+	  is: 'my-maindrawer',
+	  
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+          subrouteData:{type:Object,notify:true},
+          lastupdatetime:{type: String,notify :true}
+	  },
+	  ready: function() {
+	        this.app = document.querySelector('#app');
+        	//this.importHref(this.resolveUrl('../element/my-periph_view_' + this.periph.ecriture_type + '.html'), null, null, true);	
+	        
+	      },
+	  _toArray:function(obj){
+	    	  return this.app._toArray(obj);
+	      },
+	  _disconnect:function(obj){
+	    	  this.app = document.querySelector('#app');
+	    	  return this.app.disconnect();
+	      },
+  })
+  </script>
+
+</dom-module>

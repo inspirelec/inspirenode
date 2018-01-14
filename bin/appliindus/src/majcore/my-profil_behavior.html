@@ -189,6 +189,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	     params_delete:{type: Object,
 	   	 	  notify : true
 	        },
+		  savfireeventonly:{
+	         type:Boolean,
+			  notify:true,
+			  value:false
+		  },
 	     objet:{type: Object,
 	    	 notify : true
 	     },
@@ -408,7 +413,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		  if ( this.parent && this.parent.id){
 			  this.set('objet.titulaire_id',this.parent.id);
 		  }
-		  this.set('params_save.body',{data:this.objet});
+          if (this.savfireeventonly==false){
+			   this.sendsaveobj(this.objet);
+		  }
+		  this.fire('save_requested',this.objet);
+
+      },
+      sendsaveobj:function(obj){
+          this.set('show_loading',1);
+          this.set('params_save.body',{data:obj});
 		  this.$.save.url=this.app.url_api+':'+this.app.port_api+'/index';//?action=setprogrammation&v=piscine.1.1.1';
           this.$.save.generateRequest();
 

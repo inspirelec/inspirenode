@@ -1,0 +1,202 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="/library/bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="/library/bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="/library/bower_components/fullcalendar-calendar/fullcalendar-theme.html">
+<link rel="import" href="/library/bower_components/fullcalendar-calendar/fullcalendar-calendar.html">
+
+<!-- <link rel="import" href="/library/bower_components/iron-ajax/iron-request.html"> -->
+<dom-module id="my-calendarpage">
+
+  <template>
+
+    <style>
+      .actions { display: flex; justify-content: space-between; align-items: center; }
+      #calendar {
+        --fullcalendar: {
+          background: #7c7c7c;
+        }
+
+        --fullcalendar-borders: {
+          border-color: #0a3142;
+        }
+
+        --fullcalendar-day-numbers: {
+          color: #0d47a1;
+        }
+
+        --fullcalendar-day-headers: {
+          color: #0d47a1;
+          font-weight: 500;
+        }
+
+        --fullcalendar-today: {
+          background: palevioletred;
+        }
+
+        --fullcalendar-event: {
+          background-color: magenta;
+          border-color: magenta;
+        }
+      }
+    </style>
+    <div style="display:flex">
+      <div style="margin-left:20px;">
+        <label id="label_salles" for="Salle" style="width:50px">Salle : </label>
+        <select name="Salle" id="Salle" >
+        </select>
+      </div>
+      <div id='type_resa' class="boxs_left" style="margin-left:20px">
+        <select name="resa_type" id="resa_type" >
+          <option value="resa_horaire">Forfait Heure</option>
+          <option value="resa_hebdo">Forfait Semaine</option>
+          <option value="resa_mensuelle">Forfait Mois</option>
+        </select>
+      </div>
+    <div class='topuser' style="margin-left:20px;" >
+      <input class='user' name="usersel" id="usersel" style="background-color:white" placeholder="Selection client">
+    </div>
+      <div id='panier-events' class="boxs_left" style="margin-left:20px">
+        <p><b><u>Panier</u></b></p>
+        <div id='panier-info'></div>
+
+        <div id='payer_panier' style="margin-left:20px" >
+          <button id="payer" type="submit" onclick="getpaiement();return false;">Valider</a>
+        </div>
+
+      </div>
+      <div id='infos' class="boxs_left" style="margin-left:20px">
+        <p><b><u>Informations</u></b></p>
+        <div id='infosuser'></div>
+        <div id='payer_panier' >
+          <button id="creeruser" class="adminprofil" type="submit" style="display:none" onclick="creationcompteuseradmin();return false;">Créer un profil</a>
+        </div>
+      </div>
+    </div>
+      <fullcalendar-calendar id="calendar"
+                             options="[[optionscalendar]]"
+                             on-event-after-render="handleeventAfterRender"
+                             on-event-render="handleeventAfterRender"
+      ></fullcalendar-calendar>
+
+  </template>
+  <script>
+
+    Polymer({
+
+      is: 'my-calendarpage',
+      behaviors: [
+                  Polymer.IronResizableBehavior
+                ],
+	  properties: {  
+	     app: {
+	          type: Object
+	        },
+          optionscalendar:{type:Object,notify:true,value:{
+
+                  header: {
+                      left: 'prev,next today',
+                      center: 'title',
+                      right: 'agendaWeek,agendatwoDay,agendaDay'
+                  },
+                  defaultDate: new Date(),//'2016-03-17',
+                  minTime :'07:00:00',
+                  maxTime :'20:00:00',
+                  selectable: true,
+                  height: 'auto',
+                  selectHelper: true,
+                  //selectConstraint : 'availableForMeeting',
+                  defaultView: 'agendaWeek',
+                  //defaultView: 'timelineYear',
+
+                  lang: 'fr',//$.i18n().locale,//currentLangCode,
+                  buttonIcons: false, // show the prev/next text
+                  weekNumbers: true,
+                  editable: true,
+                  views: {
+                      agendatwoDay: {
+                          type: 'agenda',
+                          duration: { days: 2 },
+                          buttonText: '2 Jours'
+                      }
+                  },
+
+                  eventSources: [
+                      {
+                          url: /*serviceURL+*/'/index.php?action=businessHoursplanning&v='/*+version*/,
+
+                      },
+                      {
+                          url: /*serviceURL+*/'/index.php?action=eventplanning&v='/*+version*/,
+
+                      },
+                      {
+                          url: /*serviceURL+*/'/index.php?action=avaibleplanning&v='/*+version*/,
+
+                      }
+                  ]
+
+              }}
+      },
+        handleeventAfterRender:function(event, args,view) {
+            this.ajoutInfo(args.event, args.element);
+            this.ajoutDeleteButton(args.event, args.element);
+            //$(element).draggable();
+            /*$(element).addTouch();*/
+
+        },
+        ajoutInfo:function(event,element,view){
+            if (event.rendering!='background' && event.uuid && (event.nom || event.prenom)) {
+                var html='<div style="color:beige;font-weight:normal">'+event.nom+' '+event.prenom+'</div>';
+                element.append(html);
+            }
+            if (event.rendering!='background'  && event.etat) {
+                var etats={COMMANDE:'En commande',PAIEMENT:'Att. valid. paiement',ACTIF:'Actif',CLOS:'Clos'};
+                var html='<div style="color:beige;font-weight:normal">'+etats[event.etat]+'</div>';
+                element.append(html);
+            }
+            if (event.rendering=='background'  && event.title) {
+
+                var html='<div style="color:white;font-weight:bold">'+event.title+'</div>';
+                element.append(html);
+            }
+        },
+        ajoutDeleteButton:function (event,element){
+        //if (event.rendering!='background' && event.uuid && (event.editable || event.deletable)) {
+            var html='<div class="ui_persoeventbutton">'+
+                '<a href="#" '+
+                'onclick="deleteEvent(\''+event._id+'\');return false;"'+
+                'style="background-color:transparent" class="ui_persoeventbut_href ui_btniconseul ui-btn-left ui-btn ui-btn-icon-left ui-icon-delete ui-btn-icon-notext" >'+
+                'Button</a></div>';
+            element.append(html);
+       // }
+      },
+
+
+
+        ready: function() {
+            this.app = document.querySelector('#app');
+
+        },
+        _toArray:function(obj){
+            return this.app._toArray(obj);
+        },
+        _disconnect:function(obj){
+            this.app = document.querySelector('#app');
+            return this.app.disconnect();
+        },
+      
+    });
+
+  </script>
+
+</dom-module>
+	   	 	  
