@@ -3,7 +3,7 @@
   "appli_link_adr_web":"flotile",
   "automationfolderspe":"/../data/automation_airevoyage/",
   "reqarrayspe":[
-    {"name":"request_action_appliphp',","require":"./serveur_api/request_action_appliphp"},
+    {"name":"request_action_appliphp","require":"./serveur_api/request_action_appliphp"},
     {"name":"request_action_appli","require":"./serveur_api/request_action_appli"},
     {"name":"dbmodel","require":"./dbmodel.js"}
   ],
