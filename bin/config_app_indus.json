@@ -7,6 +7,7 @@
 		{"name":"request_action_appli","require":"./serveur_api/request_action_appli"},
 		{"name":"dbmodel","require":"./dbmodel.js"}
 	],
+	
 	"menus_appli":{"menubutton": { "accueilbutton": {"name":"Plan","visible":true,"href":"planpage"},
 							"calendarbutton": {"name":"Calendrier","visible":true,"href":"calendarpage"},
 							"tagbutton": {"name":"Pieces","visible":true,"href":"tagListPage"},

@@ -7,6 +7,7 @@
     {"name":"request_action_appli","require":"./serveur_api/request_action_appli"},
     {"name":"dbmodel","require":"./dbmodel.js"}
   ],
+  
    "menus_appli": { "menubutton": {
                           "accueilbutton": {
                               "name": "Plan",
